@@ -61,3 +61,8 @@ auth/API routes and the native Clerk, Stream and analytics packages. Demo
 screens replace the root and account controls, while the local lesson screens
 are shared with the main app. Its small UI substitutions fail loudly if the
 source no longer matches.
+
+For a version-1-to-current upgrade check on a running Android emulator, provide
+both test-signed APKs to `python3 scripts/smoke-android-upgrade.py old.apk new.apk`.
+The script clears the demo's existing data, completes a lesson in the old build,
+installs the new build in place and checks saved progress, replay and relaunch.

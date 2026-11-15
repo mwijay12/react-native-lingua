@@ -155,11 +155,14 @@ And pick whichever template fits your workflow.
 Since this repository is already created, install dependencies and start the development server:
 
 ```bash
-npm install
+npm ci --legacy-peer-deps --ignore-scripts --no-audit --no-fund
+npm run lint && npm run typecheck && npm test
 npx expo start
 ```
 
-`npx expo start` means "download (if needed) and execute Expo locally." It starts Metro Bundler, which compiles and serves your React Native code.
+The main source requires a configured Clerk publishable key; the separate
+[Android demo](demo/android/README.md) intentionally does not. `npx expo start`
+starts Metro Bundler, which compiles and serves your React Native code.
 
 Once it starts, you'll see a QR code and shortcut keys in the terminal. For example:
 
@@ -179,7 +182,7 @@ Open Google Play Store or Apple App Store, install **Expo Go**, then come back h
 
 Now open Expo Go and scan the QR code from the terminal. The app should compile and launch.
 
-If all is good, you'll see the starter app with two tabs: Home and Explore.
+With the main app's required environment configured, the project opens in Expo. The standalone demo uses local onboarding and does not require an account.
 
 **Set Up Environment Variables**
 
