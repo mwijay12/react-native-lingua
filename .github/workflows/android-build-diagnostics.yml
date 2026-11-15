@@ -1,0 +1,41 @@
+name: Collect Android build diagnostics
+
+# Temporary branch-scoped capture of the failed build log.
+on:
+  push:
+    branches: ["arena/6801c5e3-react-native-lingua"]
+    paths: [".github/workflows/android-build-diagnostics.yml"]
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  diagnostics:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stage the build log
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run view 43777410912 --repo "$GITHUB_REPOSITORY" --job 133006738569 --log > build.log
+          python3 - <<'PY'
+          import base64, hashlib, json, os, subprocess
+          from pathlib import Path
+
+          data = Path('build.log').read_bytes()
+          payload = json.dumps({'content': base64.b64encode(data).decode('ascii'), 'encoding': 'base64'}).encode()
+          sha = subprocess.run(
+              ['gh', 'api', '--method', 'POST', f"repos/{os.environ['GITHUB_REPOSITORY']}/git/blobs", '--input', '-', '--jq', '.sha'],
+              input=payload, stdout=subprocess.PIPE, check=True,
+          ).stdout.decode().strip()
+          assert sha == hashlib.sha1(f'blob {len(data)}\0'.encode() + data).hexdigest()
+          Path('.arena-build-debug.json').write_text(json.dumps({'sha': sha, 'size': len(data)}, indent=2) + '\n')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .arena-build-debug.json
+          git commit -m 'Stage temporary Android build diagnostics'
+          git push origin HEAD:arena/6801c5e3-react-native-lingua
