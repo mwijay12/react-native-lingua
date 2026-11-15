@@ -1,3 +1,4 @@
+import { MotionSticker } from "@/components/MotionSticker";
 import { isAvailableLanguage, LANGUAGES } from "@/data/languages";
 import { posthog } from "@/lib/posthog";
 import { useLanguageStore } from "@/store/languageStore";
@@ -51,77 +52,84 @@ export default function LanguageSelectScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FBF8F1" }}>
-      <View className="flex-row items-center px-4 py-3">
-        <TouchableOpacity
-          onPress={() => router.canGoBack() ? router.back() : router.replace("/onboarding")}
-          className="w-10 h-10 items-center justify-center"
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-        >
-          <Ionicons name="chevron-back" size={24} color="#183B37" />
-        </TouchableOpacity>
-        <Text className="flex-1 text-center font-poppins-semibold text-lg text-text-primary">Choose a language</Text>
-        <View className="w-10" />
-      </View>
-
-      <View className="px-5 mb-3">
-        <Text className="font-poppins-semibold text-[10px] tracking-[1.2px] text-lingua-teal mb-2">YOUR COURSE, YOUR PACE</Text>
-        <Text className="body-sm text-text-secondary mb-3">Pick a course. Menus and instructions are in English.</Text>
-        {hasOldSelection && (
-          <Text className="body-sm text-text-secondary mb-3" testID="legacy-language-message">
-            Your previous course is not available in this version. Choose a course to continue; your saved lesson history stays on this device.
-          </Text>
-        )}
-        <View className="flex-row items-center bg-white border border-border rounded-2xl px-4 py-3">
-          <Ionicons name="search-outline" size={18} color="#80918A" />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search languages"
-            placeholderTextColor="#80918A"
-            accessibilityLabel="Search languages"
-            value={search}
-            onChangeText={setSearch}
-          />
+      <View className="flex-1 w-full max-w-[640px] self-center">
+        <View className="flex-row items-center px-4 py-3">
+          <TouchableOpacity
+            onPress={() => router.canGoBack() ? router.back() : router.replace("/onboarding")}
+            className="w-10 h-10 items-center justify-center"
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
+            <Ionicons name="chevron-back" size={24} color="#183B37" />
+          </TouchableOpacity>
+          <Text className="flex-1 text-center font-poppins-semibold text-lg text-text-primary">Choose a language</Text>
+          <View className="w-10" />
         </View>
-      </View>
 
-      <Text className="px-5 font-poppins-semibold text-base text-text-primary mb-3">Beginner courses</Text>
-      <FlatList
-        data={filtered}
-        keyExtractor={(item) => item.code}
-        renderItem={renderItem}
-        contentContainerStyle={styles.listContent}
-        ItemSeparatorComponent={() => <View className="h-2" />}
-        ListEmptyComponent={<Text className="body-sm text-text-secondary py-4">No matching courses found.</Text>}
-        keyboardShouldPersistTaps="handled"
-      />
+        <View className="px-5 mb-3">
+          <View className="flex-row items-center mb-3">
+            <View className="flex-1 pr-2">
+              <Text className="font-poppins-semibold text-[10px] tracking-[1.2px] text-lingua-teal mb-2">YOUR COURSE, YOUR PACE</Text>
+              <Text className="body-sm text-text-secondary">Pick a course. Menus and instructions are in English.</Text>
+            </View>
+            <MotionSticker kind="globe" size={62} testID="language-sticker" />
+          </View>
+          {hasOldSelection && (
+            <Text className="body-sm text-text-secondary mb-3" testID="legacy-language-message">
+              Your previous course is not available in this version. Choose a course to continue; your saved lesson history stays on this device.
+            </Text>
+          )}
+          <View className="flex-row items-center bg-white border border-border rounded-2xl px-4 py-3">
+            <Ionicons name="search-outline" size={18} color="#80918A" />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search languages"
+              placeholderTextColor="#526860"
+              accessibilityLabel="Search languages"
+              value={search}
+              onChangeText={setSearch}
+            />
+          </View>
+        </View>
 
-      <View className="px-5 pt-3 pb-4">
-        <TouchableOpacity
-          className={`rounded-2xl items-center py-4 ${selectionVisible ? "bg-lingua-teal" : "bg-[#9EBDB5]"}`}
-          activeOpacity={0.85}
-          accessibilityRole="button"
-          accessibilityState={{ disabled: !selectionVisible }}
-          disabled={!selectionVisible}
-          testID="language-confirm-button"
-          onPress={() => {
-            const selected = LANGUAGES.find((language) => language.code === selectedCode);
-            if (!selected) return;
-            posthog.capture("language_selected", {
-              language_code: selected.code,
-              language_name: selected.name,
-            });
-            setSelectedLanguage(selected.code);
-            if (isAvailableLanguage(selectedLanguage) && router.canGoBack()) {
-              router.back();
-            } else {
-              router.replace("/(tabs)");
-            }
-          }}
-        >
-          <Text className="font-poppins-semibold text-base text-white">Continue</Text>
-        </TouchableOpacity>
-        <Text className="caption text-center mt-2">You can switch courses anytime.</Text>
+        <Text className="px-5 font-poppins-semibold text-base text-text-primary mb-3">Beginner courses</Text>
+        <FlatList
+          data={filtered}
+          keyExtractor={(item) => item.code}
+          renderItem={renderItem}
+          contentContainerStyle={styles.listContent}
+          ItemSeparatorComponent={() => <View className="h-2" />}
+          ListEmptyComponent={<Text className="body-sm text-text-secondary py-4">No matching courses found.</Text>}
+          keyboardShouldPersistTaps="handled"
+        />
+
+        <View className="px-5 pt-3 pb-4">
+          <TouchableOpacity
+            className={`rounded-2xl items-center py-4 ${selectionVisible ? "bg-lingua-teal" : "bg-[#9EBDB5]"}`}
+            activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: !selectionVisible }}
+            disabled={!selectionVisible}
+            testID="language-confirm-button"
+            onPress={() => {
+              const selected = LANGUAGES.find((language) => language.code === selectedCode);
+              if (!selected) return;
+              posthog.capture("language_selected", {
+                language_code: selected.code,
+                language_name: selected.name,
+              });
+              setSelectedLanguage(selected.code);
+              if (isAvailableLanguage(selectedLanguage) && router.canGoBack()) {
+                router.back();
+              } else {
+                router.replace("/(tabs)");
+              }
+            }}
+          >
+            <Text className="font-poppins-semibold text-base text-white">Continue</Text>
+          </TouchableOpacity>
+          <Text className="caption text-center mt-2">You can switch courses anytime.</Text>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -131,6 +139,7 @@ const styles = StyleSheet.create({
   flag: { width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: "#E4E9DF" },
   searchInput: {
     flex: 1,
+    minWidth: 0,
     marginLeft: 8,
     fontFamily: "Poppins-Regular",
     fontSize: 14,

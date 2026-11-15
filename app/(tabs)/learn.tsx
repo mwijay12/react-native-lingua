@@ -3,12 +3,17 @@ import { useRouter } from "expo-router";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { LearningSticker, type StickerKind } from "@/components/LearningSticker";
 import { LessonCard } from "@/components/LessonCard";
+import { MotionSticker } from "@/components/MotionSticker";
 import { colors } from "@/constants/theme";
 import { getCourseUnits } from "@/data/courses";
 import { LANGUAGES } from "@/data/languages";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLearningStore } from "@/store/learningStore";
+
+const UNIT_STICKERS: StickerKind[] = ["talk", "people", "book"];
+const UNIT_BACKGROUNDS = ["bg-[#FCF1DB]", "bg-[#EAF5EE]", "bg-[#F0ECF8]"];
 
 export default function LearnScreen() {
   const router = useRouter();
@@ -37,7 +42,7 @@ export default function LearnScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FBF8F1" }}>
-      <View className="flex-row items-center px-5 pt-3 pb-3">
+      <View className="w-full max-w-[720px] self-center flex-row items-center px-5 pt-3 pb-3">
         <TouchableOpacity onPress={() => router.navigate("/(tabs)")} accessibilityRole="button" accessibilityLabel="Go to home" hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
           <Ionicons name="chevron-back" size={24} color={colors.neutral.textPrimary} />
         </TouchableOpacity>
@@ -56,9 +61,7 @@ export default function LearnScreen() {
               <Text className="font-poppins-semibold text-xl text-text-primary mt-2">{language?.name} foundations</Text>
               <Text className="body-sm text-text-secondary mt-1">Everyday language, useful patterns and guided practice.</Text>
             </View>
-            <View className="w-11 h-11 rounded-xl bg-white items-center justify-center">
-              <Ionicons name="library-outline" size={22} color="#14675D" />
-            </View>
+            <MotionSticker kind="book" size={72} testID="path-sticker" />
           </View>
           <View className="h-2 bg-[#C8DDD3] rounded-full overflow-hidden mt-4" accessibilityRole="progressbar" accessibilityLabel="Course progress" accessibilityValue={{ min: 0, max: 100, now: progress }}>
             <View className="h-2 bg-lingua-teal rounded-full" style={{ width: `${progress}%` }} />
@@ -73,13 +76,14 @@ export default function LearnScreen() {
 
         {units.map((unit) => (
           <View key={unit.id} className="mb-6" testID={`course-unit-${unit.id}`}>
-            <View className="flex-row items-center mb-1">
-              <View className="bg-[#EDF2EE] rounded-md px-2.5 py-1 mr-2">
-                <Text className="font-poppins-semibold text-[10px] text-lingua-teal">UNIT {unit.order}</Text>
+            <View className={`flex-row items-center rounded-[20px] px-4 py-3 mb-3 ${UNIT_BACKGROUNDS[(unit.order - 1) % UNIT_BACKGROUNDS.length]}`}>
+              <View className="flex-1 pr-2">
+                <Text className="font-poppins-semibold text-[10px] tracking-[0.8px] text-lingua-teal">UNIT {unit.order}</Text>
+                <Text className="font-poppins-semibold text-lg text-text-primary mt-1">{unit.title}</Text>
+                <Text className="body-sm text-text-secondary mt-1">{unit.description}</Text>
               </View>
-              <Text className="font-poppins-semibold text-lg text-text-primary flex-1">{unit.title}</Text>
+              <LearningSticker kind={UNIT_STICKERS[(unit.order - 1) % UNIT_STICKERS.length]} size={58} />
             </View>
-            <Text className="body-sm text-text-secondary mt-1 mb-4">{unit.description}</Text>
             <View className="gap-3">
               {unit.lessons.map((lesson) => (
                 <LessonCard
@@ -100,4 +104,4 @@ export default function LearnScreen() {
   );
 }
 
-const styles = StyleSheet.create({ content: { paddingHorizontal: 20, paddingBottom: 36 } });
+const styles = StyleSheet.create({ content: { width: "100%", maxWidth: 720, alignSelf: "center", paddingHorizontal: 20, paddingBottom: 36 } });

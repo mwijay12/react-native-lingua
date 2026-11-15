@@ -1,19 +1,18 @@
-import { Ionicons } from "@expo/vector-icons";
+import { LearningSticker, type StickerKind } from "@/components/LearningSticker";
 
-type IconName = keyof typeof Ionicons.glyphMap;
-
-const icons: Record<string, IconName> = {
-  "👋": "hand-left-outline",
-  "🙋": "person-outline",
-  "🔢": "grid-outline",
-  "👨‍👩‍👧": "people-outline",
-  "🍲": "restaurant-outline",
-  "💬": "chatbubble-ellipses-outline",
-  "🎨": "color-palette-outline",
-  "☕": "cafe-outline",
+// Map lesson subjects to Lingua's own scalable doodles rather than depending on
+// a device's emoji font. The title beside the drawing carries the meaning.
+const stickers: Record<string, StickerKind> = {
+  "👋": "talk",
+  "🙋": "people",
+  "🔢": "numbers",
+  "👨‍👩‍👧": "people",
+  "🍲": "food",
+  "💬": "talk",
+  "🎨": "palette",
+  "☕": "cup",
 };
 
-// Use bundled icons rather than relying on the device having a particular emoji font.
-export function LessonIcon({ icon, size = 25 }: { icon?: string; size?: number }) {
-  return <Ionicons name={(icon && icons[icon]) || "book-outline"} size={size} color="#14675D" />;
+export function LessonIcon({ icon, size = 42 }: { icon?: string; size?: number }) {
+  return <LearningSticker kind={(icon && stickers[icon]) || "book"} size={size} />;
 }

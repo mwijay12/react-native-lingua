@@ -4,6 +4,7 @@ import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "rea
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AccountControls } from "@/components/AccountControls";
+import { MotionSticker } from "@/components/MotionSticker";
 import { CREATOR_CREDIT } from "@/constants/branding";
 import { getCourseUnits } from "@/data/courses";
 import { LANGUAGES } from "@/data/languages";
@@ -18,8 +19,13 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FBF8F1" }}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-        <Text className="h2">Profile</Text>
-        <Text className="body-md text-text-secondary mt-2">Your learning, at a glance.</Text>
+        <View className="flex-row items-center">
+          <View className="flex-1 pr-2">
+            <Text className="h2">Profile</Text>
+            <Text className="body-md text-text-secondary mt-2">Your learning, at a glance.</Text>
+          </View>
+          <MotionSticker kind="medal" size={68} testID="profile-sticker" />
+        </View>
 
         <View className="rounded-2xl bg-[#E5F3ED] p-5 mt-5">
           <Text className="caption">CURRENT COURSE</Text>
@@ -82,6 +88,6 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 36 },
+  content: { width: "100%", maxWidth: 720, alignSelf: "center", paddingHorizontal: 20, paddingTop: 18, paddingBottom: 36 },
   flag: { width: 44, height: 44, borderRadius: 22, marginRight: 12, borderWidth: 1, borderColor: "#E4E9DF" },
 });

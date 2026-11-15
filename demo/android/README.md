@@ -6,7 +6,9 @@ practice questions, including everyday numbers, family, food and conversation.
 There are 27 playable lessons: eight each in Kiswahili and English, and eleven
 in French. Each course has two foundation lessons with grammar explanations,
 examples and practice feedback. Earlier lessons also include context notes.
-The app retains Lingua's cat-and-parrot identity in a more focused study layout.
+The app retains Lingua's cat-and-parrot identity, with original SVG learning
+doodles and gentle motion. Artwork remains visible and still when the device's
+reduced-motion setting is on; lessons work the same way offline.
 
 XP, completed lessons, study sessions, the daily goal and missed questions are
 stored on the device, not synced to an account. XP is awarded only the first

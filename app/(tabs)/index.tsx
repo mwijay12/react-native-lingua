@@ -4,7 +4,9 @@ import { router } from "expo-router";
 import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { LearningSticker } from "@/components/LearningSticker";
 import { LessonIcon } from "@/components/LessonIcon";
+import { MotionSticker } from "@/components/MotionSticker";
 import { images } from "@/constants/images";
 import { getCourseUnits } from "@/data/courses";
 import { LANGUAGES } from "@/data/languages";
@@ -68,7 +70,9 @@ export default function HomeScreen() {
               <Text className="font-poppins-semibold text-[22px] text-white" testID="home-course-title">{language?.name ?? "Choose a language"}</Text>
               <Text className="font-poppins text-xs text-[#D2E9E1] mt-1">{completedCount} of {lessons.length} lessons completed</Text>
             </View>
-            <Image source={images.mascotCat} style={styles.courseCat} resizeMode="contain" accessible={false} />
+            <View className="w-20 h-20 rounded-full bg-[#2B7468] items-center justify-center ml-2">
+              <Image source={images.mascotCat} style={styles.courseCat} resizeMode="contain" accessible={false} />
+            </View>
           </View>
           {lessons.length > 0 && (
             <View className="h-2 bg-white/25 rounded-full overflow-hidden mt-4" accessibilityRole="progressbar" accessibilityLabel="Course progress" accessibilityValue={{ min: 0, max: 100, now: courseProgress }}>
@@ -92,9 +96,12 @@ export default function HomeScreen() {
               <Text className="font-poppins-semibold text-[10px] tracking-[1px] text-lingua-teal">TODAY’S STUDY</Text>
               <Text className="font-poppins-semibold text-lg text-text-primary mt-1">Daily goal</Text>
             </View>
-            <Text className="font-poppins-semibold text-base text-text-primary" testID="daily-goal-progress">
-              {todaySessions} / {dailyGoal}
-            </Text>
+            <View className="flex-row items-center">
+              <MotionSticker kind="medal" size={46} testID="goal-sticker" />
+              <Text className="font-poppins-semibold text-base text-text-primary ml-1" testID="daily-goal-progress">
+                {todaySessions} / {dailyGoal}
+              </Text>
+            </View>
           </View>
           <View className="h-2 bg-[#EDF2EE] rounded-full overflow-hidden mt-3" accessibilityRole="progressbar" accessibilityLabel="Daily study goal" accessibilityValue={{ min: 0, max: dailyGoal, now: Math.min(todaySessions, dailyGoal), text: `${todaySessions} of ${dailyGoal} sessions` }}>
             <View className="h-2 bg-lingua-teal rounded-full" style={{ width: `${goalProgress}%` }} />
@@ -149,8 +156,8 @@ export default function HomeScreen() {
           onPress={() => router.push("/review")}
           testID="home-review-button"
         >
-          <View className="w-12 h-12 rounded-2xl bg-[#F3F0E7] items-center justify-center mr-3">
-            <Ionicons name="refresh-outline" size={23} color="#14675D" />
+          <View className="w-12 h-12 rounded-2xl bg-[#F9F4E8] items-center justify-center mr-3">
+            <LearningSticker kind="review" size={42} />
           </View>
           <View className="flex-1">
             <Text className="font-poppins-semibold text-sm text-text-primary">Review missed questions</Text>
@@ -201,8 +208,8 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   center: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#FBF8F1" },
-  content: { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 36 },
+  content: { width: "100%", maxWidth: 720, alignSelf: "center", paddingHorizontal: 20, paddingTop: 18, paddingBottom: 36 },
   headerParrot: { width: 48, height: 48 },
   flag: { width: 36, height: 36, borderRadius: 18, marginRight: 10 },
-  courseCat: { width: 58, height: 65, marginLeft: 8 },
+  courseCat: { width: 75, height: 78 },
 });

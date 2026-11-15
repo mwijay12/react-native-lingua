@@ -15,6 +15,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { LessonIcon } from "@/components/LessonIcon";
+import { MotionSticker } from "@/components/MotionSticker";
 import { QuestionInput } from "@/components/QuestionInput";
 import { images } from "@/constants/images";
 import { LESSONS } from "@/data/lessons";
@@ -112,7 +113,7 @@ export default function LessonScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FBF8F1" }}>
-      <View className="flex-row items-center px-5 py-3 border-b border-border">
+      <View className="w-full max-w-[720px] self-center flex-row items-center px-5 py-3 border-b border-border">
         <TouchableOpacity onPress={goBack} accessibilityRole="button" accessibilityLabel="Go back" hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <Ionicons name="chevron-back" size={24} color="#183B37" />
         </TouchableOpacity>
@@ -132,7 +133,7 @@ export default function LessonScreen() {
             <>
               <View className="flex-row items-center mb-3">
                 <View className="w-14 h-14 rounded-2xl bg-[#E5F3ED] items-center justify-center mr-3">
-                  <LessonIcon icon={lesson.icon} size={28} />
+                  <LessonIcon icon={lesson.icon} size={50} />
                 </View>
                 <View className="flex-1">
                   <Text className="font-poppins-semibold text-xl text-text-primary">{lesson.title}</Text>
@@ -193,7 +194,7 @@ export default function LessonScreen() {
           {phase === "practice" && activity && (
             <>
               <Text className="caption mb-2">QUESTION {questionIndex + 1} OF {lesson.activities.length}</Text>
-              <View className="h-2 bg-surface rounded-full overflow-hidden mb-6">
+              <View className="h-2 bg-surface rounded-full overflow-hidden mb-6" accessibilityRole="progressbar" accessibilityLabel="Lesson question progress" accessibilityValue={{ min: 0, max: lesson.activities.length, now: questionIndex }}>
                 <View className="h-2 bg-lingua-teal rounded-full" style={{ width: `${Math.round((questionIndex / lesson.activities.length) * 100)}%` }} />
               </View>
               <Text className="font-poppins-semibold text-xl text-text-primary mb-2">{activity.question}</Text>
@@ -242,8 +243,13 @@ export default function LessonScreen() {
 
           {phase === "finished" && (
             <View className="items-center py-8">
-              <View className="w-32 h-32 rounded-full bg-lingua-sand items-center justify-center mb-5">
-                <Image source={images.mascotCat} style={styles.finishCat} resizeMode="contain" accessible={false} />
+              <View className="flex-row items-end mb-5">
+                <View className="w-32 h-32 rounded-full bg-lingua-sand items-center justify-center">
+                  <Image source={images.mascotCat} style={styles.finishCat} resizeMode="contain" accessible={false} />
+                </View>
+                <View className="-ml-3">
+                  <MotionSticker kind="medal" size={72} testID="lesson-complete-sticker" />
+                </View>
               </View>
               <Text className="h2 text-center">Lesson complete!</Text>
               <Text className="body-md text-text-secondary text-center mt-3" testID="lesson-result">
@@ -271,7 +277,7 @@ export default function LessonScreen() {
 
 const styles = StyleSheet.create({
   center: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#FBF8F1" },
-  content: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 40, flexGrow: 1 },
+  content: { width: "100%", maxWidth: 720, alignSelf: "center", paddingHorizontal: 20, paddingTop: 20, paddingBottom: 40, flexGrow: 1 },
   finishCat: { width: 105, height: 120 },
 
 });

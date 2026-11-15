@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { MotionSticker } from "@/components/MotionSticker";
 import { QuestionInput } from "@/components/QuestionInput";
 import { getCourseUnits } from "@/data/courses";
 import { LANGUAGES } from "@/data/languages";
@@ -86,7 +87,7 @@ export default function ReviewScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FBF8F1" }}>
-      <View className="flex-row items-center px-5 py-3 border-b border-border">
+      <View className="w-full max-w-[720px] self-center flex-row items-center px-5 py-3 border-b border-border">
         <TouchableOpacity onPress={goBack} accessibilityRole="button" accessibilityLabel="Go back" hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <Ionicons name="chevron-back" size={24} color="#183B37" />
         </TouchableOpacity>
@@ -105,10 +106,15 @@ export default function ReviewScreen() {
           {phase === "intro" && (
             <>
               <Text className="font-poppins-semibold text-[10px] tracking-[1px] text-lingua-teal">FOCUSED PRACTICE · {language?.name.toUpperCase() ?? "NO COURSE"}</Text>
-              <Text className="h2 mt-2">Review your mistakes</Text>
-              <Text className="body-md text-text-secondary mt-2">
-                Return to questions you missed in this course. Your review list is saved on this device.
-              </Text>
+              <View className="flex-row items-center mt-2">
+                <View className="flex-1 pr-2">
+                  <Text className="h2">Review your mistakes</Text>
+                  <Text className="body-md text-text-secondary mt-2">
+                    Return to questions you missed in this course. Your review list is saved on this device.
+                  </Text>
+                </View>
+                <MotionSticker kind="review" size={70} testID="review-sticker" />
+              </View>
               <View className="rounded-[22px] bg-white border border-border p-5 mt-6">
                 <View className="flex-row items-center">
                   <View className="w-12 h-12 rounded-2xl bg-lingua-mint items-center justify-center mr-3">
@@ -161,7 +167,7 @@ export default function ReviewScreen() {
               <Text className="font-poppins-semibold text-[10px] tracking-[1px] text-lingua-teal mb-2">
                 QUESTION {questionIndex + 1} OF {questions.length} · {question.lesson.title.toUpperCase()}
               </Text>
-              <View className="h-2 bg-surface rounded-full overflow-hidden mb-6">
+              <View className="h-2 bg-surface rounded-full overflow-hidden mb-6" accessibilityRole="progressbar" accessibilityLabel="Review question progress" accessibilityValue={{ min: 0, max: questions.length, now: questionIndex }}>
                 <View className="h-2 bg-lingua-teal rounded-full" style={{ width: `${Math.round((questionIndex / questions.length) * 100)}%` }} />
               </View>
               <Text className="font-poppins-semibold text-xl text-text-primary mb-2">{question.activity.question}</Text>
@@ -193,8 +199,8 @@ export default function ReviewScreen() {
 
           {phase === "finished" && (
             <View className="items-center py-12">
-              <View className="w-16 h-16 rounded-full bg-lingua-mint items-center justify-center mb-5">
-                <Ionicons name="checkmark" size={32} color="#14675D" />
+              <View className="mb-5">
+                <MotionSticker kind="medal" size={104} testID="review-complete-sticker" />
               </View>
               <Text className="h2 text-center">Review complete</Text>
               <Text className="body-md text-text-secondary text-center mt-3" testID="review-result">
@@ -216,5 +222,5 @@ export default function ReviewScreen() {
 
 const styles = StyleSheet.create({
   center: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#FBF8F1" },
-  content: { paddingHorizontal: 20, paddingTop: 24, paddingBottom: 40, flexGrow: 1 },
+  content: { width: "100%", maxWidth: 720, alignSelf: "center", paddingHorizontal: 20, paddingTop: 24, paddingBottom: 40, flexGrow: 1 },
 });

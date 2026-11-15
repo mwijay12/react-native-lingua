@@ -18,7 +18,7 @@ export const colors = {
   },
   neutral: {
     textPrimary: "#183B37",
-    textSecondary: "#60736C",
+    textSecondary: "#526860",
     border: "#E4E9DF",
     surface: "#F2F0E8",
     background: "#FBF8F1",
@@ -39,8 +39,8 @@ export const fontSize = {
   h4: 16,
   bodyLg: 16,
   bodyMd: 14,
-  bodySm: 13,
-  caption: 11,
+  bodySm: 14,
+  caption: 12,
 } as const;
 
 export const lineHeight = {
@@ -50,8 +50,8 @@ export const lineHeight = {
   h4: 22,  // 16 × 1.4
   bodyLg: 26, // 16 × 1.6
   bodyMd: 22, // 14 × 1.6
-  bodySm: 21, // 13 × 1.6
-  caption: 15, // 11 × 1.4
+  bodySm: 22, // 14 px supporting text
+  caption: 18, // 12 px labels
 } as const;
 
 export const fontWeight = {

@@ -46,8 +46,17 @@ Created by Mwijay. This version provides beginner Kiswahili, English and French
 courses with English instructions, local practice questions, and on-device XP
 and lesson progress. The 27 playable lessons cover everyday topics and include
 context notes, plus six foundation lessons on useful language patterns. Lingua's
-cat and parrot companions remain part of its identity. The standalone
-[Android demo](demo/android/README.md) has no sign-in or analytics.
+cat and parrot companions remain part of its identity. Original SVG learning
+doodles add a playful path and celebration without changing the lessons. The
+standalone [Android demo](demo/android/README.md) has no sign-in or analytics.
+
+The doodles in `components/LearningSticker.tsx` are original, hand-drawn shapes
+in Lingua's palette. `MotionSticker` keeps decoration in reserved space, never
+intercepts touches, and moves it gently only while its screen is focused and the
+app is active. Device reduced-motion settings keep the drawings still (including
+the tab indicator); artwork and learning content are never hidden until an
+animation runs. The selected cat and parrot remain the existing image assets.
+The approach is adapted for a native app from the [motion-lab prompt pack](https://github.com/mwijay12/motion-lab/blob/main/motion-lab/docs/agent-prompt-pack.md).
 
 The study dashboard has a configurable daily session goal, a rolling seven-day
 activity view and per-course completion. A finished lesson or review set counts
