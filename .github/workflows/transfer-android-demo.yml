@@ -1,0 +1,45 @@
+# Temporary bridge: obtain the test build and diagnostics without committing APKs.
+name: Transfer Android demo
+on:
+  push:
+    branches: ["arena/aa8896d6-react-native-lingua"]
+    paths: [".github/workflows/transfer-android-demo.yml"]
+
+permissions:
+  actions: read
+  checks: read
+  contents: write
+
+jobs:
+  transfer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TARGET_RUN: "43686552671"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Wait for the APK build and emulator test
+        run: gh run watch "$TARGET_RUN" --repo "$GITHUB_REPOSITORY" --exit-status --interval 30 || true
+      - name: Download build and test results
+        run: |
+          mkdir -p transfer
+          gh run download "$TARGET_RUN" --repo "$GITHUB_REPOSITORY" --name Lingua-Demo-APK --dir transfer || true
+          gh run download "$TARGET_RUN" --repo "$GITHUB_REPOSITORY" --name Lingua-Demo-Android-Smoke --dir transfer/smoke || true
+          gh run view "$TARGET_RUN" --repo "$GITHUB_REPOSITORY" --log > transfer/build.log || true
+          if [ -d transfer/smoke ]; then
+            tar -czf transfer/smoke.tar.gz -C transfer smoke
+            rm -rf transfer/smoke
+          fi
+      - name: Stage as temporary unreferenced GitHub blobs
+        id: stage
+        run: python3 scripts/transfer-android-demo.py transfer
+      - name: Publish transfer manifest pointer
+        uses: actions/upload-artifact@v4
+        with:
+          name: Demo-transfer-${{ steps.stage.outputs.manifest }}
+          path: transfer-pointer.txt
+          if-no-files-found: error
+          retention-days: 1
