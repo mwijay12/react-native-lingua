@@ -2,7 +2,6 @@ import SocialButton from "@/components/SocialButton";
 import VerificationModal from "@/components/VerificationModal";
 import { images } from "@/constants/images";
 import { posthog } from "@/lib/posthog";
-import { useLanguageStore } from "@/store/languageStore";
 import { useSignIn, useSSO } from "@clerk/expo";
 import { AntDesign, FontAwesome, Ionicons } from "@expo/vector-icons";
 import * as Linking from "expo-linking";
@@ -29,7 +28,6 @@ type SSOStrategy = "oauth_google" | "oauth_facebook" | "oauth_apple";
 export default function SignInScreen() {
   const { signIn, errors, fetchStatus } = useSignIn();
   const { startSSOFlow } = useSSO();
-  const { selectedLanguage } = useLanguageStore();
 
   const [email, setEmail] = useState("");
   const [showVerification, setShowVerification] = useState(false);
@@ -88,11 +86,7 @@ export default function SignInScreen() {
     }
     if (signIn.status === "complete") {
       posthog.capture("sign_in_completed", { method: "code" });
-      if (signIn.createdUserId) {
-        posthog.identify(signIn.createdUserId, {
-          $set: { preferred_language: selectedLanguage ?? null },
-        });
-      }
+      // ClerkIdentifier in the root layout identifies the signed-in user.
       await signIn.finalize({
         navigate: ({ decorateUrl }) => {
           router.replace(decorateUrl("/") as Href);
@@ -147,7 +141,7 @@ export default function SignInScreen() {
               onPress={() => router.back()}
               className="mt-4 w-10 h-10 justify-center"
             >
-              <Ionicons name="chevron-back" size={24} color="#001328" />
+              <Ionicons name="chevron-back" size={24} color="#183B37" />
             </TouchableOpacity>
 
             {/* Header */}
@@ -159,7 +153,7 @@ export default function SignInScreen() {
             {/* Mascot */}
             <View className="items-center mt-6 mb-6">
               <Image
-                source={images.mascotAuth}
+                source={images.mascotCat}
                 style={{ width: 160, height: 160 }}
                 resizeMode="contain"
               />
@@ -194,7 +188,7 @@ export default function SignInScreen() {
 
             {/* Sign In button */}
             <TouchableOpacity
-              className="bg-lingua-purple rounded-2xl py-4 items-center mt-2"
+              className="bg-lingua-teal rounded-2xl py-4 items-center mt-2"
               activeOpacity={0.85}
               onPress={handleSignIn}
               disabled={!email || isLoading}
@@ -240,7 +234,7 @@ export default function SignInScreen() {
               <TouchableOpacity
                 onPress={() => router.replace("/(auth)/sign-up")}
               >
-                <Text className="body-md text-lingua-purple font-poppins-semibold">
+                <Text className="body-md text-lingua-teal font-poppins-semibold">
                   Sign Up
                 </Text>
               </TouchableOpacity>
@@ -264,7 +258,7 @@ export default function SignInScreen() {
 const styles = StyleSheet.create({
   inputContainer: {
     borderWidth: 1,
-    borderColor: "#e5e7eb",
+    borderColor: "#E4E9DF",
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingTop: 10,
@@ -274,13 +268,13 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontFamily: "Poppins-Regular",
     fontSize: 11,
-    color: "#6b7280",
+    color: "#60736C",
     marginBottom: 2,
   },
   input: {
     fontFamily: "Poppins-Regular",
     fontSize: 14,
-    color: "#001328",
+    color: "#183B37",
     padding: 0,
   },
 });

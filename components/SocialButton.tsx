@@ -14,7 +14,7 @@ export default function SocialButton({ icon, label, onPress }: Props) {
       activeOpacity={0.75}
     >
       <View className="w-6 items-center">{icon}</View>
-      <Text className="flex-1 text-center text-[14px] font-poppins-medium text-[#001328]">
+      <Text className="flex-1 text-center text-[14px] font-poppins-medium text-[#183B37]">
         {label}
       </Text>
     </TouchableOpacity>

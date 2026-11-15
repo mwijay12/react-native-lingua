@@ -1,6 +1,10 @@
 import { Lesson } from '@/types/learning';
+import { STARTER_LESSONS } from './starterLessons';
+import { EVERYDAY_LESSONS } from './everydayLessons';
 
 export const LESSONS: Lesson[] = [
+  ...STARTER_LESSONS,
+  ...EVERYDAY_LESSONS,
   // ─── Spanish ───────────────────────────────────────────────────────────────
 
   {

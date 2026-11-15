@@ -153,7 +153,7 @@ export default function SignUpScreen() {
               onPress={() => router.back()}
               className="mt-4 w-10 h-10 justify-center"
             >
-              <Ionicons name="chevron-back" size={24} color="#001328" />
+              <Ionicons name="chevron-back" size={24} color="#183B37" />
             </TouchableOpacity>
 
             {/* Header */}
@@ -165,7 +165,7 @@ export default function SignUpScreen() {
             {/* Mascot */}
             <View className="items-center mt-6 mb-6">
               <Image
-                source={images.mascotAuth}
+                source={images.mascotCat}
                 style={{ width: 160, height: 160 }}
                 resizeMode="contain"
               />
@@ -230,7 +230,7 @@ export default function SignUpScreen() {
 
             {/* Sign Up button */}
             <TouchableOpacity
-              className="bg-lingua-purple rounded-2xl py-4 items-center mt-2"
+              className="bg-lingua-teal rounded-2xl py-4 items-center mt-2"
               activeOpacity={0.85}
               onPress={handleSignUp}
               disabled={!email || !password || isLoading}
@@ -276,7 +276,7 @@ export default function SignUpScreen() {
               <TouchableOpacity
                 onPress={() => router.replace("/(auth)/sign-in")}
               >
-                <Text className="body-md text-lingua-purple font-poppins-semibold">
+                <Text className="body-md text-lingua-teal font-poppins-semibold">
                   Log in
                 </Text>
               </TouchableOpacity>
@@ -303,7 +303,7 @@ export default function SignUpScreen() {
 const styles = StyleSheet.create({
   inputContainer: {
     borderWidth: 1,
-    borderColor: "#e5e7eb",
+    borderColor: "#E4E9DF",
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingTop: 10,
@@ -313,13 +313,13 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontFamily: "Poppins-Regular",
     fontSize: 11,
-    color: "#6b7280",
+    color: "#60736C",
     marginBottom: 2,
   },
   input: {
     fontFamily: "Poppins-Regular",
     fontSize: 14,
-    color: "#001328",
+    color: "#183B37",
     padding: 0,
   },
 });

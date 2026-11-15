@@ -1,17 +1,16 @@
-import earth from "@/assets/images/earth.png";
-import mascotAuth from "@/assets/images/mascot-auth.png";
-import mascotWelcome from "@/assets/images/mascot-welcome.png";
-import mascotLogo from "@/assets/images/moscot-logo.png";
-import palace from "@/assets/images/palace.png";
-import streakFire from "@/assets/images/streak-fire.png";
-import treasure from "@/assets/images/treasure.png";
+import brandLogo from "@/assets/images/icon.png";
+import mascotCat from "@/assets/images/mascots/cat.png";
+import mascotParrot from "@/assets/images/mascots/parrot.png";
+import flagEnglish from "@/assets/images/flags/english.png";
+import flagFrench from "@/assets/images/flags/french.png";
+import flagSwahili from "@/assets/images/flags/tanzania.png";
 
+// The same original companions appear throughout the app.
 export const images = {
-  earth,
-  mascotAuth,
-  mascotWelcome,
-  mascotLogo,
-  palace,
-  streakFire,
-  treasure,
+  brandLogo,
+  mascotCat,
+  mascotParrot,
+  flagEnglish,
+  flagFrench,
+  flagSwahili,
 } as const;

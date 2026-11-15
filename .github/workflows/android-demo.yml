@@ -1,0 +1,118 @@
+name: Android demo APK
+
+on:
+  push:
+    branches:
+      - "arena/**"
+    paths:
+      - ".github/workflows/android-demo.yml"
+      - "app/**"
+      - "assets/**"
+      - "components/**"
+      - "constants/**"
+      - "data/**"
+      - "demo/android/**"
+      - "lib/**"
+      - "scripts/prepare-android-demo.mjs"
+      - "scripts/smoke-android-demo.py"
+      - "store/**"
+      - "tests/**"
+      - "types/**"
+      - "package*.json"
+      - "*.config.js"
+      - "global.css"
+      - "tsconfig.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CI: "1"
+  EXPO_NO_TELEMETRY: "1"
+
+jobs:
+  apk:
+    name: Build installable test APK
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Install project dependencies
+        run: npm ci --legacy-peer-deps --ignore-scripts --no-audit --no-fund
+      - name: Validate source and lesson content
+        run: |
+          npm run lint
+          npm run typecheck
+          npm test
+      - name: Prepare isolated demo project
+        run: node scripts/prepare-android-demo.mjs
+      - name: Generate Android project
+        working-directory: .expo/android-demo
+        env:
+          EXPO_OFFLINE: "1"
+        run: ./node_modules/.bin/expo prebuild --platform android --no-install
+      - name: Assemble bundled test APK
+        working-directory: .expo/android-demo/android
+        env:
+          EXPO_OFFLINE: "1"
+        run: ./gradlew :app:assembleRelease --no-daemon --max-workers=2
+      - name: Collect APK and verify signature
+        run: |
+          mkdir -p artifacts
+          cp .expo/android-demo/android/app/build/outputs/apk/release/app-release.apk artifacts/Lingua-Demo.apk
+          sha256sum artifacts/Lingua-Demo.apk | tee artifacts/SHA256SUMS.txt
+          BUILD_TOOLS="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
+          "$BUILD_TOOLS/apksigner" verify --verbose --print-certs artifacts/Lingua-Demo.apk
+          "$BUILD_TOOLS/aapt" dump badging artifacts/Lingua-Demo.apk > artifacts/APK-info.txt
+          sed -n '1,25p' artifacts/APK-info.txt
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lingua-Demo-APK
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 3
+
+  smoke-test:
+    name: Android emulator smoke test
+    needs: apk
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: Lingua-Demo-APK
+          path: artifacts
+      - name: Enable KVM for the emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install, open and navigate the demo
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: python3 scripts/smoke-android-demo.py artifacts/Lingua-Demo.apk
+      - name: Upload smoke-test screenshots and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lingua-Demo-Android-Smoke
+          path: android-smoke/
+          if-no-files-found: warn
+          retention-days: 3

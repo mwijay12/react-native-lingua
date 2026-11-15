@@ -1,12 +1,14 @@
-export type LanguageCode = "es" | "fr" | "ja" | "ko" | "de" | "zh";
+import type { ImageSourcePropType } from "react-native";
+
+// Legacy codes remain valid so existing saved selections can be migrated safely.
+export type LanguageCode = "sw" | "en" | "es" | "fr" | "ja" | "ko" | "de" | "zh";
 
 export interface Language {
   code: LanguageCode;
   name: string;
   nativeName: string;
-  flag: string;
+  flag: ImageSourcePropType;
   color: string;
-  learners: string;
 }
 
 export type ActivityType =

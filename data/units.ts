@@ -2,6 +2,38 @@ import { Unit } from '@/types/learning';
 
 export const UNITS: Unit[] = [
   {
+    id: 'sw-unit-1',
+    languageCode: 'sw',
+    title: 'Kiswahili: First Steps',
+    description: 'Learn everyday greetings and introductions in Kiswahili',
+    order: 1,
+    lessonIds: ['sw-lesson-1', 'sw-lesson-2'],
+  },
+  {
+    id: 'sw-unit-2',
+    languageCode: 'sw',
+    title: 'Everyday life',
+    description: 'Numbers, family, food and useful conversations',
+    order: 2,
+    lessonIds: ['sw-everyday-numbers', 'sw-everyday-family', 'sw-everyday-food', 'sw-everyday-conversation'],
+  },
+  {
+    id: 'en-unit-1',
+    languageCode: 'en',
+    title: 'English: First Steps',
+    description: 'Practise simple English greetings and introductions',
+    order: 1,
+    lessonIds: ['en-lesson-1', 'en-lesson-2'],
+  },
+  {
+    id: 'en-unit-2',
+    languageCode: 'en',
+    title: 'Everyday life',
+    description: 'Numbers, family, food and useful conversations',
+    order: 2,
+    lessonIds: ['en-everyday-numbers', 'en-everyday-family', 'en-everyday-food', 'en-everyday-conversation'],
+  },
+  {
     id: 'es-unit-1',
     languageCode: 'es',
     title: 'Greetings & Basics',
@@ -16,6 +48,14 @@ export const UNITS: Unit[] = [
     description: 'Learn how to greet and introduce yourself in French',
     order: 1,
     lessonIds: ['fr-lesson-1', 'fr-lesson-2', 'fr-lesson-3', 'fr-lesson-4', 'fr-lesson-5'],
+  },
+  {
+    id: 'fr-unit-2',
+    languageCode: 'fr',
+    title: 'Everyday life',
+    description: 'Numbers, family, food and useful conversations',
+    order: 2,
+    lessonIds: ['fr-everyday-numbers', 'fr-everyday-family', 'fr-everyday-food', 'fr-everyday-conversation'],
   },
   {
     id: 'ja-unit-1',

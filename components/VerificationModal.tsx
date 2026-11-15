@@ -83,7 +83,7 @@ export default function VerificationModal({
         <View style={styles.sheet}>
           {/* Close button */}
           <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-            <Ionicons name="close" size={22} color="#6b7280" />
+            <Ionicons name="close" size={22} color="#60736C" />
           </TouchableOpacity>
 
           <Text style={styles.title}>Check your email</Text>
@@ -131,7 +131,7 @@ export default function VerificationModal({
 
           <TouchableOpacity style={styles.resendBtn} onPress={handleResend}>
             <Text style={styles.resendText}>
-              Didn't receive it?{" "}
+              {"Didn't receive it? "}
               <Text style={styles.resendLink}>Resend</Text>
             </Text>
           </TouchableOpacity>
@@ -164,21 +164,21 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "Poppins-SemiBold",
     fontSize: 22,
-    color: "#001328",
+    color: "#183B37",
     marginBottom: 8,
     textAlign: "center",
   },
   subtitle: {
     fontFamily: "Poppins-Regular",
     fontSize: 14,
-    color: "#6b7280",
+    color: "#60736C",
     textAlign: "center",
     lineHeight: 22,
     marginBottom: 32,
   },
   emailText: {
     fontFamily: "Poppins-Medium",
-    color: "#001328",
+    color: "#183B37",
   },
   boxesRow: {
     flexDirection: "row",
@@ -194,21 +194,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   boxEmpty: {
-    borderColor: "#e5e7eb",
+    borderColor: "#E4E9DF",
     backgroundColor: "#fff",
   },
   boxActive: {
-    borderColor: "#6c4ef5",
+    borderColor: "#14675D",
     backgroundColor: "#fff",
   },
   boxFilled: {
-    borderColor: "#6c4ef5",
+    borderColor: "#14675D",
     backgroundColor: "#f5f2ff",
   },
   boxText: {
     fontFamily: "Poppins-SemiBold",
     fontSize: 20,
-    color: "#001328",
+    color: "#183B37",
   },
   hiddenInput: {
     position: "absolute",
@@ -230,10 +230,10 @@ const styles = StyleSheet.create({
   resendText: {
     fontFamily: "Poppins-Regular",
     fontSize: 13,
-    color: "#6b7280",
+    color: "#60736C",
   },
   resendLink: {
     fontFamily: "Poppins-Medium",
-    color: "#6c4ef5",
+    color: "#14675D",
   },
 });
