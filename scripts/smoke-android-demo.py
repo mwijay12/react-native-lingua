@@ -52,10 +52,26 @@ def find_node(root, text, exact=False):
     return min(matches) if matches else None
 
 
+def dismiss_launcher_dialog(root):
+    # A slow emulator can report its background Pixel Launcher as unresponsive,
+    # covering the app. Do not dismiss errors from Lingua itself.
+    if root is None or not find_node(root, "Pixel Launcher isn't responding"):
+        return False
+    button = find_node(root, "Wait", exact=True) or find_node(root, "Close app", exact=True)
+    if not button:
+        return False
+    _, _, x, y = button
+    adb("shell", "input", "tap", str(x), str(y))
+    print("Dismissed emulator Pixel Launcher dialog", flush=True)
+    return True
+
+
 def wait_for(text, timeout=90, exact=False):
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
         root = dump_ui()
+        if root is not None and dismiss_launcher_dialog(root):
+            continue
         node = find_node(root, text, exact=exact) if root is not None else None
         if node:
             print(f"Found: {text}", flush=True)
@@ -82,6 +98,8 @@ def scroll_to(text, direction="down", max_swipes=8, exact=False):
     width, height = screen_size()
     for _ in range(max_swipes + 1):
         root = dump_ui()
+        if root is not None and dismiss_launcher_dialog(root):
+            continue
         node = find_node(root, text, exact=exact) if root is not None else None
         if node:
             print(f"Found after scrolling: {text}", flush=True)
