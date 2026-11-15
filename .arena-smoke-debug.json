@@ -1,0 +1,22 @@
+[
+  {
+    "name": "failed-job.log",
+    "sha": "89eaa30f49f60e714fba2d7d02ecc3f20d2d7294",
+    "size": 38314
+  },
+  {
+    "name": "last-screen.png",
+    "sha": "aa4c4538a6633e89381cf41326091a7fec1f5166",
+    "size": 256937
+  },
+  {
+    "name": "last-window.xml",
+    "sha": "6a5008b685207128c117a49ead23fed6d3b3a966",
+    "size": 4143
+  },
+  {
+    "name": "logcat.txt",
+    "sha": "1299966c4611ba8895524a9afbd6e23821762a7e",
+    "size": 86
+  }
+]
