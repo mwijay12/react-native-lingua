@@ -3,7 +3,7 @@ import { router } from "expo-router";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { UNITS } from "@/data/units";
+import { getCourseUnits } from "@/data/courses";
 import { useLanguageStore } from "@/store/languageStore";
 import { LanguageCode } from "@/types/learning";
 
@@ -31,11 +31,10 @@ const EXAMPLES: Partial<Record<LanguageCode, { first: string; firstMeaning: stri
 export default function ChatScreen() {
   const selectedLanguage = useLanguageStore((state) => state.selectedLanguage);
   const example = selectedLanguage ? EXAMPLES[selectedLanguage] : undefined;
-  const unit = UNITS.find((item) => item.languageCode === selectedLanguage);
-  const lessonId = unit?.lessonIds[0];
+  const lessonId = getCourseUnits(selectedLanguage)[0]?.lessons[0]?.id;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#FBF8F1" }}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         <Text className="h2">Chat</Text>
         <Text className="body-md text-text-secondary mt-2">Read a short conversation and practise it aloud.</Text>
@@ -59,7 +58,7 @@ export default function ChatScreen() {
               <Text className="font-poppins-semibold text-base text-text-primary">{example.first}</Text>
               <Text className="body-sm text-text-secondary mt-2">{example.firstMeaning}</Text>
             </View>
-            <View className="self-end max-w-[90%] rounded-2xl bg-[#F3F0FF] p-4 mb-3">
+            <View className="self-end max-w-[90%] rounded-2xl bg-[#E5F3ED] p-4 mb-3">
               <Text className="caption mb-1">PERSON 2</Text>
               <Text className="font-poppins-semibold text-base text-text-primary">{example.reply}</Text>
               <Text className="body-sm text-text-secondary mt-2">{example.replyMeaning}</Text>
@@ -70,12 +69,12 @@ export default function ChatScreen() {
         )}
 
         <TouchableOpacity
-          className="border border-lingua-purple rounded-2xl items-center py-4 mt-5"
+          className="border border-lingua-teal rounded-2xl items-center py-4 mt-5"
           accessibilityRole="button"
           onPress={() => lessonId ? router.push(`/lesson/${lessonId}`) : router.push("/language-select")}
           testID="chat-lesson-button"
         >
-          <Text className="font-poppins-semibold text-base text-lingua-purple">Practise greetings</Text>
+          <Text className="font-poppins-semibold text-base text-lingua-teal">Practise greetings</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>

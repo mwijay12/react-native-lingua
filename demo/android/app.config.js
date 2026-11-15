@@ -12,9 +12,8 @@ module.exports = {
     android: {
       package: "com.jsmastery.duolingoclone.demo",
       adaptiveIcon: {
-        backgroundColor: "#E6F4FE",
+        backgroundColor: "#155F57",
         foregroundImage: "./assets/images/android-icon-foreground.png",
-        backgroundImage: "./assets/images/android-icon-background.png",
         monochromeImage: "./assets/images/android-icon-monochrome.png",
       },
       edgeToEdgeEnabled: true,
@@ -27,7 +26,7 @@ module.exports = {
           image: "./assets/images/splash-icon.png",
           imageWidth: 200,
           resizeMode: "contain",
-          backgroundColor: "#ffffff",
+          backgroundColor: "#155F57",
         },
       ],
       ["expo-build-properties", { android: { minSdkVersion: 24 } }],

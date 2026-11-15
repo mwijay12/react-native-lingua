@@ -3,6 +3,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -15,6 +16,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { LessonIcon } from "@/components/LessonIcon";
+import { images } from "@/constants/images";
 import { LESSONS } from "@/data/lessons";
 import { isCorrectAnswer } from "@/lib/practice";
 import { useLearningStore } from "@/store/learningStore";
@@ -57,15 +59,15 @@ export default function LessonScreen() {
   };
 
   if (!hydrated) {
-    return <View style={styles.center}><ActivityIndicator size="large" color="#6C4EF5" /></View>;
+    return <View style={styles.center}><ActivityIndicator size="large" color="#14675D" /></View>;
   }
 
   if (!lesson) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#FBF8F1" }}>
         <View className="flex-1 items-center justify-center px-8">
           <Text className="h3 text-center">Lesson not found</Text>
-          <TouchableOpacity onPress={goBack} className="bg-lingua-purple rounded-xl px-5 py-3 mt-5" accessibilityRole="button">
+          <TouchableOpacity onPress={goBack} className="bg-lingua-teal rounded-xl px-5 py-3 mt-5" accessibilityRole="button">
             <Text className="font-poppins-semibold text-white">Back to lessons</Text>
           </TouchableOpacity>
         </View>
@@ -102,10 +104,10 @@ export default function LessonScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#FBF8F1" }}>
       <View className="flex-row items-center px-5 py-3 border-b border-border">
         <TouchableOpacity onPress={goBack} accessibilityRole="button" accessibilityLabel="Go back" hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-          <Ionicons name="chevron-back" size={24} color="#001328" />
+          <Ionicons name="chevron-back" size={24} color="#183B37" />
         </TouchableOpacity>
         <Text className="flex-1 text-center font-poppins-semibold text-base text-text-primary" numberOfLines={1}>
           {phase === "practice" ? "Practice" : phase === "finished" ? "Well done!" : "Lesson"}
@@ -122,7 +124,7 @@ export default function LessonScreen() {
           {phase === "review" && (
             <>
               <View className="flex-row items-center mb-3">
-                <View className="w-14 h-14 rounded-2xl bg-[#F3F0FF] items-center justify-center mr-3">
+                <View className="w-14 h-14 rounded-2xl bg-[#E5F3ED] items-center justify-center mr-3">
                   <LessonIcon icon={lesson.icon} size={28} />
                 </View>
                 <View className="flex-1">
@@ -131,7 +133,7 @@ export default function LessonScreen() {
                 </View>
               </View>
               <Text className="body-sm text-text-secondary mb-5">{lesson.description}</Text>
-              <View className="rounded-2xl bg-[#F3F0FF] p-4 mb-5">
+              <View className="rounded-2xl bg-[#E5F3ED] p-4 mb-5">
                 <Text className="font-poppins-semibold text-sm text-text-primary">How to use this lesson</Text>
                 <Text className="body-sm text-text-secondary mt-1">
                   Read the words and phrases, then answer the practice questions. Pronunciations are approximate guides.
@@ -160,7 +162,7 @@ export default function LessonScreen() {
                 </>
               )}
               {lesson.activities.length > 0 ? (
-                <TouchableOpacity onPress={() => setPhase("practice")} className="bg-lingua-purple rounded-2xl items-center py-4 mt-6" accessibilityRole="button" testID="start-practice-button">
+                <TouchableOpacity onPress={() => setPhase("practice")} className="bg-lingua-teal rounded-2xl items-center py-4 mt-6" accessibilityRole="button" testID="start-practice-button">
                   <Text className="font-poppins-semibold text-base text-white">Start practice</Text>
                 </TouchableOpacity>
               ) : (
@@ -173,7 +175,7 @@ export default function LessonScreen() {
             <>
               <Text className="caption mb-2">QUESTION {questionIndex + 1} OF {lesson.activities.length}</Text>
               <View className="h-2 bg-surface rounded-full overflow-hidden mb-6">
-                <View className="h-2 bg-lingua-purple rounded-full" style={{ width: `${Math.round((questionIndex / lesson.activities.length) * 100)}%` }} />
+                <View className="h-2 bg-lingua-teal rounded-full" style={{ width: `${Math.round((questionIndex / lesson.activities.length) * 100)}%` }} />
               </View>
               <Text className="font-poppins-semibold text-xl text-text-primary mb-2">{activity.question}</Text>
               <Text className="body-sm text-text-secondary mb-5">
@@ -189,7 +191,7 @@ export default function LessonScreen() {
                       accessibilityRole="radio"
                       accessibilityState={{ selected: answer === option, disabled: feedback === "correct" }}
                       testID={`activity-choice-${index}`}
-                      className={`rounded-2xl border p-4 ${answer === option ? "border-lingua-purple bg-[#F3F0FF]" : "border-border bg-white"}`}
+                      className={`rounded-2xl border p-4 ${answer === option ? "border-lingua-teal bg-[#E5F3ED]" : "border-border bg-white"}`}
                     >
                       <Text className="font-poppins-medium text-sm text-text-primary">{option}</Text>
                     </TouchableOpacity>
@@ -224,13 +226,13 @@ export default function LessonScreen() {
                 </View>
               )}
               {feedback === "correct" ? (
-                <TouchableOpacity onPress={advance} className="bg-lingua-purple rounded-2xl items-center py-4 mt-6" accessibilityRole="button" testID={questionIndex + 1 === lesson.activities.length ? "finish-lesson-button" : "next-question-button"}>
+                <TouchableOpacity onPress={advance} className="bg-lingua-teal rounded-2xl items-center py-4 mt-6" accessibilityRole="button" testID={questionIndex + 1 === lesson.activities.length ? "finish-lesson-button" : "next-question-button"}>
                   <Text className="font-poppins-semibold text-base text-white">
                     {questionIndex + 1 === lesson.activities.length ? "Finish lesson" : "Next question"}
                   </Text>
                 </TouchableOpacity>
               ) : (
-                <TouchableOpacity onPress={checkAnswer} disabled={!answer.trim()} className={`rounded-2xl items-center py-4 mt-6 ${answer.trim() ? "bg-lingua-purple" : "bg-[#BDB5E8]"}`} accessibilityRole="button" accessibilityState={{ disabled: !answer.trim() }} testID="check-answer-button">
+                <TouchableOpacity onPress={checkAnswer} disabled={!answer.trim()} className={`rounded-2xl items-center py-4 mt-6 ${answer.trim() ? "bg-lingua-teal" : "bg-[#9EBDB5]"}`} accessibilityRole="button" accessibilityState={{ disabled: !answer.trim() }} testID="check-answer-button">
                   <Text className="font-poppins-semibold text-base text-white">Check answer</Text>
                 </TouchableOpacity>
               )}
@@ -239,15 +241,15 @@ export default function LessonScreen() {
 
           {phase === "finished" && (
             <View className="items-center py-8">
-              <View className="w-24 h-24 rounded-full bg-[#EDF8F1] items-center justify-center mb-5">
-                <Ionicons name="checkmark-circle" size={58} color="#21A96B" />
+              <View className="w-32 h-32 rounded-full bg-lingua-sand items-center justify-center mb-5">
+                <Image source={images.mascotCat} style={styles.finishCat} resizeMode="contain" accessible={false} />
               </View>
               <Text className="h2 text-center">Lesson complete!</Text>
               <Text className="body-md text-text-secondary text-center mt-3" testID="lesson-result">
                 {earnedXp ? `You earned ${lesson.xpReward} XP.` : "You have already earned XP for this lesson. Keep practising!"}
               </Text>
               <Text className="body-sm text-text-secondary text-center mt-2">Your progress is saved on this device.</Text>
-              <TouchableOpacity onPress={goBack} className="bg-lingua-purple rounded-2xl items-center py-4 px-8 mt-7" accessibilityRole="button" testID="lesson-done-button">
+              <TouchableOpacity onPress={goBack} className="bg-lingua-teal rounded-2xl items-center py-4 px-8 mt-7" accessibilityRole="button" testID="lesson-done-button">
                 <Text className="font-poppins-semibold text-base text-white">Done</Text>
               </TouchableOpacity>
             </View>
@@ -259,8 +261,9 @@ export default function LessonScreen() {
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#fff" },
+  center: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#FBF8F1" },
   content: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 40, flexGrow: 1 },
+  finishCat: { width: 105, height: 120 },
   answerInput: {
     minHeight: 56,
     borderWidth: 1,
@@ -270,6 +273,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     fontFamily: "Poppins-Regular",
     fontSize: 15,
-    color: "#001328",
+    color: "#183B37",
   },
 });

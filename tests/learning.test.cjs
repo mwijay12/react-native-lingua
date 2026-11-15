@@ -15,33 +15,61 @@ require.extensions[".ts"] = (module, filename) => {
 
 const { LESSONS } = require("../data/lessons.ts");
 const { UNITS } = require("../data/units.ts");
+const { getCourseUnits } = require("../data/courses.ts");
 const { awardLesson, migrateLegacyProgress } = require("../lib/learningProgress.ts");
-const { isCorrectAnswer } = require("../lib/practice.ts");
+const { isCorrectAnswer, normalizeAnswer } = require("../lib/practice.ts");
 const agentSession = require("../app/api/agent-session+api.ts");
 const streamToken = require("../app/api/stream-token+api.ts");
 
-test("each launch course has complete, playable beginner lessons", () => {
+test("each launch course has ordered, complete and playable lessons in both units", () => {
   assert.equal(new Set(LESSONS.map((lesson) => lesson.id)).size, LESSONS.length);
+  assert.equal(new Set(UNITS.map((unit) => unit.id)).size, UNITS.length);
+  assert.deepEqual(getCourseUnits(null), []);
+  const activityIds = new Set();
   for (const code of ["sw", "en", "fr"]) {
-    const unit = UNITS.find((item) => item.languageCode === code);
-    assert.ok(unit, `Missing ${code} unit`);
-    assert.ok(unit.lessonIds.length >= 2, `${code} needs at least two lessons`);
-    for (const id of unit.lessonIds) {
-      const lesson = LESSONS.find((item) => item.id === id);
-      assert.ok(lesson, `Missing ${id}`);
-      assert.equal(lesson.unitId, unit.id);
-      assert.ok(lesson.vocabulary.length > 0 && lesson.phrases.length > 0, `${id} has no material`);
-      assert.ok(lesson.activities.length > 0, `${id} has no questions`);
-      assert.ok(Number.isInteger(lesson.xpReward) && lesson.xpReward > 0);
-      for (const activity of lesson.activities) {
-        assert.ok(["multiple-choice", "translate"].includes(activity.type), `${activity.id} is not supported`);
-        assert.ok(activity.question && activity.correctAnswer, `${activity.id} is incomplete`);
-        if (activity.type === "multiple-choice") {
-          assert.ok(activity.options?.includes(activity.correctAnswer), `${activity.id} has no correct option`);
-          assert.equal(new Set(activity.options).size, activity.options.length);
+    const units = getCourseUnits(code);
+    assert.deepEqual(units.map((unit) => unit.id), [`${code}-unit-1`, `${code}-unit-2`]);
+    assert.deepEqual(units.map((unit) => unit.order), [1, 2]);
+    assert.deepEqual(units[1].lessonIds, ["numbers", "family", "food", "conversation"].map((topic) => `${code}-everyday-${topic}`));
+    for (const unit of units) {
+      assert.equal(unit.lessons.length, unit.lessonIds.length, `${unit.id} has a missing lesson`);
+      assert.equal(new Set(unit.lessonIds).size, unit.lessonIds.length);
+      for (const lesson of unit.lessons) {
+        const id = lesson.id;
+        assert.equal(lesson.unitId, unit.id);
+        assert.ok(lesson.vocabulary.length > 0 && lesson.phrases.length > 0, `${id} has no material`);
+        for (const word of lesson.vocabulary) assert.ok(word.word && word.translation && word.pronunciation, `${id} has incomplete vocabulary`);
+        for (const phrase of lesson.phrases) assert.ok(phrase.text && phrase.translation && phrase.pronunciation, `${id} has an incomplete phrase`);
+        assert.ok(lesson.activities.length > 0, `${id} has no questions`);
+        assert.ok(Number.isInteger(lesson.xpReward) && lesson.xpReward > 0);
+        for (const activity of lesson.activities) {
+          assert.ok(!activityIds.has(activity.id), `Duplicate activity ${activity.id}`);
+          activityIds.add(activity.id);
+          assert.ok(["multiple-choice", "translate"].includes(activity.type), `${activity.id} is not supported`);
+          assert.ok(activity.question && activity.correctAnswer, `${activity.id} is incomplete`);
+          if (activity.type === "multiple-choice") {
+            assert.ok(activity.options?.includes(activity.correctAnswer), `${activity.id} has no correct option`);
+            assert.equal(new Set(activity.options.map(normalizeAnswer)).size, activity.options.length, `${activity.id} has equivalent options`);
+          }
         }
       }
     }
+  }
+});
+
+test("existing lesson IDs stay in place and the next lesson advances into everyday life", () => {
+  const original = {
+    sw: ["sw-lesson-1", "sw-lesson-2"],
+    en: ["en-lesson-1", "en-lesson-2"],
+    fr: ["fr-lesson-1", "fr-lesson-2", "fr-lesson-3", "fr-lesson-4", "fr-lesson-5"],
+  };
+  for (const [code, completed] of Object.entries(original)) {
+    const lessons = getCourseUnits(code).flatMap((unit) => unit.lessons);
+    assert.deepEqual(lessons.slice(0, completed.length).map((lesson) => lesson.id), completed);
+    assert.equal(lessons.find((lesson) => !completed.includes(lesson.id)).id, `${code}-everyday-numbers`);
+    const progress = migrateLegacyProgress({ completedLessonIds: completed }, LESSONS);
+    assert.deepEqual(progress.completedLessonIds, completed);
+    assert.equal(progress.totalXp, lessons.slice(0, completed.length).reduce((sum, lesson) => sum + lesson.xpReward, 0));
   }
 });
 

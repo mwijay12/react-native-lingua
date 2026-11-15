@@ -20,7 +20,7 @@ export default function DemoIndex() {
   if (!hydrated) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#6c4ef5" />
+        <ActivityIndicator size="large" color="#14675D" />
       </View>
     );
   }

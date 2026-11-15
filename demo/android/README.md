@@ -2,7 +2,10 @@
 
 This is a **test-only**, separately identified Android app. It includes beginner
 courses in Kiswahili, English and French, English menus, offline vocabulary and
-practice questions. XP and lesson completion are stored on the device; XP is
+practice questions, including everyday numbers, family, food and conversation.
+There are 21 playable lessons: six each in Kiswahili and English, and nine in
+French. The app has a new cat-and-parrot visual identity. XP and lesson
+completion are stored on the device; XP is
 awarded only the first time each lesson is completed. Existing sample XP and
 streaks from the earlier demo are not counted as real progress. Switching
 courses does not erase completed lessons.

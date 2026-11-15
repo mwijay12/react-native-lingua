@@ -1,8 +1,6 @@
 <div align="center">
   <br />
-    <a href="https://youtu.be/Q7AYc2kECDI" target="_blank">
-      <img src="public/readme/readme-hero.webp" alt="Project Banner">
-    </a>
+    <img src="assets/images/icon.png" alt="Lingua logo" width="128">
   <br />
 
   <div>
@@ -18,10 +16,10 @@
 
   </div>
 
-  <h3 align="center">Duolingo Clone | Stream & Visual Agents</h3>
+  <h3 align="center">Lingua | Language for life</h3>
 
    <div align="center">
-     Build this project step by step with our detailed tutorial on <a href="https://www.youtube.com/watch?v=XUkNR-JfHwo" target="_blank"><b>JavaScript Mastery</b></a> YouTube. Join the JSM family!
+     Created by Mwijay. Adapted from a <a href="https://www.youtube.com/watch?v=XUkNR-JfHwo" target="_blank"><b>JavaScript Mastery tutorial</b></a>.
     </div>
 </div>
 
@@ -46,8 +44,10 @@ If you prefer visual learning, this is the perfect resource for you. Follow our 
 
 Created by Mwijay. This version provides beginner Kiswahili, English and French
 courses with English instructions, local practice questions, and on-device XP
-and lesson progress. The standalone [Android demo](demo/android/README.md) has
-no sign-in or analytics.
+and lesson progress. Each course includes everyday lessons on numbers, family,
+food and conversation. Lingua's cat and parrot companions are part of its new
+visual identity. The standalone [Android demo](demo/android/README.md) has no
+sign-in or analytics.
 
 **AI voice and live chat are not enabled.** The AI screens show labelled local
 practice instead, and the agent-session and Stream-token API routes in this

@@ -92,8 +92,10 @@ def scroll_to(text, direction="down", max_swipes=8, exact=False):
     raise RuntimeError(f"Could not scroll to {text!r}")
 
 
-def complete_lesson(title, answers, *, wrong_first=False, screenshot_name=None):
-    tap(f"Lesson 1: {title}")
+def complete_lesson(title, answers, *, lesson_number=1, wrong_first=False, screenshot_name=None):
+    label = f"Lesson {lesson_number}: {title}"
+    scroll_to(label)
+    tap(label)
     wait_for("Words to learn")
     if screenshot_name:
         screenshot(screenshot_name)
@@ -108,7 +110,7 @@ def complete_lesson(title, answers, *, wrong_first=False, screenshot_name=None):
             tap(answer)
         else:
             tap("Type your answer")
-            adb("shell", "input", "text", answer)
+            adb("shell", "input", "text", answer.replace(" ", "%s"))
             # Hide the Android keyboard before tapping the check button.
             adb("shell", "input", "keyevent", "KEYCODE_BACK")
         tap("Check answer")
@@ -126,8 +128,9 @@ def change_course(language):
     scroll_to(language, exact=True)
     tap(language, exact=True)
     tap("Continue")
-    wait_for("Your learning, at a glance.")
+    scroll_to("Your learning, at a glance.", direction="up")
     tap("Learn")
+    scroll_to("YOUR LEARNING PATH", direction="up")
 
 
 def main(apk):
@@ -162,21 +165,25 @@ def main(apk):
     tap("Learn")
     wait_for("Kiswahili: First Steps")
     complete_lesson("Kiswahili Greetings", [("choice", "Thank you"), ("choice", "Kwaheri"), ("text", "Asante")], wrong_first=True, screenshot_name="07-kiswahili")
+    complete_lesson("Numbers 1–10", [("choice", "Two"), ("choice", "Tano"), ("text", "Tatu"), ("choice", "Kumi"), ("choice", "Nane")], lesson_number=3, screenshot_name="08-everyday-numbers")
+    complete_lesson("Everyday conversation", [("choice", "No"), ("choice", "Samahani"), ("text", "Ndiyo"), ("choice", "Sielewi")], lesson_number=6)
     change_course("English")
     wait_for("English: First Steps")
-    complete_lesson("English Greetings", [("choice", "Good morning"), ("choice", "Thank you"), ("text", "Please")], screenshot_name="08-english")
+    complete_lesson("English Greetings", [("choice", "Good morning"), ("choice", "Thank you"), ("text", "Please")], screenshot_name="09-english")
+    complete_lesson("Family", [("choice", "Father"), ("choice", "Sister"), ("text", "Family"), ("choice", "This is my mother.")], lesson_number=4, screenshot_name="10-everyday-family")
     change_course("French")
     wait_for("Bonjour! Greetings")
-    complete_lesson("Bonjour! Greetings", [("choice", "Hello / Good day"), ("choice", "Au revoir"), ("text", "Merci")], screenshot_name="09-french")
+    complete_lesson("Bonjour! Greetings", [("choice", "Hello / Good day"), ("choice", "Au revoir"), ("text", "Merci")], screenshot_name="11-french")
+    complete_lesson("Food & drinks", [("choice", "Water"), ("choice", "Le pain"), ("text", "Le riz"), ("choice", "Tea")], lesson_number=8, screenshot_name="12-everyday-food")
 
     tap("Home")
-    wait_for("30 XP")
+    wait_for("70 XP")
     adb("shell", "am", "force-stop", PACKAGE)
     adb("shell", "am", "start", "-n", f"{PACKAGE}/.MainActivity")
     wait_for("French")
-    wait_for("30 XP")
-    screenshot("10-relaunch")
-    print("Android smoke test passed: three courses, lessons, progress, relaunch, creator credit and disabled AI.", flush=True)
+    wait_for("70 XP")
+    screenshot("13-relaunch")
+    print("Android smoke test passed: three courses, all everyday topics, progress, relaunch, creator credit and disabled AI.", flush=True)
 
 
 if __name__ == "__main__":

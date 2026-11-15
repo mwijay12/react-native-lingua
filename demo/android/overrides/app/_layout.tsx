@@ -28,14 +28,14 @@ export default function DemoRootLayout() {
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />
-      <SafeAreaView edges={["top"]} style={{ backgroundColor: "#4c35c4" }}>
+      <SafeAreaView edges={["top"]} style={{ backgroundColor: "#104F49" }}>
         <View className="items-center px-3 py-2">
           <Text className="text-center text-xs text-white font-poppins-semibold">
             DEMO · Sign-in and AI voice are disabled
           </Text>
         </View>
       </SafeAreaView>
-      <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      <View style={{ flex: 1, backgroundColor: "#FBF8F1" }}>
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index" />
           <Stack.Screen name="onboarding" />

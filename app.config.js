@@ -1,6 +1,6 @@
 export default {
   expo: {
-    name: "duolingo-clone",
+    name: "Lingua",
     slug: "duolingo-clone",
     version: "1.0.0",
     orientation: "portrait",
@@ -15,9 +15,8 @@ export default {
     android: {
       package: "com.jsmastery.duolingoclone",
       adaptiveIcon: {
-        backgroundColor: "#E6F4FE",
+        backgroundColor: "#155F57",
         foregroundImage: "./assets/images/android-icon-foreground.png",
-        backgroundImage: "./assets/images/android-icon-background.png",
         monochromeImage: "./assets/images/android-icon-monochrome.png",
       },
       edgeToEdgeEnabled: true,
@@ -35,9 +34,9 @@ export default {
           image: "./assets/images/splash-icon.png",
           imageWidth: 200,
           resizeMode: "contain",
-          backgroundColor: "#ffffff",
+          backgroundColor: "#155F57",
           dark: {
-            backgroundColor: "#000000",
+            backgroundColor: "#155F57",
           },
         },
       ],

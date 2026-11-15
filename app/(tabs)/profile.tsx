@@ -15,12 +15,12 @@ export default function ProfileScreen() {
   const language = LANGUAGES.find((item) => item.code === selectedLanguage);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#FBF8F1" }}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         <Text className="h2">Profile</Text>
         <Text className="body-md text-text-secondary mt-2">Your learning, at a glance.</Text>
 
-        <View className="rounded-2xl bg-[#F3F0FF] p-5 mt-5">
+        <View className="rounded-2xl bg-[#E5F3ED] p-5 mt-5">
           <Text className="caption">CURRENT COURSE</Text>
           <View className="flex-row items-center mt-3">
             {language && <Image source={language.flag} style={styles.flag} />}
@@ -30,7 +30,7 @@ export default function ProfileScreen() {
             </View>
           </View>
           <TouchableOpacity onPress={() => router.push("/language-select")} className="bg-white rounded-xl items-center py-3 mt-4" accessibilityRole="button" testID="change-language-button">
-            <Text className="font-poppins-semibold text-sm text-lingua-purple">Change language</Text>
+            <Text className="font-poppins-semibold text-sm text-lingua-teal">Change language</Text>
           </TouchableOpacity>
         </View>
 
@@ -62,5 +62,5 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   content: { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 36 },
-  flag: { width: 44, height: 44, borderRadius: 22, marginRight: 12, borderWidth: 1, borderColor: "#e5e7eb" },
+  flag: { width: 44, height: 44, borderRadius: 22, marginRight: 12, borderWidth: 1, borderColor: "#E4E9DF" },
 });
