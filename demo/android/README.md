@@ -3,12 +3,26 @@
 This is a **test-only**, separately identified Android app. It includes beginner
 courses in Kiswahili, English and French, English menus, offline vocabulary and
 practice questions, including everyday numbers, family, food and conversation.
-There are 21 playable lessons: six each in Kiswahili and English, and nine in
-French. The app has a new cat-and-parrot visual identity. XP and lesson
-completion are stored on the device; XP is
-awarded only the first time each lesson is completed. Existing sample XP and
-streaks from the earlier demo are not counted as real progress. Switching
-courses does not erase completed lessons.
+There are 27 playable lessons: eight each in Kiswahili and English, and eleven
+in French. Each course has two foundation lessons with grammar explanations,
+examples and practice feedback. Earlier lessons also include context notes.
+The app retains Lingua's cat-and-parrot identity in a more focused study layout.
+
+XP, completed lessons, study sessions, the daily goal and missed questions are
+stored on the device, not synced to an account. XP is awarded only the first
+time each lesson is completed. A completed lesson (including a replay) or a
+completed review set counts as one session toward the daily goal; the goal can
+be set to one, two or three sessions across all courses. Days follow the
+device's local calendar. The seven-day view counts days with a finished session,
+not a streak, and dates are not invented for lessons completed in older versions.
+
+A wrong answer in a lesson is saved for review even if the learner then retries
+it correctly. The review list shows the selected course and practises up to ten
+saved questions per set. A correct answer removes a question; a wrong answer
+leaves it for another review. Reviewing does not award extra XP. Switching
+courses does not erase progress or another course's review list. Existing
+earned version-1 XP and completions are retained, while fictional sample XP and
+streaks from earlier versions are not counted as real progress.
 
 The demo does not sign users in, collect analytics, start an AI call, or connect
 to the agent backend. AI Teacher and Chat contain clearly labelled offline

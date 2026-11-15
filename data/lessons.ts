@@ -1,10 +1,13 @@
 import { Lesson } from '@/types/learning';
 import { STARTER_LESSONS } from './starterLessons';
 import { EVERYDAY_LESSONS } from './everydayLessons';
+import { FOUNDATION_LESSONS } from './foundationLessons';
+import { LESSON_NOTES } from './lessonNotes';
 
-export const LESSONS: Lesson[] = [
+const LESSON_DATA: Lesson[] = [
   ...STARTER_LESSONS,
   ...EVERYDAY_LESSONS,
+  ...FOUNDATION_LESSONS,
   // ─── Spanish ───────────────────────────────────────────────────────────────
 
   {
@@ -1016,3 +1019,8 @@ export const LESSONS: Lesson[] = [
     },
   },
 ];
+
+export const LESSONS: Lesson[] = LESSON_DATA.map((lesson) => ({
+  ...lesson,
+  notes: lesson.notes ?? LESSON_NOTES[lesson.id],
+}));

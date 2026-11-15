@@ -11,6 +11,7 @@ on:
       - "components/**"
       - "constants/**"
       - "data/**"
+      - "hooks/**"
       - "demo/android/**"
       - "lib/**"
       - "scripts/prepare-android-demo.mjs"

@@ -18,6 +18,17 @@ export const UNITS: Unit[] = [
     lessonIds: ['sw-everyday-numbers', 'sw-everyday-family', 'sw-everyday-food', 'sw-everyday-conversation'],
   },
   {
+    id: 'sw-unit-3',
+    languageCode: 'sw',
+    title: 'Language foundations',
+    description: 'Build useful sentences and ask questions with confidence.',
+    order: 3,
+    lessonIds: [
+      'sw-foundation-present',
+      'sw-foundation-questions',
+    ],
+  },
+  {
     id: 'en-unit-1',
     languageCode: 'en',
     title: 'English: First Steps',
@@ -32,6 +43,17 @@ export const UNITS: Unit[] = [
     description: 'Numbers, family, food and useful conversations',
     order: 2,
     lessonIds: ['en-everyday-numbers', 'en-everyday-family', 'en-everyday-food', 'en-everyday-conversation'],
+  },
+  {
+    id: 'en-unit-3',
+    languageCode: 'en',
+    title: 'Language foundations',
+    description: 'Build sentences with the verb be and talk about routines.',
+    order: 3,
+    lessonIds: [
+      'en-foundation-be',
+      'en-foundation-present',
+    ],
   },
   {
     id: 'es-unit-1',
@@ -56,6 +78,17 @@ export const UNITS: Unit[] = [
     description: 'Numbers, family, food and useful conversations',
     order: 2,
     lessonIds: ['fr-everyday-numbers', 'fr-everyday-family', 'fr-everyday-food', 'fr-everyday-conversation'],
+  },
+  {
+    id: 'fr-unit-3',
+    languageCode: 'fr',
+    title: 'Language foundations',
+    description: 'Use être and French articles to make clear sentences.',
+    order: 3,
+    lessonIds: [
+      'fr-foundation-etre',
+      'fr-foundation-articles',
+    ],
   },
   {
     id: 'ja-unit-1',

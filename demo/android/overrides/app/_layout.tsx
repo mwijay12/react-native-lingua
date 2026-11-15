@@ -42,6 +42,7 @@ export default function DemoRootLayout() {
           <Stack.Screen name="language-select" />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="lesson/[id]" />
+          <Stack.Screen name="review" />
         </Stack>
       </View>
     </SafeAreaProvider>
