@@ -31,7 +31,7 @@ export default function DemoRootLayout() {
       <SafeAreaView edges={["top"]} style={{ backgroundColor: "#4c35c4" }}>
         <View className="items-center px-3 py-2">
           <Text className="text-center text-xs text-white font-poppins-semibold">
-            DEMO · Login na sauti ya AI vimezimwa
+            DEMO · Sign-in and AI voice are disabled
           </Text>
         </View>
       </SafeAreaView>
@@ -41,7 +41,7 @@ export default function DemoRootLayout() {
           <Stack.Screen name="onboarding" />
           <Stack.Screen name="language-select" />
           <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="lesson" />
+          <Stack.Screen name="lesson/[id]" />
         </Stack>
       </View>
     </SafeAreaProvider>

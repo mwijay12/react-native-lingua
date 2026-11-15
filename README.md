@@ -42,9 +42,25 @@ If you prefer visual learning, this is the perfect resource for you. Follow our 
 
 <a href="https://youtu.be/Q7AYc2kECDI" target="_blank"><img src="https://github.com/sujatagunale/EasyRead/assets/151519281/1736fca5-a031-4854-8c09-bc110e3bc16d" /></a>
 
+## Current starter version
+
+Created by Mwijay. This version provides beginner Kiswahili, English and French
+courses with English instructions, local practice questions, and on-device XP
+and lesson progress. The standalone [Android demo](demo/android/README.md) has
+no sign-in or analytics.
+
+**AI voice and live chat are not enabled.** The AI screens show labelled local
+practice instead, and the agent-session and Stream-token API routes in this
+source return 503. They must not be re-enabled until authentication, call
+ownership, rate limiting, token validation and the agent deployment have been
+secured and reviewed. Any previously deployed backend is unaffected by these
+source changes and must be disabled or secured separately.
+
 ## <a name="introduction">✨ Introduction</a>
 
-This application is a full-featured React Native language-learning platform that leverages a sophisticated AI teacher for real-time voice interaction. Rather than just another "toy" demo, it serves as a masterclass in Practical Vibe Coding, a structured workflow using tools like Expo, Clerk, and Stream to build production-ready apps without writing manual code. It transforms the "app you never built" into a shipped reality by bridging the gap between raw AI prompting and professional software architecture.
+This is an Expo and React Native language-learning project based on the original
+tutorial below. The current starter build focuses on local, text-based lessons;
+real-time AI teaching remains future work.
 
 If you're getting started and need assistance or face any bugs, join our active Discord community with over **50k+** members. It's a place where people help each other out.
 
@@ -76,7 +92,7 @@ If you're getting started and need assistance or face any bugs, join our active 
 
 👉 **Auth Pages**: Secure and professional signup and sign-in functionality utilizing email and social auth, powered by **Clerk** for robust user management.
 
-👉 **Real-Time AI Teacher**: An immersive "speak and respond" experience powered by **Stream Voice Agents**, allowing for natural, back-and-forth verbal practice that feels like having a tutor always around.
+👉 **AI Teacher (planned)**: Live voice and chat are currently disabled. The app offers labelled offline practice while secure services are developed.
 
 👉 **Lesson Interface**: A core learning engine built with **React Native**, **Expo**, and **TypeScript**, using **NativeWind** to maintain a polished UI that survives contact with serious features.
 

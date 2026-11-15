@@ -47,7 +47,7 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
       state.index * tabWidth + (tabWidth - CIRCLE_SIZE) / 2,
       { damping: 18, stiffness: 160 }
     );
-  }, [state.index]);
+  }, [state.index, indicatorX, tabWidth]);
 
   const indicatorStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: indicatorX.value }],
@@ -78,6 +78,10 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
             onPress={onPress}
             style={styles.tab}
             activeOpacity={0.8}
+            accessibilityRole="tab"
+            accessibilityLabel={tab.label}
+            accessibilityState={{ selected: isFocused }}
+            testID={`tab-${route.name}`}
           >
             <Ionicons
               name={isFocused ? tab.activeIcon : tab.icon}

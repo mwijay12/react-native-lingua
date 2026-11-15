@@ -1,52 +1,31 @@
-import { Language } from "@/types/learning";
+import { images } from "@/constants/images";
+import { Language, LanguageCode } from "@/types/learning";
 
+// Only launch courses are listed. Existing content for other languages is kept.
 export const LANGUAGES: Language[] = [
   {
-    code: "es",
-    name: "Spanish",
-    nativeName: "Español",
-    flag: "https://flagcdn.com/w320/es.png",
-    color: "#FF9500",
-    learners: "28.4M",
+    code: "sw",
+    name: "Kiswahili",
+    nativeName: "Swahili",
+    flag: images.flagSwahili,
+    color: "#21A96B",
+  },
+  {
+    code: "en",
+    name: "English",
+    nativeName: "English",
+    flag: images.flagEnglish,
+    color: "#4D88FF",
   },
   {
     code: "fr",
     name: "French",
     nativeName: "Français",
-    flag: "https://flagcdn.com/w320/fr.png",
-    color: "#4D88FF",
-    learners: "19.4M",
+    flag: images.flagFrench,
+    color: "#6C4EF5",
   },
-  {
-    code: "ja",
-    name: "Japanese",
-    nativeName: "日本語",
-    flag: "https://flagcdn.com/w320/jp.png",
-    color: "#FF3B30",
-    learners: "12.7M",
-  },
-  // {
-  //   code: "ko",
-  //   name: "Korean",
-  //   nativeName: "한국어",
-  //   flag: "https://flagcdn.com/w320/kr.png",
-  //   color: "#4D88FF",
-  //   learners: "9.3M",
-  // },
-  {
-    code: "de",
-    name: "German",
-    nativeName: "Deutsch",
-    flag: "https://flagcdn.com/w320/de.png",
-    color: "#FFCC00",
-    learners: "8.1M",
-  },
-  // {
-  //   code: "zh",
-  //   name: "Chinese",
-  //   nativeName: "中文",
-  //   flag: "https://flagcdn.com/w320/cn.png",
-  //   color: "#FF3B30",
-  //   learners: "7.4M",
-  // },
 ];
+
+export function isAvailableLanguage(code: unknown): code is LanguageCode {
+  return LANGUAGES.some((language) => language.code === code);
+}

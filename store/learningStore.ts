@@ -2,36 +2,27 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-interface LearningState {
-  xpToday: number;
-  dailyGoal: number;
-  streak: number;
-  completedLessonIds: string[];
-  addXP: (amount: number) => void;
-  completeLesson: (lessonId: string) => void;
+import { LESSONS } from "@/data/lessons";
+import { awardLesson, LearningProgress, migrateLegacyProgress } from "@/lib/learningProgress";
+
+interface LearningState extends LearningProgress {
+  completeLesson: (lessonId: string, reward: number) => void;
 }
 
 export const useLearningStore = create<LearningState>()(
   persist(
     (set) => ({
-      xpToday: 15,
-      dailyGoal: 20,
-      streak: 12,
+      totalXp: 0,
       completedLessonIds: [],
-      addXP: (amount) =>
-        set((state) => ({
-          xpToday: Math.min(state.xpToday + amount, state.dailyGoal),
-        })),
-      completeLesson: (lessonId) =>
-        set((state) => ({
-          completedLessonIds: state.completedLessonIds.includes(lessonId)
-            ? state.completedLessonIds
-            : [...state.completedLessonIds, lessonId],
-        })),
+      completeLesson: (lessonId, reward) =>
+        set((state) => awardLesson(state, lessonId, reward)),
     }),
     {
       name: "learning-storage",
+      version: 1,
       storage: createJSONStorage(() => AsyncStorage),
-    }
-  )
+      partialize: ({ totalXp, completedLessonIds }) => ({ totalXp, completedLessonIds }),
+      migrate: (previous) => migrateLegacyProgress(previous, LESSONS),
+    },
+  ),
 );

@@ -1,3 +1,4 @@
+import { CREATOR_CREDIT } from "@/constants/branding";
 import { images } from "@/constants/images";
 import { posthog } from "@/lib/posthog";
 import { Ionicons } from "@expo/vector-icons";
@@ -9,65 +10,38 @@ export default function OnboardingScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <View className="flex-1 px-6">
-        {/* Logo header */}
         <View className="flex-row items-center justify-center gap-2 mt-4">
-          <Image source={images.mascotLogo} className="w-10 h-10" />
-          <Text className="font-poppins-semibold text-xl text-text-primary">
-            lingua
-          </Text>
+          <Image source={images.mascotLogo} className="w-10 h-10" style={{ width: 40, height: 40 }} />
+          <Text className="font-poppins-semibold text-xl text-text-primary">lingua</Text>
         </View>
-
-        {/* Hero heading */}
         <Text className="h1 mt-8">
-          {"Your AI language\n"}
-          <Text className="text-lingua-purple">teacher.</Text>
+          {"Start your language\n"}
+          <Text className="text-lingua-purple">journey.</Text>
         </Text>
-
-        {/* Subtitle */}
         <Text className="body-md text-text-secondary mt-3">
-          Real conversations, personalized lessons, anytime, anywhere.
+          Learn Kiswahili, English and French, one lesson at a time.
         </Text>
-
-        {/* Mascot illustration with speech bubbles */}
         <View className="flex-1 mt-4">
           <Image
             source={images.mascotWelcome}
             className="flex-1 w-full"
+            style={{ flex: 1, width: "100%", height: "100%" }}
             resizeMode="contain"
           />
-
-          <View
-            className="absolute bg-white rounded-2xl px-4 py-2.5 left-0 top-[35%]"
-            style={styles.shadow}
-          >
-            <Text className="font-poppins-medium text-sm text-text-primary">
-              Hello!
-            </Text>
+          <View className="absolute bg-white rounded-2xl px-4 py-2.5 left-0 top-[35%]" style={styles.shadow}>
+            <Text className="font-poppins-medium text-sm text-text-primary">Hello!</Text>
           </View>
-
-          <View
-            className="absolute bg-white rounded-2xl px-4 py-2.5 right-0 top-[10%]"
-            style={styles.shadow}
-          >
-            <Text className="font-poppins-medium text-sm text-text-primary">
-              ¡Hola!
-            </Text>
+          <View className="absolute bg-white rounded-2xl px-4 py-2.5 right-0 top-[10%]" style={styles.shadow}>
+            <Text className="font-poppins-medium text-sm text-text-primary">Habari!</Text>
           </View>
-
-          <View
-            className="absolute bg-white rounded-2xl px-4 py-2.5 right-5 top-[60%]"
-            style={styles.shadow}
-          >
-            <Text className="font-poppins-medium text-sm text-error">
-              你好!
-            </Text>
+          <View className="absolute bg-white rounded-2xl px-4 py-2.5 right-5 top-[60%]" style={styles.shadow}>
+            <Text className="font-poppins-medium text-sm text-error">Bonjour!</Text>
           </View>
         </View>
-
-        {/* CTA button */}
         <TouchableOpacity
-          className="bg-lingua-purple rounded-2xl flex-row items-center justify-center mt-2 mb-6 py-4.5"
+          className="bg-lingua-purple rounded-2xl flex-row items-center justify-center mt-2 mb-2 py-4.5"
           activeOpacity={0.85}
+          accessibilityRole="button"
           testID="get-started-button"
           onPress={() => {
             posthog.capture("onboarding_get_started_tapped");
@@ -77,13 +51,11 @@ export default function OnboardingScreen() {
           <Text className="font-poppins-semibold text-base text-white">
             Get Started
           </Text>
-          <Ionicons
-            name="chevron-forward"
-            size={22}
-            color="#fff"
-            style={{ marginLeft: 8 }}
-          />
+          <Ionicons name="chevron-forward" size={22} color="#fff" style={{ marginLeft: 8 }} />
         </TouchableOpacity>
+        <Text className="font-poppins-medium text-xs text-text-secondary text-center mb-4" testID="onboarding-creator-credit">
+          {CREATOR_CREDIT}
+        </Text>
       </View>
     </SafeAreaView>
   );

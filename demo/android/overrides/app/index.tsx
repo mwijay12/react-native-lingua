@@ -1,3 +1,4 @@
+import { isAvailableLanguage } from "@/data/languages";
 import { useLanguageStore } from "@/store/languageStore";
 import { Redirect } from "expo-router";
 import { useEffect, useState } from "react";
@@ -12,7 +13,6 @@ export default function DemoIndex() {
     const unsubscribe = useLanguageStore.persist.onFinishHydration(() =>
       setHydrated(true),
     );
-    // Hydration can finish between the initial render and this subscription.
     if (useLanguageStore.persist.hasHydrated()) setHydrated(true);
     return unsubscribe;
   }, []);
@@ -25,5 +25,7 @@ export default function DemoIndex() {
     );
   }
 
-  return <Redirect href={selectedLanguage ? "/(tabs)" : "/onboarding"} />;
+  if (isAvailableLanguage(selectedLanguage)) return <Redirect href="/(tabs)" />;
+  if (selectedLanguage !== null) return <Redirect href="/language-select" />;
+  return <Redirect href="/onboarding" />;
 }

@@ -1,260 +1,128 @@
-import { useAuth, useUser } from "@clerk/expo";
+import { useUser } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { router } from "expo-router";
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { LessonIcon } from "@/components/LessonIcon";
 import { images } from "@/constants/images";
-import { colors } from "@/constants/theme";
 import { LANGUAGES } from "@/data/languages";
+import { LESSONS } from "@/data/lessons";
 import { UNITS } from "@/data/units";
-import { posthog } from "@/lib/posthog";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLearningStore } from "@/store/learningStore";
-import { LanguageCode } from "@/types/learning";
-
-function getGreeting(langCode: LanguageCode | null): string {
-  switch (langCode) {
-    case "es":
-      return "Hola";
-    case "fr":
-      return "Bonjour";
-    case "ja":
-      return "こんにちは";
-    case "de":
-      return "Hallo";
-    default:
-      return "Hello";
-  }
-}
-
-const PLAN_ITEMS = [
-  {
-    id: "lesson",
-    icon: "book" as const,
-    iconBg: "#EDE9FE",
-    iconColor: colors.primary.purple,
-    title: "Lesson",
-    subtitle: "At the café",
-    completed: true,
-  },
-  {
-    id: "ai-conversation",
-    icon: "headset" as const,
-    iconBg: "#EDE9FE",
-    iconColor: colors.primary.purple,
-    title: "AI Conversation",
-    subtitle: "Talk about your day",
-    completed: false,
-  },
-  {
-    id: "new-words",
-    icon: "chatbubble-ellipses" as const,
-    iconBg: "#FEE2E2",
-    iconColor: "#EF4444",
-    title: "New words",
-    subtitle: "10 words",
-    completed: false,
-  },
-];
 
 export default function HomeScreen() {
   const { user } = useUser();
-  const { signOut } = useAuth();
   const { selectedLanguage } = useLanguageStore();
-  const { xpToday, dailyGoal, streak } = useLearningStore();
-
-  const language = LANGUAGES.find((l) => l.code === selectedLanguage);
-  const unit = UNITS.find((u) => u.languageCode === selectedLanguage);
+  const { totalXp, completedLessonIds } = useLearningStore();
   const firstName = user?.firstName ?? "Learner";
-  const greeting = getGreeting(selectedLanguage);
-  const xpProgress =
-    dailyGoal > 0 ? Math.min((xpToday / dailyGoal) * 100, 100) : 0;
+
+  const language = LANGUAGES.find((item) => item.code === selectedLanguage);
+  const unit = UNITS.find((item) => item.languageCode === selectedLanguage);
+  const lessons = unit?.lessonIds
+    .map((id) => LESSONS.find((item) => item.id === id))
+    .filter((lesson) => lesson !== undefined) ?? [];
+  const completedCount = lessons.filter((lesson) => completedLessonIds.includes(lesson.id)).length;
+  const nextLesson = lessons.find((lesson) => !completedLessonIds.includes(lesson.id));
+  const progress = lessons.length ? Math.round((completedCount / lessons.length) * 100) : 0;
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: colors.neutral.background }}
-    >
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* ── Header ── */}
-        <View className="flex-row items-center justify-between mb-5">
-          <View className="flex-row items-center gap-[10px]">
-            {language ? (
-              <Image
-                source={{ uri: language.flag }}
-                className="w-[34px] h-[34px] rounded-full"
-              />
-            ) : (
-              <View className="w-[34px] h-[34px] rounded-full bg-surface" />
-            )}
-            <Text className="font-poppins-semibold text-base text-text-primary">
-              {greeting}, {firstName}! 👋
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
+        <View className="flex-row items-center justify-between mb-6">
+          <View className="flex-1 pr-3">
+            <Text className="font-poppins-semibold text-[22px] text-text-primary">
+              Hello, {firstName}!
             </Text>
+            <Text className="body-sm text-text-secondary mt-1">Ready to learn something new?</Text>
           </View>
-
-          <View className="flex-row items-center gap-[14px]">
-            <View className="flex-row items-center gap-1">
-              <Image source={images.streakFire} className="w-[22px] h-[22px]" />
-              <Text className="font-poppins-semibold text-[15px] text-streak">
-                {streak}
-              </Text>
-            </View>
-            <TouchableOpacity activeOpacity={0.7}>
-              <Ionicons
-                name="notifications-outline"
-                size={24}
-                color={colors.neutral.textPrimary}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity activeOpacity={0.7} onPress={() => signOut()}>
-              <Ionicons
-                name="log-out-outline"
-                size={24}
-                color={colors.neutral.textPrimary}
-              />
-            </TouchableOpacity>
-          </View>
+          <Image source={images.mascotLogo} style={{ width: 48, height: 48 }} resizeMode="contain" />
         </View>
 
-        {/* ── Daily Goal Card ── */}
-        <View className="flex-row items-center bg-[#FFF5E8] rounded-[20px] py-4 pl-5 pr-3 mb-4">
-          <View className="flex-1 pr-2">
-            <Text className="font-poppins text-xs text-text-secondary mb-1">
-              Daily goal
+        <View className="bg-lingua-purple rounded-[24px] p-5 mb-6">
+          <Text className="font-poppins-medium text-xs text-white/80 mb-2">YOUR COURSE</Text>
+          <View className="flex-row items-center mb-1">
+            {language && <Image source={language.flag} style={styles.flag} />}
+            <Text className="font-poppins-bold text-[23px] text-white flex-1" testID="home-course-title">
+              {language?.name ?? "Choose a language"}
             </Text>
-            <Text>
-              <Text className="font-poppins-bold text-[28px] text-text-primary leading-[34px]">
-                {xpToday}
-              </Text>
-              <Text className="font-poppins text-sm text-text-secondary leading-[34px]">
-                {` / ${dailyGoal} XP`}
-              </Text>
-            </Text>
-            <View className="h-2 bg-border rounded mt-[10px] overflow-hidden">
-              <View
-                className="h-2 bg-streak rounded"
-                style={{ width: `${Math.round(xpProgress)}%` as `${number}%` }}
-              />
-            </View>
           </View>
-          <Image
-            source={images.treasure}
-            className="w-20 h-20"
-            resizeMode="contain"
-          />
-        </View>
-
-        {/* ── Continue Learning Card ── */}
-        <View className="flex-row bg-lingua-purple rounded-[20px] h-[160px] mb-6 overflow-hidden">
-          <View className="flex-1 py-5 pl-5 pr-2 justify-between">
-            <View>
-              <Text className="font-poppins text-[11px] text-white/75 mb-0.5">
-                Continue learning
-              </Text>
-              <Text className="font-poppins-bold text-[22px] text-white leading-7">
-                {language?.name ?? "Pick a language"}
-              </Text>
-              <Text className="font-poppins text-xs text-white/65 mt-0.5">
-                A1 · Unit {unit?.order ?? 1}
-              </Text>
-            </View>
-            <TouchableOpacity
-              className="bg-white rounded-xl py-2 px-[22px] self-start"
-              activeOpacity={0.85}
-              testID="continue-learning-button"
-              onPress={() => {
-                posthog.capture("continue_learning_tapped", {
-                  language_code: selectedLanguage,
-                  unit_order: unit?.order ?? 1,
-                  xp_today: xpToday,
-                  streak,
-                });
-              }}
-            >
-              <Text className="font-poppins-semibold text-[13px] text-lingua-purple">
-                Continue
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <Image
-            source={images.palace}
-            className="w-[130px] h-[160px]"
-            resizeMode="cover"
-          />
-        </View>
-
-        {/* ── Today's Plan Header ── */}
-        <View className="flex-row items-center justify-between mb-3">
-          <Text className="font-poppins-semibold text-[17px] text-text-primary">
-            {"Today's plan"}
+          <Text className="font-poppins text-sm text-white/80 mt-1">
+            {unit ? `Unit ${unit.order} · ${unit.title}` : "Pick a course to get started."}
           </Text>
-          <TouchableOpacity activeOpacity={0.7}>
-            <Text className="font-poppins-medium text-[13px] text-lingua-blue">
-              View all
+          {unit && (
+            <>
+              <View className="h-2 bg-white/30 rounded-full overflow-hidden mt-4">
+                <View className="h-2 bg-white rounded-full" style={{ width: `${progress}%` }} />
+              </View>
+              <Text className="font-poppins text-xs text-white/80 mt-2">
+                {completedCount} of {lessons.length} lessons completed
+              </Text>
+            </>
+          )}
+          <TouchableOpacity
+            className="bg-white rounded-xl py-3 px-5 self-start mt-4"
+            activeOpacity={0.85}
+            accessibilityRole="button"
+            testID="continue-learning-button"
+            onPress={() => unit ? router.navigate("/(tabs)/learn") : router.push("/language-select")}
+          >
+            <Text className="font-poppins-semibold text-sm text-lingua-purple">
+              {unit ? "Continue" : "Choose a course"}
             </Text>
           </TouchableOpacity>
         </View>
 
-        {/* ── Today's Plan Card ── */}
-        <View
-          className="bg-white rounded-[20px] border border-border mb-4 overflow-hidden"
-          style={styles.planCardShadow}
-        >
-          {PLAN_ITEMS.map((item, index) => (
-            <View key={item.id}>
-              {index > 0 && <View className="h-px bg-border mx-4" />}
-              <View className="flex-row items-center px-4 py-[14px]">
-                <View
-                  className="w-11 h-11 rounded-xl items-center justify-center"
-                  style={{ backgroundColor: item.iconBg }}
-                >
-                  <Ionicons name={item.icon} size={20} color={item.iconColor} />
-                </View>
-                <View className="flex-1 ml-3">
-                  <Text className="font-poppins-semibold text-sm text-text-primary mb-0.5">
-                    {item.title}
-                  </Text>
-                  <Text className="font-poppins text-xs text-text-secondary">
-                    {item.subtitle}
-                  </Text>
-                </View>
-                {item.completed ? (
-                  <View className="w-[26px] h-[26px] rounded-full bg-lingua-blue items-center justify-center">
-                    <Ionicons name="checkmark" size={14} color="#fff" />
-                  </View>
-                ) : (
-                  <View className="w-[26px] h-[26px] rounded-full border-2 border-border" />
-                )}
-              </View>
-            </View>
-          ))}
+        <View className="flex-row items-center justify-between mb-3">
+          <Text className="font-poppins-semibold text-lg text-text-primary">Your progress</Text>
+          <Text className="caption">Saved on this device</Text>
         </View>
+        <View className="flex-row gap-3 mb-6">
+          <View className="flex-1 bg-[#FFF5E8] rounded-2xl p-4">
+            <Ionicons name="star" size={22} color="#F59E0B" />
+            <Text className="font-poppins-bold text-[22px] text-text-primary mt-2" testID="home-total-xp">
+              {totalXp} XP
+            </Text>
+            <Text className="body-sm text-text-secondary">Total earned</Text>
+          </View>
+          <View className="flex-1 bg-[#EDF8F1] rounded-2xl p-4">
+            <Ionicons name="checkmark-circle" size={22} color="#21A96B" />
+            <Text className="font-poppins-bold text-[22px] text-text-primary mt-2" testID="home-completed-count">
+              {completedLessonIds.length}
+            </Text>
+            <Text className="body-sm text-text-secondary">Lessons completed</Text>
+          </View>
+        </View>
+
+        <Text className="font-poppins-semibold text-lg text-text-primary mb-3">
+          {nextLesson ? "Up next" : "Keep practising"}
+        </Text>
+        <TouchableOpacity
+          className="flex-row items-center rounded-2xl border border-border bg-white p-4"
+          accessibilityRole="button"
+          activeOpacity={0.8}
+          onPress={() => nextLesson ? router.push(`/lesson/${nextLesson.id}`) : router.navigate("/(tabs)/learn")}
+        >
+          <View className="w-12 h-12 rounded-xl bg-[#F3F0FF] items-center justify-center mr-3">
+            <LessonIcon icon={nextLesson?.icon} />
+          </View>
+          <View className="flex-1">
+            <Text className="font-poppins-semibold text-sm text-text-primary">
+              {nextLesson?.title ?? "Review your lessons"}
+            </Text>
+            <Text className="body-sm text-text-secondary mt-1">
+              {nextLesson ? `${nextLesson.activities.length} questions · ${nextLesson.xpReward} XP` : "Revisit what you have learned."}
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color="#6b7280" />
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-// ScrollView.contentContainerStyle and shadow (iOS/Android) must stay in StyleSheet
 const styles = StyleSheet.create({
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 100,
-  },
-  planCardShadow: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
-  },
+  content: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 32 },
+  flag: { width: 34, height: 34, borderRadius: 17, marginRight: 10 },
 });

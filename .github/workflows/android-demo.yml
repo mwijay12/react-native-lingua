@@ -16,6 +16,7 @@ on:
       - "scripts/prepare-android-demo.mjs"
       - "scripts/smoke-android-demo.py"
       - "store/**"
+      - "tests/**"
       - "types/**"
       - "package*.json"
       - "*.config.js"
@@ -47,6 +48,11 @@ jobs:
           java-version: "17"
       - name: Install project dependencies
         run: npm ci --legacy-peer-deps --ignore-scripts --no-audit --no-fund
+      - name: Validate source and lesson content
+        run: |
+          npm run lint
+          npm run typecheck
+          npm test
       - name: Prepare isolated demo project
         run: node scripts/prepare-android-demo.mjs
       - name: Generate Android project

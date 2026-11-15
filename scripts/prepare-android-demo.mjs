@@ -35,8 +35,6 @@ rmSync(join(output, "app", "api"), { recursive: true, force: true });
 cpSync(join(demo, "overrides"), output, { recursive: true });
 cpSync(join(demo, "app.config.js"), join(output, "app.config.js"));
 cpSync(join(demo, "metro.config.js"), join(output, "metro.config.js"));
-mkdirSync(join(output, "demo"));
-cpSync(join(demo, "flags.ts"), join(output, "demo", "flags.ts"));
 symlinkSync(join(root, "node_modules"), join(output, "node_modules"), "dir");
 
 // These services are deliberately absent from the native demo and autolinking.
@@ -49,74 +47,16 @@ for (const name of [
 manifest.name = "lingua-android-demo";
 writeFileSync(join(output, "package.json"), `${JSON.stringify(manifest, null, 2)}\n`);
 
-// Keep the original UI, but make the demo entry and sample navigation local.
+// Keep the real lesson screens, but make the demo entry local and account-free.
 replaceOnce("app/onboarding.tsx", 'import { posthog } from "@/lib/posthog";\n', "");
-replaceOnce(
-  "app/onboarding.tsx",
-  'Real conversations, personalized lessons, anytime, anywhere.',
-  'Muonekano wa app ya kujifunza lugha.',
-);
 replaceOnce(
   "app/onboarding.tsx",
   '            posthog.capture("onboarding_get_started_tapped");\n            router.push("/(auth)/sign-up");',
   '            router.push("/language-select");',
 );
-replaceOnce("app/onboarding.tsx", "            Get Started\n", "            Jaribu demo\n");
-replaceOnce(
-  "app/onboarding.tsx",
-  '<Image source={images.mascotLogo} className="w-10 h-10" />',
-  '<Image source={images.mascotLogo} className="w-10 h-10" style={{ width: 40, height: 40 }} />',
-);
-replaceOnce(
-  "app/onboarding.tsx",
-  '            className="flex-1 w-full"\n            resizeMode="contain"',
-  '            className="flex-1 w-full"\n            style={{ flex: 1, width: "100%", height: "100%" }}\n            resizeMode="contain"',
-);
-
-replaceOnce(
-  "app/(tabs)/index.tsx",
-  'import { useAuth, useUser } from "@clerk/expo";',
-  'import { router } from "expo-router";',
-);
-replaceOnce(
-  "app/(tabs)/index.tsx",
-  '  const { user } = useUser();\n  const { signOut } = useAuth();\n  const { selectedLanguage } = useLanguageStore();',
-  '  const { selectedLanguage, clearSelectedLanguage } = useLanguageStore();\n  const signOut = () => {\n    clearSelectedLanguage();\n    router.replace("/");\n  };',
-);
+replaceOnce("app/onboarding.tsx", "            Get Started\n", "            Try the demo\n");
+replaceOnce("app/(tabs)/index.tsx", 'import { useUser } from "@clerk/expo";\n', "");
+replaceOnce("app/(tabs)/index.tsx", '  const { user } = useUser();\n', "");
 replaceOnce('app/(tabs)/index.tsx', '  const firstName = user?.firstName ?? "Learner";', '  const firstName = "Learner";');
-replaceOnce(
-  "app/(tabs)/index.tsx",
-  '                  streak,\n                });',
-  '                  streak,\n                });\n                router.navigate("/(tabs)/learn");',
-);
-replaceOnce(
-  "app/(tabs)/index.tsx",
-  '                className="w-[34px] h-[34px] rounded-full"',
-  '                className="w-[34px] h-[34px] rounded-full"\n                style={{ width: 34, height: 34, borderRadius: 17 }}',
-);
-replaceOnce(
-  "app/(tabs)/index.tsx",
-  '<Image source={images.streakFire} className="w-[22px] h-[22px]" />',
-  '<Image source={images.streakFire} className="w-[22px] h-[22px]" style={{ width: 22, height: 22 }} />',
-);
-replaceOnce(
-  "app/(tabs)/index.tsx",
-  '            className="w-20 h-20"\n            resizeMode="contain"',
-  '            className="w-20 h-20"\n            style={{ width: 80, height: 80 }}\n            resizeMode="contain"',
-);
-replaceOnce(
-  "app/(tabs)/index.tsx",
-  '            className="w-[130px] h-[160px]"\n            resizeMode="cover"',
-  '            className="w-[130px] h-[160px]"\n            style={{ width: 130, height: 160 }}\n            resizeMode="cover"',
-);
-
-// Avoid remote thumbnail and flag hosts so visual assets work offline.
-replaceOnce("components/LessonCard.tsx", 'import { colors } from "@/constants/theme";', 'import { colors } from "@/constants/theme";\nimport { images } from "@/constants/images";');
-replaceOnce("components/LessonCard.tsx", 'function getLessonThumbnail(lessonId: string): string {\n  return `https://picsum.photos/seed/${lessonId}/160/100`;\n}\n\n', "");
-replaceOnce("components/LessonCard.tsx", 'source={{ uri: getLessonThumbnail(lesson.id) }}', 'source={images.palace}');
-replaceOnce("data/languages.ts", 'import { Language } from "@/types/learning";', 'import { Language } from "@/types/learning";\nimport { demoFlags } from "@/demo/flags";');
-for (const [code, country] of [["es", "es"], ["fr", "fr"], ["ja", "jp"], ["de", "de"]]) {
-  replaceOnce("data/languages.ts", `"https://flagcdn.com/w320/${country}.png"`, `demoFlags.${code}`);
-}
 
 console.log(`Prepared standalone Android demo in ${output}`);

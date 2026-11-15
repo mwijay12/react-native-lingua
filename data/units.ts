@@ -2,6 +2,22 @@ import { Unit } from '@/types/learning';
 
 export const UNITS: Unit[] = [
   {
+    id: 'sw-unit-1',
+    languageCode: 'sw',
+    title: 'Kiswahili: First Steps',
+    description: 'Learn everyday greetings and introductions in Kiswahili',
+    order: 1,
+    lessonIds: ['sw-lesson-1', 'sw-lesson-2'],
+  },
+  {
+    id: 'en-unit-1',
+    languageCode: 'en',
+    title: 'English: First Steps',
+    description: 'Practise simple English greetings and introductions',
+    order: 1,
+    lessonIds: ['en-lesson-1', 'en-lesson-2'],
+  },
+  {
     id: 'es-unit-1',
     languageCode: 'es',
     title: 'Greetings & Basics',
