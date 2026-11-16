@@ -1,0 +1,32 @@
+[
+  {
+    "name": "01-onboarding.png",
+    "sha": "fe3d457535ffd932d3066517596b516661729b13",
+    "size": 500318
+  },
+  {
+    "name": "02-language.png",
+    "sha": "dcb0567152bff2e12de736a63a6babdf94b3db07",
+    "size": 150709
+  },
+  {
+    "name": "failed-job.log",
+    "sha": "c6e012783823c8cbb9a1f360cfe44c8ba765764d",
+    "size": 38819
+  },
+  {
+    "name": "last-screen.png",
+    "sha": "611850587f7f74915b7de5afb893f0e314cce387",
+    "size": 181731
+  },
+  {
+    "name": "last-window.xml",
+    "sha": "2b2e3240cbc33b5d7fcdef5bd1d7ace358b4998b",
+    "size": 32605
+  },
+  {
+    "name": "logcat.txt",
+    "sha": "5a753af526c9cc16f8aabbdc07a66ea279af2e93",
+    "size": 86
+  }
+]
