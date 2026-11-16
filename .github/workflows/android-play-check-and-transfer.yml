@@ -2,7 +2,9 @@ name: Android play upgrade and transfer
 
 # Temporary, branch-scoped validation and transfer of this test build.
 on:
-  workflow_dispatch:
+  push:
+    branches: ["arena/22e64741-react-native-lingua"]
+    paths: [".github/workflows/android-play-check-and-transfer.yml"]
 
 permissions:
   contents: read
