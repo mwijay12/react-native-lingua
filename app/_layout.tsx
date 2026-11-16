@@ -1,7 +1,8 @@
 import "../global.css";
 
+import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
 import { posthog } from "@/lib/posthog";
-import { useLanguageStore } from "@/store/languageStore";
+import { useLanguageHydrationStatus, useLanguageStore } from "@/store/languageStore";
 import { ClerkProvider, useUser } from "@clerk/expo";
 import { tokenCache } from "@clerk/expo/token-cache";
 import { useFonts } from "expo-font";
@@ -35,6 +36,7 @@ function ClerkIdentifier() {
 }
 
 export default function RootLayout() {
+  const languageHydration = useLanguageHydrationStatus((state) => state.status);
   const [fontsLoaded, fontError] = useFonts({
     "Poppins-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
     "Poppins-Medium": require("../assets/fonts/Poppins-Medium.ttf"),
@@ -78,16 +80,22 @@ export default function RootLayout() {
       }}
     >
       <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-        <ClerkIdentifier />
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="onboarding" />
-          <Stack.Screen name="(auth)" />
-          <Stack.Screen name="language-select" />
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="lesson/[id]" />
-          <Stack.Screen name="review" />
-        </Stack>
+        {languageHydration !== "ready" ? (
+          <LearningHydrationScreen status={languageHydration} storage="course" />
+        ) : (
+          <>
+            <ClerkIdentifier />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="onboarding" />
+              <Stack.Screen name="(auth)" />
+              <Stack.Screen name="language-select" />
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="lesson/[id]" />
+              <Stack.Screen name="review" />
+            </Stack>
+          </>
+        )}
       </ClerkProvider>
     </PostHogProvider>
   );

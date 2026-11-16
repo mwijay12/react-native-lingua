@@ -25,7 +25,8 @@ export function QuestionInput({ activity, answer, disabled, onChange, onSubmit }
               disabled={disabled}
               accessibilityRole="radio"
               accessibilityLabel={option}
-              accessibilityState={{ selected, disabled }}
+              accessibilityState={{ checked: selected, disabled }}
+              aria-checked={selected}
               testID={`activity-choice-${index}`}
               className={`flex-row items-center rounded-2xl border border-b-2 p-3.5 ${selected ? "border-lingua-teal bg-[#E5F3ED]" : "border-border bg-white"}`}
             >

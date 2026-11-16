@@ -117,7 +117,8 @@ export default function HomeScreen() {
                 onPress={() => setDailyGoal(goal)}
                 accessibilityRole="radio"
                 accessibilityLabel={`${goal} ${goal === 1 ? "session" : "sessions"} per day`}
-                accessibilityState={{ selected: dailyGoal === goal }}
+                accessibilityState={{ checked: dailyGoal === goal }}
+                aria-checked={dailyGoal === goal}
                 testID={`daily-goal-${goal}`}
                 className={`flex-1 rounded-xl border items-center py-2.5 ${dailyGoal === goal ? "bg-lingua-mint border-lingua-teal" : "bg-white border-border"}`}
               >

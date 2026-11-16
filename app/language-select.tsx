@@ -32,7 +32,8 @@ export default function LanguageSelectScreen() {
         className={`flex-row items-center px-4 border rounded-[20px] ${compact ? "py-2" : "py-3.5"} ${isSelected ? "bg-lingua-mint border-[#9BCDC0]" : "bg-white border-border"}`}
         activeOpacity={0.8}
         accessibilityRole="radio"
-        accessibilityState={{ selected: isSelected }}
+        accessibilityState={{ checked: isSelected }}
+        aria-checked={isSelected}
         accessibilityLabel={item.name}
         testID={`language-option-${item.code}`}
       >

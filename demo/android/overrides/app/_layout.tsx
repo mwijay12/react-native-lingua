@@ -1,5 +1,7 @@
 import "../global.css";
 
+import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
+import { useLanguageHydrationStatus } from "@/store/languageStore";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -12,6 +14,7 @@ SplashScreen.preventAutoHideAsync();
 
 // This layout is only copied into the isolated Android demo project.
 export default function DemoRootLayout() {
+  const languageHydration = useLanguageHydrationStatus((state) => state.status);
   const [fontsLoaded, fontError] = useFonts({
     "Poppins-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
     "Poppins-Medium": require("../assets/fonts/Poppins-Medium.ttf"),
@@ -36,14 +39,18 @@ export default function DemoRootLayout() {
         </View>
       </SafeAreaView>
       <View style={{ flex: 1, backgroundColor: "#FBF8F1" }}>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="onboarding" />
-          <Stack.Screen name="language-select" />
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="lesson/[id]" />
-          <Stack.Screen name="review" />
-        </Stack>
+        {languageHydration !== "ready" ? (
+          <LearningHydrationScreen status={languageHydration} storage="course" />
+        ) : (
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="onboarding" />
+            <Stack.Screen name="language-select" />
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="lesson/[id]" />
+            <Stack.Screen name="review" />
+          </Stack>
+        )}
       </View>
     </SafeAreaProvider>
   );

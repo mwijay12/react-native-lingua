@@ -176,7 +176,8 @@ def main(apk):
     wait_for("TODAY’S STUDY")
     scroll_to("2 sessions per day", exact=True)
     tap("2 sessions per day", exact=True)
-    wait_for("0 / 2")
+    # The goal controls can be visible while the counter above is offscreen.
+    scroll_to("0 / 2", direction="up")
     scroll_to("0 XP")
     screenshot("03-home")
 
