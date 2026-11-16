@@ -66,8 +66,8 @@ selected course. A correct answer in review clears a question, while a missed
 answer stays for another set. Review awards no XP. Existing lesson progress is
 preserved on upgrade, but old completions are not assigned fictional study
 dates. Goals and history use the device's local calendar and do not sync. If
-saved progress cannot be read, Lingua offers a retry instead of treating it as
-an empty profile or overwriting it.
+saved progress or the selected course cannot be read, Lingua offers a retry
+instead of treating it as an empty profile or overwriting it.
 
 **AI voice and live chat are not enabled.** The AI screens show labelled local
 practice instead, and the agent-session and Stream-token API routes in this

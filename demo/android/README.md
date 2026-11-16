@@ -25,7 +25,7 @@ leaves it for another review. Reviewing does not award extra XP. Switching
 courses does not erase progress or another course's review list. Existing
 earned version-1 XP and completions are retained, while fictional sample XP and
 streaks from earlier versions are not counted as real progress. If saved
-progress cannot be read, the app offers a retry without resetting it.
+progress or the selected course cannot be read, the app offers a retry without resetting it.
 
 The demo does not sign users in, collect analytics, start an AI call, or connect
 to the agent backend. AI Teacher and Chat contain clearly labelled offline

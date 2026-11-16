@@ -36,6 +36,7 @@ Module._load = function (request, parent, isMain) {
   return originalLoad.call(this, request, parent, isMain);
 };
 const { useLearningStore, useLearningHydrationStatus } = require("../store/learningStore.ts");
+const { useLanguageStore, useLanguageHydrationStatus } = require("../store/languageStore.ts");
 Module._load = originalLoad;
 
 test("failed progress reads are retryable and do not overwrite the saved value", async () => {
@@ -43,6 +44,8 @@ test("failed progress reads are retryable and do not overwrite the saved value",
   await new Promise((resolve) => setImmediate(resolve));
   assert.equal(useLearningHydrationStatus.getState().status, "error");
   assert.equal(useLearningStore.persist.hasHydrated(), false);
+  assert.equal(useLanguageHydrationStatus.getState().status, "error");
+  assert.equal(useLanguageStore.persist.hasHydrated(), false);
   assert.equal(stored, saved);
   assert.equal(writes, 0);
 
@@ -65,5 +68,13 @@ test("failed progress reads are retryable and do not overwrite the saved value",
   await useLearningStore.persist.rehydrate();
   assert.equal(useLearningHydrationStatus.getState().status, "ready");
   assert.equal(useLearningStore.getState().totalXp, 10);
+  assert.equal(writes, 0);
+
+  const course = JSON.stringify({ state: { selectedLanguage: "fr" }, version: 0 });
+  stored = course;
+  await useLanguageStore.persist.rehydrate();
+  assert.equal(useLanguageHydrationStatus.getState().status, "ready");
+  assert.equal(useLanguageStore.getState().selectedLanguage, "fr");
+  assert.equal(stored, course);
   assert.equal(writes, 0);
 });
