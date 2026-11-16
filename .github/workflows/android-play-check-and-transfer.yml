@@ -1,0 +1,104 @@
+name: Android play upgrade and transfer
+
+# Temporary, branch-scoped validation and transfer of this test build.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  upgrade:
+    name: Verify upgrade from the shared study demo
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download previously shared study demo
+        uses: actions/download-artifact@v4
+        with:
+          name: Lingua-Demo-APK
+          path: old-apk
+          run-id: 43781308415
+          github-token: ${{ github.token }}
+      - name: Download Quick Mix demo
+        uses: actions/download-artifact@v4
+        with:
+          name: Lingua-Demo-APK
+          path: new-apk
+          run-id: 43792279548
+          github-token: ${{ github.token }}
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install old demo and upgrade in place
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: python3 scripts/smoke-android-play-upgrade.py old-apk/Lingua-Demo.apk new-apk/Lingua-Demo.apk
+      - name: Upload diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lingua-Play-Upgrade-Diagnostics
+          path: android-smoke/
+          if-no-files-found: warn
+          retention-days: 3
+
+  transfer:
+    name: Stage test APK for transfer
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download Quick Mix demo
+        uses: actions/download-artifact@v4
+        with:
+          name: Lingua-Demo-APK
+          path: new-apk
+          run-id: 43792279548
+          github-token: ${{ github.token }}
+      - name: Stage temporary Git blobs and a small manifest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import base64, hashlib, json, os, subprocess
+          from pathlib import Path
+
+          apk = Path('new-apk/Lingua-Demo.apk')
+          expected = Path('new-apk/SHA256SUMS.txt').read_text().split()[0]
+          digest = hashlib.sha256(apk.read_bytes()).hexdigest()
+          assert digest == expected, 'APK hash does not match build artifact'
+          parts = []
+          with apk.open('rb') as stream:
+              while chunk := stream.read(16 * 1024 * 1024):
+                  payload = json.dumps({'content': base64.b64encode(chunk).decode('ascii'), 'encoding': 'base64'}).encode()
+                  response = subprocess.run(
+                      ['gh', 'api', '--method', 'POST', f"repos/{os.environ['GITHUB_REPOSITORY']}/git/blobs", '--input', '-', '--jq', '.sha'],
+                      input=payload, stdout=subprocess.PIPE, check=True,
+                  ).stdout.decode().strip()
+                  git_sha = hashlib.sha1(f'blob {len(chunk)}\0'.encode() + chunk).hexdigest()
+                  assert response == git_sha, 'Unexpected Git blob hash'
+                  parts.append({'sha': response, 'size': len(chunk), 'sha256': hashlib.sha256(chunk).hexdigest()})
+                  print(f'Staged part {len(parts)}: {response}', flush=True)
+          Path('.arena-apk-transfer.json').write_text(json.dumps({
+              'run': 43792279548, 'size': apk.stat().st_size, 'sha256': digest, 'parts': parts,
+          }, indent=2) + '\n')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .arena-apk-transfer.json
+          git commit -m 'Stage temporary Quick Mix Android test transfer manifest'
+          git push origin HEAD:arena/22e64741-react-native-lingua
