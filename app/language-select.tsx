@@ -6,10 +6,12 @@ import { Language, LanguageCode } from "@/types/learning";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
-import { FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function LanguageSelectScreen() {
+  const { height } = useWindowDimensions();
+  const compact = height < 650;
   const { selectedLanguage, setSelectedLanguage } = useLanguageStore();
   const [selectedCode, setSelectedCode] = useState<LanguageCode>(
     isAvailableLanguage(selectedLanguage) ? selectedLanguage : LANGUAGES[0].code,
@@ -27,7 +29,7 @@ export default function LanguageSelectScreen() {
     return (
       <TouchableOpacity
         onPress={() => setSelectedCode(item.code)}
-        className={`flex-row items-center py-3.5 px-4 border rounded-[20px] ${isSelected ? "bg-lingua-mint border-[#9BCDC0]" : "bg-white border-border"}`}
+        className={`flex-row items-center px-4 border rounded-[20px] ${compact ? "py-2" : "py-3.5"} ${isSelected ? "bg-lingua-mint border-[#9BCDC0]" : "bg-white border-border"}`}
         activeOpacity={0.8}
         accessibilityRole="radio"
         accessibilityState={{ selected: isSelected }}
@@ -53,7 +55,7 @@ export default function LanguageSelectScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FBF8F1" }}>
       <View className="flex-1 w-full max-w-[640px] self-center">
-        <View className="flex-row items-center px-4 py-3">
+        <View className={`flex-row items-center px-4 ${compact ? "py-2" : "py-3"}`}>
           <TouchableOpacity
             onPress={() => router.canGoBack() ? router.back() : router.replace("/onboarding")}
             className="w-10 h-10 items-center justify-center"
@@ -67,12 +69,12 @@ export default function LanguageSelectScreen() {
         </View>
 
         <View className="px-5 mb-3">
-          <View className="flex-row items-center mb-3">
+          <View className={`flex-row items-center ${compact ? "mb-2" : "mb-3"}`}>
             <View className="flex-1 pr-2">
               <Text className="font-poppins-semibold text-[10px] tracking-[1.2px] text-lingua-teal mb-2">YOUR COURSE, YOUR PACE</Text>
               <Text className="body-sm text-text-secondary">Pick a course. Menus and instructions are in English.</Text>
             </View>
-            <MotionSticker kind="globe" size={62} testID="language-sticker" />
+            <MotionSticker kind="globe" size={compact ? 48 : 62} testID="language-sticker" />
           </View>
           {hasOldSelection && (
             <Text className="body-sm text-text-secondary mb-3" testID="legacy-language-message">

@@ -4,17 +4,22 @@ import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "rea
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AccountControls } from "@/components/AccountControls";
+import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
 import { MotionSticker } from "@/components/MotionSticker";
 import { CREATOR_CREDIT } from "@/constants/branding";
 import { getCourseUnits } from "@/data/courses";
 import { LANGUAGES } from "@/data/languages";
+import { useLearningHydration } from "@/hooks/useLearningHydration";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLearningStore } from "@/store/learningStore";
 
 export default function ProfileScreen() {
+  const hydration = useLearningHydration();
   const selectedLanguage = useLanguageStore((state) => state.selectedLanguage);
   const { totalXp, completedLessonIds } = useLearningStore();
   const language = LANGUAGES.find((item) => item.code === selectedLanguage);
+
+  if (hydration !== "ready") return <LearningHydrationScreen status={hydration} />;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FBF8F1" }}>

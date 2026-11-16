@@ -1,16 +1,17 @@
 import { useUser } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
 import { LearningSticker } from "@/components/LearningSticker";
 import { LessonIcon } from "@/components/LessonIcon";
 import { MotionSticker } from "@/components/MotionSticker";
 import { images } from "@/constants/images";
 import { getCourseUnits } from "@/data/courses";
 import { LANGUAGES } from "@/data/languages";
-import { useLearningHydrated } from "@/hooks/useLearningHydrated";
+import { useLearningHydration } from "@/hooks/useLearningHydration";
 import { useStudyDate } from "@/hooks/useStudyDate";
 import { getReviewQuestions, lastSevenDays, localDateKey, sessionCount, type DailyGoal } from "@/lib/studyProgress";
 import { useLanguageStore } from "@/store/languageStore";
@@ -23,7 +24,7 @@ export default function HomeScreen() {
   const { user } = useUser();
   const { selectedLanguage } = useLanguageStore();
   const { totalXp, completedLessonIds, dailyGoal, setDailyGoal, activityByDate, reviewItems } = useLearningStore();
-  const hydrated = useLearningHydrated();
+  const hydration = useLearningHydration();
   const now = useStudyDate();
   const firstName = user?.firstName ?? "Learner";
 
@@ -39,9 +40,7 @@ export default function HomeScreen() {
   const activeDays = week.filter((day) => day.sessions > 0).length;
   const reviewCount = getReviewQuestions(reviewItems, lessons).length;
 
-  if (!hydrated) {
-    return <View style={styles.center}><ActivityIndicator size="large" color="#14675D" /></View>;
-  }
+  if (hydration !== "ready") return <LearningHydrationScreen status={hydration} />;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FBF8F1" }}>
@@ -207,7 +206,6 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#FBF8F1" },
   content: { width: "100%", maxWidth: 720, alignSelf: "center", paddingHorizontal: 20, paddingTop: 18, paddingBottom: 36 },
   headerParrot: { width: 48, height: 48 },
   flag: { width: 36, height: 36, borderRadius: 18, marginRight: 10 },

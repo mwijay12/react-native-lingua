@@ -14,6 +14,12 @@ import {
   type StudyProgress,
 } from "@/lib/studyProgress";
 
+export type LearningHydrationStatus = "loading" | "ready" | "error";
+
+// This status is intentionally not persisted: reporting a read failure must
+// never write default progress over the value that could not be loaded.
+export const useLearningHydrationStatus = create<{ status: LearningHydrationStatus }>(() => ({ status: "loading" }));
+
 interface LearningState extends LearningProgress, StudyProgress {
   completeLesson: (lessonId: string) => void;
   setDailyGoal: (goal: DailyGoal) => void;
@@ -57,6 +63,12 @@ export const useLearningStore = create<LearningState>()(
       name: "learning-storage",
       version: 2,
       storage: createJSONStorage(() => AsyncStorage),
+      onRehydrateStorage: () => {
+        useLearningHydrationStatus.setState({ status: "loading" });
+        return (_state, error) => {
+          if (error) useLearningHydrationStatus.setState({ status: "error" });
+        };
+      },
       partialize: ({ totalXp, completedLessonIds, dailyGoal, activityByDate, reviewItems }) => ({
         totalXp, completedLessonIds, dailyGoal, activityByDate, reviewItems,
       }),
@@ -64,3 +76,8 @@ export const useLearningStore = create<LearningState>()(
     },
   ),
 );
+
+// The finish event runs only after Zustand has applied the saved state and set
+// hasHydrated. Also handle storage implementations that complete synchronously.
+useLearningStore.persist.onFinishHydration(() => useLearningHydrationStatus.setState({ status: "ready" }));
+if (useLearningStore.persist.hasHydrated()) useLearningHydrationStatus.setState({ status: "ready" });

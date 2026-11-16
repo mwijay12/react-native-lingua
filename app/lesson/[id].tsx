@@ -2,7 +2,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
-  ActivityIndicator,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -14,12 +13,15 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
 import { LessonIcon } from "@/components/LessonIcon";
 import { MotionSticker } from "@/components/MotionSticker";
 import { QuestionInput } from "@/components/QuestionInput";
 import { images } from "@/constants/images";
+import { isAvailableLanguage } from "@/data/languages";
 import { LESSONS } from "@/data/lessons";
-import { useLearningHydrated } from "@/hooks/useLearningHydrated";
+import { UNITS } from "@/data/units";
+import { useLearningHydration } from "@/hooks/useLearningHydration";
 import { isCorrectAnswer } from "@/lib/practice";
 import { useLearningStore } from "@/store/learningStore";
 
@@ -32,7 +34,7 @@ export default function LessonScreen() {
   const router = useRouter();
   const lesson = LESSONS.find((item) => item.id === id);
   const { completeLesson, addMistake, reviewItems } = useLearningStore();
-  const hydrated = useLearningHydrated();
+  const hydration = useLearningHydration();
   const [phase, setPhase] = useState<Phase>("review");
   const [questionIndex, setQuestionIndex] = useState(0);
   const [answer, setAnswer] = useState("");
@@ -60,9 +62,7 @@ export default function LessonScreen() {
     else router.replace("/(tabs)/learn");
   };
 
-  if (!hydrated) {
-    return <View style={styles.center}><ActivityIndicator size="large" color="#14675D" /></View>;
-  }
+  if (hydration !== "ready") return <LearningHydrationScreen status={hydration} />;
 
   if (!lesson) {
     return (
@@ -77,6 +77,7 @@ export default function LessonScreen() {
     );
   }
 
+  const lessonCourse = UNITS.find((unit) => unit.id === lesson.unitId)?.languageCode;
   const activity = lesson.activities[questionIndex];
   const updateAnswer = (value: string) => {
     setAnswer(value);
@@ -260,7 +261,14 @@ export default function LessonScreen() {
               </Text>
               <Text className="body-sm text-text-secondary text-center mt-2">Your progress is saved on this device.</Text>
               {reviewItems.some((item) => item.lessonId === lesson.id) && (
-                <TouchableOpacity onPress={() => router.replace("/review")} className="border border-lingua-teal rounded-2xl items-center py-3 px-6 mt-5" accessibilityRole="button" testID="lesson-review-button">
+                <TouchableOpacity
+                  onPress={() => isAvailableLanguage(lessonCourse)
+                    ? router.replace({ pathname: "/review", params: { course: lessonCourse } })
+                    : router.replace("/review")}
+                  className="border border-lingua-teal rounded-2xl items-center py-3 px-6 mt-5"
+                  accessibilityRole="button"
+                  testID="lesson-review-button"
+                >
                   <Text className="font-poppins-semibold text-sm text-lingua-teal">Review missed questions</Text>
                 </TouchableOpacity>
               )}
@@ -276,7 +284,6 @@ export default function LessonScreen() {
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#FBF8F1" },
   content: { width: "100%", maxWidth: 720, alignSelf: "center", paddingHorizontal: 20, paddingTop: 20, paddingBottom: 40, flexGrow: 1 },
   finishCat: { width: 105, height: 120 },
 

@@ -3,20 +3,25 @@ import { router } from "expo-router";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
 import { MotionSticker } from "@/components/MotionSticker";
 import { images } from "@/constants/images";
 import { getCourseUnits } from "@/data/courses";
 import { LANGUAGES } from "@/data/languages";
+import { useLearningHydration } from "@/hooks/useLearningHydration";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLearningStore } from "@/store/learningStore";
 
 export default function AITeacherScreen() {
+  const hydration = useLearningHydration();
   const selectedLanguage = useLanguageStore((state) => state.selectedLanguage);
   const completed = useLearningStore((state) => state.completedLessonIds);
   const language = LANGUAGES.find((item) => item.code === selectedLanguage);
   const lessons = getCourseUnits(selectedLanguage).flatMap((unit) => unit.lessons);
   const lesson = lessons.find((item) => !completed.includes(item.id)) ?? lessons[0];
   const phrase = lesson?.phrases[0];
+
+  if (hydration !== "ready") return <LearningHydrationScreen status={hydration} />;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FBF8F1" }}>

@@ -3,12 +3,14 @@ import { useRouter } from "expo-router";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
 import { LearningSticker, type StickerKind } from "@/components/LearningSticker";
 import { LessonCard } from "@/components/LessonCard";
 import { MotionSticker } from "@/components/MotionSticker";
 import { colors } from "@/constants/theme";
 import { getCourseUnits } from "@/data/courses";
 import { LANGUAGES } from "@/data/languages";
+import { useLearningHydration } from "@/hooks/useLearningHydration";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLearningStore } from "@/store/learningStore";
 
@@ -17,6 +19,7 @@ const UNIT_BACKGROUNDS = ["bg-[#FCF1DB]", "bg-[#EAF5EE]", "bg-[#F0ECF8]"];
 
 export default function LearnScreen() {
   const router = useRouter();
+  const hydration = useLearningHydration();
   const { selectedLanguage } = useLanguageStore();
   const { completedLessonIds } = useLearningStore();
   const language = LANGUAGES.find((item) => item.code === selectedLanguage);
@@ -25,6 +28,8 @@ export default function LearnScreen() {
   const completedCount = lessons.filter((lesson) => completedLessonIds.includes(lesson.id)).length;
   const nextLessonId = lessons.find((lesson) => !completedLessonIds.includes(lesson.id))?.id;
   const progress = lessons.length ? Math.round((completedCount / lessons.length) * 100) : 0;
+
+  if (hydration !== "ready") return <LearningHydrationScreen status={hydration} />;
 
   if (!units.length) {
     return (

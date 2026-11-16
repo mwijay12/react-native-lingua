@@ -1,8 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -13,11 +12,12 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
 import { MotionSticker } from "@/components/MotionSticker";
 import { QuestionInput } from "@/components/QuestionInput";
 import { getCourseUnits } from "@/data/courses";
-import { LANGUAGES } from "@/data/languages";
-import { useLearningHydrated } from "@/hooks/useLearningHydrated";
+import { isAvailableLanguage, LANGUAGES } from "@/data/languages";
+import { useLearningHydration } from "@/hooks/useLearningHydration";
 import { isCorrectAnswer } from "@/lib/practice";
 import { getReviewQuestions, type ReviewQuestion } from "@/lib/studyProgress";
 import { useLanguageStore } from "@/store/languageStore";
@@ -30,9 +30,13 @@ const REVIEW_LIMIT = 10;
 // Review is a separate pass: one attempt per question, no additional XP.
 export default function ReviewScreen() {
   const router = useRouter();
+  const { course } = useLocalSearchParams<{ course?: string }>();
   const selectedLanguage = useLanguageStore((state) => state.selectedLanguage);
+  // A lesson reached through a link can belong to a different course. Its
+  // review action should show that lesson's mistakes without switching courses.
+  const reviewLanguage = isAvailableLanguage(course) ? course : selectedLanguage;
   const { reviewItems, clearReviewQuestion, completeReview } = useLearningStore();
-  const hydrated = useLearningHydrated();
+  const hydration = useLearningHydration();
   const [phase, setPhase] = useState<Phase>("intro");
   const [questions, setQuestions] = useState<ReviewQuestion[]>([]);
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -42,9 +46,9 @@ export default function ReviewScreen() {
   const checked = useRef(false);
   const finished = useRef(false);
 
-  const lessons = getCourseUnits(selectedLanguage).flatMap((unit) => unit.lessons);
+  const lessons = getCourseUnits(reviewLanguage).flatMap((unit) => unit.lessons);
   const availableQuestions = getReviewQuestions(reviewItems, lessons);
-  const language = LANGUAGES.find((item) => item.code === selectedLanguage);
+  const language = LANGUAGES.find((item) => item.code === reviewLanguage);
   const question = questions[questionIndex];
 
   const goBack = () => {
@@ -81,9 +85,7 @@ export default function ReviewScreen() {
     setPhase("finished");
   };
 
-  if (!hydrated) {
-    return <View style={styles.center}><ActivityIndicator size="large" color="#14675D" /></View>;
-  }
+  if (hydration !== "ready") return <LearningHydrationScreen status={hydration} />;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FBF8F1" }}>
@@ -221,6 +223,5 @@ export default function ReviewScreen() {
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#FBF8F1" },
   content: { width: "100%", maxWidth: 720, alignSelf: "center", paddingHorizontal: 20, paddingTop: 24, paddingBottom: 40, flexGrow: 1 },
 });
