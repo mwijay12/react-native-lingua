@@ -96,17 +96,23 @@ def screen_size():
 
 def scroll_to(text, direction="down", max_swipes=8, exact=False):
     width, height = screen_size()
-    for _ in range(max_swipes + 1):
-        root = dump_ui()
-        if root is not None and dismiss_launcher_dialog(root):
-            continue
-        node = find_node(root, text, exact=exact) if root is not None else None
-        if node:
-            print(f"Found after scrolling: {text}", flush=True)
-            return
-        start, end = (0.78, 0.30) if direction == "down" else (0.30, 0.78)
-        adb("shell", "input", "swipe", str(width // 2), str(int(height * start)), str(width // 2), str(int(height * end)), "450")
-        time.sleep(0.5)
+    # Navigation can restore a different scroll position on different devices.
+    # Try the expected direction first, then search back in the other direction.
+    opposite = "up" if direction == "down" else "down"
+    for scan_direction in (direction, opposite):
+        for attempt in range(max_swipes + 1):
+            root = dump_ui()
+            if root is not None and dismiss_launcher_dialog(root):
+                continue
+            node = find_node(root, text, exact=exact) if root is not None else None
+            if node:
+                print(f"Found after scrolling: {text}", flush=True)
+                return
+            if attempt == max_swipes:
+                break
+            start, end = (0.78, 0.30) if scan_direction == "down" else (0.30, 0.78)
+            adb("shell", "input", "swipe", str(width // 2), str(int(height * start)), str(width // 2), str(int(height * end)), "450")
+            time.sleep(0.5)
     raise RuntimeError(f"Could not scroll to {text!r}")
 
 
@@ -200,7 +206,7 @@ def main(apk):
     # A missed answer stays saved after the lesson. A wrong review keeps it;
     # a later correct review removes it, with no additional XP.
     tap("Home")
-    scroll_to("Review missed questions", direction="up")
+    scroll_to("Review missed questions")
     tap("Review missed questions")
     wait_for("1 question saved")
     tap("Start review")
