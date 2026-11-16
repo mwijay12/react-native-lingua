@@ -44,10 +44,30 @@ If you prefer visual learning, this is the perfect resource for you. Follow our 
 
 Created by Mwijay. This version provides beginner Kiswahili, English and French
 courses with English instructions, local practice questions, and on-device XP
-and lesson progress. Each course includes everyday lessons on numbers, family,
-food and conversation. Lingua's cat and parrot companions are part of its new
-visual identity. The standalone [Android demo](demo/android/README.md) has no
-sign-in or analytics.
+and lesson progress. The 27 playable lessons cover everyday topics and include
+context notes, plus six foundation lessons on useful language patterns. Lingua's
+cat and parrot companions remain part of its identity. Original SVG learning
+doodles add a playful path and celebration without changing the lessons. The
+standalone [Android demo](demo/android/README.md) has no sign-in or analytics.
+
+The doodles in `components/LearningSticker.tsx` are original, hand-drawn shapes
+in Lingua's palette. `MotionSticker` keeps decoration in reserved space, never
+intercepts touches, and moves it gently only while its screen is focused and the
+app is active. Device reduced-motion settings keep the drawings still (including
+the tab indicator); artwork and learning content are never hidden until an
+animation runs. The selected cat and parrot remain the existing image assets.
+The approach is adapted for a native app from the [motion-lab prompt pack](https://github.com/mwijay12/motion-lab/blob/main/motion-lab/docs/agent-prompt-pack.md).
+
+The study dashboard has a configurable daily session goal, a rolling seven-day
+activity view and per-course completion. A finished lesson or review set counts
+as a session, including lesson replays; only a first lesson completion awards
+XP. Missed lesson questions are saved to an on-device review list for the
+selected course. A correct answer in review clears a question, while a missed
+answer stays for another set. Review awards no XP. Existing lesson progress is
+preserved on upgrade, but old completions are not assigned fictional study
+dates. Goals and history use the device's local calendar and do not sync. If
+saved progress or the selected course cannot be read, Lingua offers a retry
+instead of treating it as an empty profile or overwriting it.
 
 **AI voice and live chat are not enabled.** The AI screens show labelled local
 practice instead, and the agent-session and Stream-token API routes in this
@@ -88,9 +108,11 @@ If you're getting started and need assistance or face any bugs, join our active 
 
 ## <a name="features">🔋 Features</a>
 
-👉 **Onboarding Flow**: A seamless mobile sequence for language selection and goal setting, proving the gap between "I want to build this" and "it's running on my phone" is now just a weekend.
+👉 **Onboarding**: Choose Kiswahili, English or French with English instructions. The demo runs locally without signing in.
 
-👉 **Auth Pages**: Secure and professional signup and sign-in functionality utilizing email and social auth, powered by **Clerk** for robust user management.
+👉 **Study tools**: Set a daily session goal, view recent activity and course progress, and review questions you missed. Progress stays on this device.
+
+👉 **Accounts**: The tutorial source includes Clerk integration; sign-in is deliberately disabled in the standalone Android demo.
 
 👉 **AI Teacher (planned)**: Live voice and chat are currently disabled. The app offers labelled offline practice while secure services are developed.
 
@@ -98,7 +120,7 @@ If you're getting started and need assistance or face any bugs, join our active 
 
 👉 **State Management**: Clean and scalable app logic handled by **Zustand**, ensuring your "Practical Vibe Coding" workflow stays structured without getting lost in spaghetti code.
 
-👉 **Analytics & Review**: Production-ready monitoring via **PostHog**, paired with **CodeRabbit** to automatically review every AI-generated PR before it ever merges into your codebase.
+👉 **Tutorial integrations**: PostHog and CodeRabbit appear in the original project setup. The standalone demo does not collect analytics.
 
 And many more, including code architecture and reusability.
 
@@ -144,11 +166,14 @@ And pick whichever template fits your workflow.
 Since this repository is already created, install dependencies and start the development server:
 
 ```bash
-npm install
+npm ci --legacy-peer-deps --ignore-scripts --no-audit --no-fund
+npm run lint && npm run typecheck && npm test
 npx expo start
 ```
 
-`npx expo start` means "download (if needed) and execute Expo locally." It starts Metro Bundler, which compiles and serves your React Native code.
+The main source requires a configured Clerk publishable key; the separate
+[Android demo](demo/android/README.md) intentionally does not. `npx expo start`
+starts Metro Bundler, which compiles and serves your React Native code.
 
 Once it starts, you'll see a QR code and shortcut keys in the terminal. For example:
 
@@ -168,7 +193,7 @@ Open Google Play Store or Apple App Store, install **Expo Go**, then come back h
 
 Now open Expo Go and scan the QR code from the terminal. The app should compile and launch.
 
-If all is good, you'll see the starter app with two tabs: Home and Explore.
+With the main app's required environment configured, the project opens in Expo. The standalone demo uses local onboarding and does not require an account.
 
 **Set Up Environment Variables**
 

@@ -37,6 +37,13 @@ export interface Activity {
   correctAnswer: string;
   options?: string[];
   hint?: string;
+  explanation?: string;
+}
+
+export interface LessonNote {
+  title: string;
+  body: string;
+  example?: string;
 }
 
 export interface LessonGoal {
@@ -58,6 +65,7 @@ export interface Lesson {
   icon: string;
   xpReward: number;
   goals: LessonGoal[];
+  notes?: LessonNote[];
   vocabulary: VocabularyItem[];
   phrases: Phrase[];
   activities: Activity[];

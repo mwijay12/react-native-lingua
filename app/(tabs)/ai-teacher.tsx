@@ -3,19 +3,25 @@ import { router } from "expo-router";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
+import { MotionSticker } from "@/components/MotionSticker";
 import { images } from "@/constants/images";
 import { getCourseUnits } from "@/data/courses";
 import { LANGUAGES } from "@/data/languages";
+import { useLearningHydration } from "@/hooks/useLearningHydration";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLearningStore } from "@/store/learningStore";
 
 export default function AITeacherScreen() {
+  const hydration = useLearningHydration();
   const selectedLanguage = useLanguageStore((state) => state.selectedLanguage);
   const completed = useLearningStore((state) => state.completedLessonIds);
   const language = LANGUAGES.find((item) => item.code === selectedLanguage);
   const lessons = getCourseUnits(selectedLanguage).flatMap((unit) => unit.lessons);
   const lesson = lessons.find((item) => !completed.includes(item.id)) ?? lessons[0];
   const phrase = lesson?.phrases[0];
+
+  if (hydration !== "ready") return <LearningHydrationScreen status={hydration} />;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FBF8F1" }}>
@@ -25,7 +31,10 @@ export default function AITeacherScreen() {
         <Text className="body-md text-text-secondary mt-2">Your place for guided practice.</Text>
 
         <View className="rounded-[26px] bg-lingua-sand mt-5 p-5 items-center">
-          <Image source={images.mascotParrot} style={styles.parrot} resizeMode="contain" accessible={false} />
+          <View className="flex-row items-end">
+            <Image source={images.mascotParrot} style={styles.parrot} resizeMode="contain" accessible={false} />
+            <MotionSticker kind="talk" size={60} testID="teacher-sticker" />
+          </View>
           <Text className="font-poppins-semibold text-lg text-text-primary text-center mt-2">
             AI voice is not available yet
           </Text>
@@ -59,6 +68,6 @@ export default function AITeacherScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 36 },
+  content: { width: "100%", maxWidth: 720, alignSelf: "center", paddingHorizontal: 20, paddingTop: 18, paddingBottom: 36 },
   parrot: { width: 124, height: 130 },
 });

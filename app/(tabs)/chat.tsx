@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { MotionSticker } from "@/components/MotionSticker";
 import { getCourseUnits } from "@/data/courses";
 import { useLanguageStore } from "@/store/languageStore";
 import { LanguageCode } from "@/types/learning";
@@ -36,8 +37,13 @@ export default function ChatScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FBF8F1" }}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-        <Text className="h2">Chat</Text>
-        <Text className="body-md text-text-secondary mt-2">Read a short conversation and practise it aloud.</Text>
+        <View className="flex-row items-center">
+          <View className="flex-1 pr-2">
+            <Text className="h2">Chat</Text>
+            <Text className="body-md text-text-secondary mt-2">Read a short conversation and practise it aloud.</Text>
+          </View>
+          <MotionSticker kind="talk" size={68} testID="chat-sticker" />
+        </View>
 
         <View className="flex-row rounded-2xl bg-[#FFF5E8] p-4 mt-5">
           <Ionicons name="information-circle-outline" size={22} color="#B7791F" />
@@ -81,4 +87,4 @@ export default function ChatScreen() {
   );
 }
 
-const styles = StyleSheet.create({ content: { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 36 } });
+const styles = StyleSheet.create({ content: { width: "100%", maxWidth: 720, alignSelf: "center", paddingHorizontal: 20, paddingTop: 18, paddingBottom: 36 } });

@@ -24,7 +24,7 @@ if (!existsSync(join(root, "node_modules", "expo"))) {
 rmSync(output, { recursive: true, force: true });
 mkdirSync(output, { recursive: true });
 for (const name of [
-  "app", "assets", "components", "constants", "data", "lib", "store", "types",
+  "app", "assets", "components", "constants", "data", "hooks", "lib", "store", "types",
   "babel.config.js", "global.css", "postcss.config.mjs", "tsconfig.json",
   "nativewind-env.d.ts",
 ]) {

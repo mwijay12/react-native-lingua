@@ -17,19 +17,24 @@ const { LESSONS } = require("../data/lessons.ts");
 const { UNITS } = require("../data/units.ts");
 const { getCourseUnits } = require("../data/courses.ts");
 const { awardLesson, migrateLegacyProgress } = require("../lib/learningProgress.ts");
+const {
+  clearMistake, getReviewQuestions, lastSevenDays, localDateKey, migrateLearningState,
+  recordStudySession, rememberMistake, sessionCount,
+} = require("../lib/studyProgress.ts");
 const { isCorrectAnswer, normalizeAnswer } = require("../lib/practice.ts");
 const agentSession = require("../app/api/agent-session+api.ts");
 const streamToken = require("../app/api/stream-token+api.ts");
 
-test("each launch course has ordered, complete and playable lessons in both units", () => {
+test("each launch course has ordered, complete and playable lessons in all three units", () => {
   assert.equal(new Set(LESSONS.map((lesson) => lesson.id)).size, LESSONS.length);
   assert.equal(new Set(UNITS.map((unit) => unit.id)).size, UNITS.length);
   assert.deepEqual(getCourseUnits(null), []);
   const activityIds = new Set();
   for (const code of ["sw", "en", "fr"]) {
     const units = getCourseUnits(code);
-    assert.deepEqual(units.map((unit) => unit.id), [`${code}-unit-1`, `${code}-unit-2`]);
-    assert.deepEqual(units.map((unit) => unit.order), [1, 2]);
+    assert.deepEqual(units.map((unit) => unit.id), [`${code}-unit-1`, `${code}-unit-2`, `${code}-unit-3`]);
+    assert.deepEqual(units.map((unit) => unit.order), [1, 2, 3]);
+    assert.equal(units[2].lessons.length, 2);
     assert.deepEqual(units[1].lessonIds, ["numbers", "family", "food", "conversation"].map((topic) => `${code}-everyday-${topic}`));
     for (const unit of units) {
       assert.equal(unit.lessons.length, unit.lessonIds.length, `${unit.id} has a missing lesson`);
@@ -38,6 +43,12 @@ test("each launch course has ordered, complete and playable lessons in both unit
         const id = lesson.id;
         assert.equal(lesson.unitId, unit.id);
         assert.ok(lesson.vocabulary.length > 0 && lesson.phrases.length > 0, `${id} has no material`);
+        assert.ok(lesson.notes?.length > 0, `${id} has no language context`);
+        for (const note of lesson.notes) assert.ok(note.title && note.body && note.example, `${id} has an incomplete note`);
+        if (unit.order === 3) {
+          assert.ok(lesson.notes.length >= 2 && lesson.activities.length >= 5, `${id} needs a deeper explanation and practice`);
+          assert.ok(lesson.activities.every((activity) => activity.explanation), `${id} needs answer explanations`);
+        }
         for (const word of lesson.vocabulary) assert.ok(word.word && word.translation && word.pronunciation, `${id} has incomplete vocabulary`);
         for (const phrase of lesson.phrases) assert.ok(phrase.text && phrase.translation && phrase.pronunciation, `${id} has an incomplete phrase`);
         assert.ok(lesson.activities.length > 0, `${id} has no questions`);
@@ -108,4 +119,67 @@ test("AI session and token endpoints fail closed without contacting a service", 
   } finally {
     global.fetch = originalFetch;
   }
+});
+
+test("v1 progress keeps earned XP and lesson history without inventing study dates", () => {
+  const versionOne = {
+    totalXp: 35,
+    completedLessonIds: ["sw-lesson-1", "sw-lesson-2", "fr-lesson-5", "sw-lesson-1", "old-course-lesson"],
+  };
+  assert.deepEqual(migrateLearningState(versionOne, 1, LESSONS), {
+    totalXp: 35,
+    completedLessonIds: ["sw-lesson-1", "sw-lesson-2", "fr-lesson-5", "old-course-lesson"],
+    dailyGoal: 1,
+    activityByDate: {},
+    reviewItems: [],
+  });
+  assert.deepEqual(migrateLearningState({ xpToday: 999, completedLessonIds: ["fr-lesson-5"] }, 0, LESSONS), {
+    totalXp: 15, completedLessonIds: ["fr-lesson-5"], dailyGoal: 1, activityByDate: {}, reviewItems: [],
+  });
+  assert.equal(migrateLearningState({ totalXp: NaN, completedLessonIds: ["fr-lesson-5"] }, 1, LESSONS).totalXp, 15);
+});
+
+test("study sessions count on the finish date and calendar history crosses year and DST boundaries", () => {
+  const originalTz = process.env.TZ;
+  process.env.TZ = "America/New_York";
+  try {
+    // This UTC instant is still December 31 on the device.
+    assert.equal(localDateKey(new Date("2025-01-01T02:00:00Z")), "2024-12-31");
+    let history = {};
+    history = recordStudySession(history, "lesson", new Date(2024, 11, 31, 23, 59));
+    const previous = history;
+    history = recordStudySession(history, "review", new Date(2025, 0, 1, 0, 1));
+    history = recordStudySession(history, "lesson", new Date(2025, 0, 1, 8));
+    assert.deepEqual(previous, { "2024-12-31": { lessons: 1, reviews: 0 } });
+    assert.deepEqual(history["2025-01-01"], { lessons: 1, reviews: 1 });
+    assert.equal(sessionCount(history["2025-01-01"]), 2);
+    assert.equal(sessionCount(history["2024-12-30"]), 0);
+    assert.deepEqual(lastSevenDays(history, new Date(2025, 0, 1, 9)).map((day) => day.key), [
+      "2024-12-26", "2024-12-27", "2024-12-28", "2024-12-29", "2024-12-30", "2024-12-31", "2025-01-01",
+    ]);
+    assert.deepEqual(lastSevenDays({}, new Date(2024, 2, 12, 2)).map((day) => day.key), [
+      "2024-03-06", "2024-03-07", "2024-03-08", "2024-03-09", "2024-03-10", "2024-03-11", "2024-03-12",
+    ]);
+  } finally {
+    if (originalTz === undefined) delete process.env.TZ;
+    else process.env.TZ = originalTz;
+  }
+});
+
+test("missed-question review is unique, course-specific, and cleared only by explicit review", () => {
+  const sw = getCourseUnits("sw").flatMap((unit) => unit.lessons);
+  const fr = getCourseUnits("fr").flatMap((unit) => unit.lessons);
+  let saved = rememberMistake([], "sw-lesson-1", "sw-lesson-1-act-1");
+  saved = rememberMistake(saved, "sw-lesson-1", "sw-lesson-1-act-1");
+  saved = rememberMistake(saved, "fr-lesson-1", "fr-lesson-1-act-1");
+  saved = rememberMistake(saved, "missing-lesson", "missing-question");
+  assert.equal(saved.length, 3);
+  assert.deepEqual(getReviewQuestions(saved, sw).map((item) => item.activity.id), ["sw-lesson-1-act-1"]);
+  assert.deepEqual(getReviewQuestions(saved, fr).map((item) => item.activity.id), ["fr-lesson-1-act-1"]);
+  // Retrying a lesson never calls clearMistake; a correct separate review does.
+  const before = saved;
+  saved = clearMistake(saved, "sw-lesson-1", "sw-lesson-1-act-1");
+  assert.equal(before.length, 3);
+  assert.equal(getReviewQuestions(saved, sw).length, 0);
+  assert.equal(getReviewQuestions(saved, fr).length, 1);
 });

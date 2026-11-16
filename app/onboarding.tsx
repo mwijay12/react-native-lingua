@@ -1,3 +1,4 @@
+import { MotionSticker } from "@/components/MotionSticker";
 import { CREATOR_CREDIT } from "@/constants/branding";
 import { images } from "@/constants/images";
 import { posthog } from "@/lib/posthog";
@@ -23,10 +24,13 @@ export default function OnboardingScreen() {
 
         <View className="mt-5">
           <Text className="font-poppins-semibold text-[11px] tracking-[1.5px] text-lingua-teal">A LITTLE EACH DAY</Text>
-          <Text className="h1 mt-2">
-            {"Words for\n"}
-            <Text className="text-lingua-teal">real life.</Text>
-          </Text>
+          <View className="flex-row items-end mt-2">
+            <Text className="h1 flex-1">
+              {"Words for\n"}
+              <Text className="text-lingua-teal">real life.</Text>
+            </Text>
+            <MotionSticker kind="book" size={68} testID="welcome-sticker" />
+          </View>
           <Text className="body-md text-text-secondary mt-2">
             Learn Kiswahili, English and French through everyday moments.
           </Text>
@@ -41,7 +45,7 @@ export default function OnboardingScreen() {
             <Text className="font-poppins-semibold text-xs text-lingua-teal">Habari!</Text>
           </View>
           <View className="absolute right-3 bottom-3 rounded-2xl bg-white px-3 py-1.5">
-            <Text className="font-poppins-semibold text-xs text-[#C45F4B]">Bonjour!</Text>
+            <Text className="font-poppins-semibold text-xs text-[#9E4938]">Bonjour!</Text>
           </View>
         </View>
 
@@ -70,7 +74,7 @@ export default function OnboardingScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { flexGrow: 1, paddingHorizontal: 24, paddingBottom: 12 },
+  content: { flexGrow: 1, width: "100%", maxWidth: 560, alignSelf: "center", paddingHorizontal: 24, paddingBottom: 12 },
   logo: { width: 44, height: 44, borderRadius: 14 },
   cat: { position: "absolute", bottom: 0, left: "16%", width: "43%", height: "94%" },
   parrot: { position: "absolute", bottom: 0, right: "10%", width: "42%", height: "78%" },
