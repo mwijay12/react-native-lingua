@@ -15,7 +15,7 @@ on:
       - "demo/android/**"
       - "lib/**"
       - "scripts/prepare-android-demo.mjs"
-      - "scripts/smoke-android-demo.py"
+      - "scripts/smoke-android-*.py"
       - "store/**"
       - "tests/**"
       - "types/**"
@@ -87,7 +87,7 @@ jobs:
     name: Android emulator smoke test
     needs: apk
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4

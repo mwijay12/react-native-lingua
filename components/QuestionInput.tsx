@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import type { KeyboardEvent } from "react";
+import { Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import type { Activity } from "@/types/learning";
 
@@ -14,13 +15,33 @@ interface QuestionInputProps {
 // The same answer controls are used by lessons and the missed-question review.
 export function QuestionInput({ activity, answer, disabled, onChange, onSubmit }: QuestionInputProps) {
   if (activity.type === "multiple-choice") {
+    const options = activity.options ?? [];
     return (
-      <View className="gap-3">
-        {(activity.options ?? []).map((option, index) => {
+      <View className="gap-3" accessibilityRole="radiogroup" accessibilityLabel="Answer choices">
+        {options.map((option, index) => {
           const selected = answer === option;
+          // React Native Web's press handler handles Enter but not Space or
+          // arrow keys for radio roles. Keep the native controls unchanged.
+          const webKeyboard = Platform.OS === "web" ? {
+            tabIndex: (disabled ? -1 : (answer ? selected : index === 0) ? 0 : -1) as 0 | -1,
+            onKeyDownCapture: (event: KeyboardEvent<HTMLElement>) => {
+              if (disabled) return;
+              if (event.key === " ") {
+                event.preventDefault();
+                onChange(option);
+              } else if (["ArrowDown", "ArrowRight", "ArrowUp", "ArrowLeft"].includes(event.key)) {
+                event.preventDefault();
+                const direction = event.key === "ArrowDown" || event.key === "ArrowRight" ? 1 : -1;
+                const next = (index + direction + options.length) % options.length;
+                onChange(options[next]);
+                event.currentTarget.parentElement?.querySelectorAll<HTMLElement>('[role="radio"]')[next]?.focus();
+              }
+            },
+          } : {};
           return (
             <TouchableOpacity
               key={option}
+              {...webKeyboard}
               onPress={() => onChange(option)}
               disabled={disabled}
               accessibilityRole="radio"

@@ -27,6 +27,16 @@ earned version-1 XP and completions are retained, while fictional sample XP and
 streaks from earlier versions are not counted as real progress. If saved
 progress or the selected course cannot be read, the app offers a retry without resetting it.
 
+**Quick Mix** is an untimed, offline round of up to three shuffled
+multiple-choice questions from completed lessons in the selected course. A new
+learner can preview the first playable lesson. Correct answers earn stars for
+that round only; playing does not alter XP, the daily session goal or saved
+review questions. Leaving before finishing does not record the round. The
+sticker book shows six milestones for lessons, courses, review and completed or
+perfect mixes. Mix counters are saved separately on the device, while other
+stickers reflect existing study progress. If play rewards cannot be read or
+saved, the app provides a retry, without resetting study data.
+
 The demo does not sign users in, collect analytics, start an AI call, or connect
 to the agent backend. AI Teacher and Chat contain clearly labelled offline
 practice and examples, not simulated live conversations. It is not the
@@ -69,3 +79,6 @@ For a version-1-to-current upgrade check on a running Android emulator, provide
 both test-signed APKs to `python3 scripts/smoke-android-upgrade.py old.apk new.apk`.
 The script clears the demo's existing data, completes a lesson in the old build,
 installs the new build in place and checks saved progress, replay and relaunch.
+For an upgrade from the study-dashboard demo to Quick Mix, run
+`python3 scripts/smoke-android-play-upgrade.py old.apk new.apk` instead. It
+checks the selected course, goal, XP and review alongside the new rewards.

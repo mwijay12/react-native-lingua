@@ -89,6 +89,23 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
+        <TouchableOpacity
+          className="flex-row items-center rounded-[22px] border border-[#E6D9B7] bg-[#FFF7E3] p-4 mb-5"
+          onPress={() => router.push("/play")}
+          accessibilityRole="button"
+          accessibilityLabel="Play Quick Mix and collect stickers"
+          activeOpacity={0.8}
+          testID="home-play-button"
+        >
+          <LearningSticker kind="numbers" size={58} />
+          <View className="flex-1 ml-3 pr-2">
+            <Text className="font-poppins-semibold text-[10px] tracking-[0.8px] text-lingua-teal">PLAY & COLLECT</Text>
+            <Text className="font-poppins-semibold text-base text-text-primary mt-1">Quick Mix</Text>
+            <Text className="caption mt-1">A little quiz and a sticker book.</Text>
+          </View>
+          <Ionicons name="arrow-forward" size={19} color="#14675D" />
+        </TouchableOpacity>
+
         <View className="rounded-[24px] border border-border bg-white p-5 mb-5" testID="daily-goal-card">
           <View className="flex-row items-start justify-between">
             <View className="flex-1 pr-2">

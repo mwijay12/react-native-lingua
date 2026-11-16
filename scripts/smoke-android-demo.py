@@ -86,6 +86,20 @@ def tap(text, exact=False):
     print(f"Tapped: {text}", flush=True)
 
 
+def wait_for_one_of(texts, timeout=90):
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        root = dump_ui()
+        if root is not None and dismiss_launcher_dialog(root):
+            continue
+        for text in texts:
+            if root is not None and find_node(root, text, exact=True):
+                print(f"Found: {text}", flush=True)
+                return text
+        time.sleep(1)
+    raise RuntimeError(f"Did not find any of {texts!r} on screen")
+
+
 def screen_size():
     text = adb("shell", "wm", "size").stdout.decode("utf-8", "replace")
     sizes = re.findall(r"(\d+)x(\d+)", text)
@@ -166,6 +180,40 @@ def change_course(language):
     scroll_to("YOUR LEARNING PATH", direction="up")
 
 
+def play_kiswahili_mix(*, preview):
+    scroll_to("Play Quick Mix and collect stickers", direction="up")
+    tap("Play Quick Mix and collect stickers")
+    source = "Try a preview from your first Kiswahili lesson" if preview else "Mix questions from your completed Kiswahili lessons"
+    scroll_to(source, direction="up")
+    scroll_to("Play 2-question mix")
+    tap("Play 2-question mix")
+    answers = {
+        'What does "Asante" mean?': "Thank you",
+        'Which word means "Goodbye"?': "Kwaheri",
+    }
+    seen = set()
+    for index in range(2):
+        question = wait_for_one_of(answers)
+        if question in seen:
+            raise RuntimeError(f"Duplicate Quick Mix question: {question}")
+        seen.add(question)
+        answer = answers[question]
+        scroll_to(answer, direction="up", exact=True)
+        tap(answer, exact=True)
+        scroll_to("Check answer")
+        tap("Check answer")
+        wait_for("Lovely work! You found it.")
+        action = "Finish mix" if index == 1 else "Next question"
+        scroll_to(action)
+        tap(action)
+    wait_for("2 / 2 round stars")
+    scroll_to("Play rewards saved on this device.")
+    scroll_to("New stickers for your book!")
+    screenshot("quick-mix-result")
+    scroll_to("Done")
+    tap("Done")
+
+
 def main(apk):
     adb("install", "-r", str(apk))
     adb("shell", "pm", "clear", PACKAGE)
@@ -183,9 +231,27 @@ def main(apk):
     scroll_to("2 sessions per day", exact=True)
     tap("2 sessions per day", exact=True)
     # The goal controls can be visible while the counter above is offscreen.
-    scroll_to("0 / 2", direction="up")
-    scroll_to("0 XP")
+    scroll_to("0 / 2", direction="up", exact=True)
+    scroll_to("0 XP", exact=True)
     screenshot("03-home")
+
+    # A new learner can play immediately. A finished perfect mix awards two
+    # stickers but must not add XP or count toward the study goal.
+    play_kiswahili_mix(preview=True)
+    scroll_to("0 / 2", direction="up", exact=True)
+    scroll_to("0 XP", exact=True)
+    adb("shell", "am", "force-stop", PACKAGE)
+    adb("shell", "am", "start", "-n", f"{PACKAGE}/.MainActivity")
+    wait_for("Kiswahili")
+    scroll_to("Play Quick Mix and collect stickers", direction="up")
+    tap("Play Quick Mix and collect stickers")
+    scroll_to("2 / 6 collected")
+    scroll_to("Mix Maker")
+    scroll_to("Bright Star")
+    screenshot("quick-mix-relaunch")
+    tap("Go back", exact=True)
+    scroll_to("0 / 2", direction="up", exact=True)
+    scroll_to("0 XP", exact=True)
 
     tap("AI Teacher")
     wait_for("AI voice is not available yet")
@@ -253,13 +319,18 @@ def main(apk):
     tap("Home")
     scroll_to("12 / 2", direction="up")
     scroll_to("115 XP")
+    scroll_to("Play Quick Mix and collect stickers", direction="up")
+    tap("Play Quick Mix and collect stickers")
+    scroll_to("6 / 6 collected")
+    screenshot("all-stickers")
+    tap("Go back", exact=True)
     adb("shell", "am", "force-stop", PACKAGE)
     adb("shell", "am", "start", "-n", f"{PACKAGE}/.MainActivity")
     wait_for("French")
     scroll_to("12 / 2")
     scroll_to("115 XP")
     screenshot("13-relaunch")
-    print("Android smoke test passed: three courses, foundation lessons, review, goal, progress, relaunch, creator credit and disabled AI.", flush=True)
+    print("Android smoke test passed: Quick Mix, stickers, three courses, foundation lessons, review, goal, progress, relaunch, creator credit and disabled AI.", flush=True)
 
 
 if __name__ == "__main__":
