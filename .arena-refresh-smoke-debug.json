@@ -1,0 +1,57 @@
+[
+  {
+    "name": "01-onboarding.png",
+    "sha": "3b72ef1dc38ee879fb0951d95d5062ecc517fb39",
+    "size": 501149
+  },
+  {
+    "name": "02-language.png",
+    "sha": "f90d506c57b59b6d71bfb38743ac44aa20c7bfab",
+    "size": 151492
+  },
+  {
+    "name": "03-home.png",
+    "sha": "35bf7b634a99a2023f86bdab2ad267c1bbdc845e",
+    "size": 200289
+  },
+  {
+    "name": "04-ai-teacher.png",
+    "sha": "1d68ef4a3ae1fcc798751367d5ef606ea9c37700",
+    "size": 240545
+  },
+  {
+    "name": "05-chat.png",
+    "sha": "9a250ecec525db2b39acec29c084b50779d260bd",
+    "size": 138938
+  },
+  {
+    "name": "06-profile.png",
+    "sha": "2ff6eb62b9d0791132421ec293be6513c76ca176",
+    "size": 134480
+  },
+  {
+    "name": "07-kiswahili.png",
+    "sha": "b885fa05451957a81d2b477d574b5444b345bfe3",
+    "size": 161830
+  },
+  {
+    "name": "failed-job.log",
+    "sha": "2e4cc33495cf23d332c8fa8a0831e99dfebae5d2",
+    "size": 50080
+  },
+  {
+    "name": "last-screen.png",
+    "sha": "6f4a8de2cd67e0fbc7f0a981bd18e2f09084ce6f",
+    "size": 212585
+  },
+  {
+    "name": "last-window.xml",
+    "sha": "02fe1c309fdca615e935758fce347a5fe37c77c6",
+    "size": 28070
+  },
+  {
+    "name": "logcat.txt",
+    "sha": "070a228d867b1bfdf43ed9fed12656c15416acad",
+    "size": 86
+  }
+]
