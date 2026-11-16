@@ -93,6 +93,7 @@ export default function RootLayout() {
               <Stack.Screen name="(tabs)" />
               <Stack.Screen name="lesson/[id]" />
               <Stack.Screen name="review" />
+              <Stack.Screen name="play" />
             </Stack>
           </>
         )}

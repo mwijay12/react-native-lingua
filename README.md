@@ -69,6 +69,15 @@ dates. Goals and history use the device's local calendar and do not sync. If
 saved progress or the selected course cannot be read, Lingua offers a retry
 instead of treating it as an empty profile or overwriting it.
 
+The dashboard's **Quick Mix** offers an untimed round of up to three shuffled
+multiple-choice questions from completed lessons in the current course. New
+learners can preview the first playable lesson. Round stars are just for fun:
+playing does not change XP, daily sessions or the missed-question review list,
+and an unfinished round is not saved. The sticker book celebrates lesson,
+course, review and mix milestones across courses. Mix rewards use separate
+on-device storage; if rewards cannot be read or saved, the app offers a retry
+without resetting existing study progress.
+
 **AI voice and live chat are not enabled.** The AI screens show labelled local
 practice instead, and the agent-session and Stream-token API routes in this
 source return 503. They must not be re-enabled until authentication, call
@@ -111,6 +120,8 @@ If you're getting started and need assistance or face any bugs, join our active 
 👉 **Onboarding**: Choose Kiswahili, English or French with English instructions. The demo runs locally without signing in.
 
 👉 **Study tools**: Set a daily session goal, view recent activity and course progress, and review questions you missed. Progress stays on this device.
+
+👉 **Play and collect**: Try a short Quick Mix and collect milestone stickers without changing study XP or review.
 
 👉 **Accounts**: The tutorial source includes Clerk integration; sign-in is deliberately disabled in the standalone Android demo.
 
