@@ -1,0 +1,47 @@
+name: Temporary Android smoke diagnostics
+
+on:
+  push:
+    branches:
+      - "arena/85f2bc67-react-native-lingua"
+    paths:
+      - ".github/workflows/temporary-planning-diagnostics.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  diagnostics:
+    name: Retrieve failed emulator diagnostics
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: arena/85f2bc67-react-native-lingua
+          fetch-depth: 0
+      - name: Download emulator screenshots and logs
+        uses: actions/download-artifact@v4
+        with:
+          name: Lingua-Demo-Android-Smoke
+          path: .planning-diagnostics/smoke
+          run-id: 44032616442
+          github-token: ${{ github.token }}
+      - name: Download runner job log
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh api "repos/$GITHUB_REPOSITORY/actions/jobs/133874117694/logs" > .planning-diagnostics/job.log; then
+            echo 'Job log is not available yet; screenshots and logcat will still be staged.'
+            rm -f .planning-diagnostics/job.log
+          fi
+      - name: Stage diagnostics temporarily
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git pull --ff-only origin arena/85f2bc67-react-native-lingua
+          git add .planning-diagnostics
+          git commit -m 'Temporarily stage Android smoke diagnostics'
+          git push origin HEAD:arena/85f2bc67-react-native-lingua
