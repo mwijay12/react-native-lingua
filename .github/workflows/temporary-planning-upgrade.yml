@@ -1,0 +1,133 @@
+name: Temporary planning upgrade and APK handoff
+
+on:
+  push:
+    branches:
+      - "arena/85f2bc67-react-native-lingua"
+    paths:
+      - ".github/workflows/temporary-planning-upgrade.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  upgrade:
+    name: Upgrade the illustrated demo in place
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download previous illustrated demo
+        uses: actions/download-artifact@v4
+        with:
+          name: Lingua-Demo-APK
+          path: baseline
+          run-id: 44022259614
+          github-token: ${{ github.token }}
+      - name: Wait for the new APK build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          deadline=$((SECONDS + 2700))
+          while (( SECONDS < deadline )); do
+            job="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/44029700441/jobs" --jq '.jobs[] | select(.name == "Build installable test APK") | "\(.status):\(.conclusion)"')"
+            if [[ "$job" == "completed:success" ]]; then exit 0; fi
+            if [[ "$job" == completed:* ]]; then echo "APK build failed: $job" >&2; exit 1; fi
+            sleep 20
+          done
+          echo 'Timed out waiting for the APK build' >&2
+          exit 1
+      - name: Download the new demo
+        uses: actions/download-artifact@v4
+        with:
+          name: Lingua-Demo-APK
+          path: current
+          run-id: 44029700441
+          github-token: ${{ github.token }}
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Test the upgrade offline
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: python3 scripts/smoke-android-planning-upgrade.py baseline/Lingua-Demo.apk current/Lingua-Demo.apk
+      - name: Upload upgrade diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Planning-Upgrade-Diagnostics
+          path: android-smoke/
+          if-no-files-found: warn
+          retention-days: 3
+
+  handoff:
+    name: Temporarily stage the tested APK
+    needs: upgrade
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: arena/85f2bc67-react-native-lingua
+          fetch-depth: 0
+      - name: Require both fresh-install smoke tests to pass
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run watch 44029700441 --exit-status --interval 30
+      - uses: actions/download-artifact@v4
+        with:
+          name: Lingua-Demo-APK
+          path: current
+          run-id: 44029700441
+          github-token: ${{ github.token }}
+      - name: Split compressed APK and create checksums
+        run: |
+          python3 - <<'PY'
+          import gzip, hashlib, json, shutil
+          from pathlib import Path
+          src = Path('current/Lingua-Demo.apk')
+          output = Path('.apk-transfer')
+          output.mkdir(exist_ok=True)
+          packed = Path('lingua-transfer.apk.gz')
+          with src.open('rb') as input_file, gzip.open(packed, 'wb', compresslevel=1) as compressed:
+              shutil.copyfileobj(input_file, compressed)
+          digest = lambda file: hashlib.sha256(file.read_bytes()).hexdigest()
+          expected = Path('current/SHA256SUMS.txt').read_text().split()[0]
+          if digest(src) != expected:
+              raise RuntimeError('APK differs from the build checksum')
+          permissions = Path('current/APK-permissions.txt').read_text()
+          if 'android.permission.RECORD_AUDIO' in permissions:
+              raise RuntimeError('Playback-only APK must not request microphone permission')
+          (output / 'APK-permissions.txt').write_text(permissions)
+          parts = []
+          with packed.open('rb') as stream:
+              for index in range(100):
+                  chunk = stream.read(8 * 1024 * 1024)
+                  if not chunk:
+                      break
+                  file = output / f'part-{index:02d}'
+                  file.write_bytes(chunk)
+                  parts.append({'name': file.name, 'size': len(chunk), 'sha256': hashlib.sha256(chunk).hexdigest()})
+          manifest = {'source_run': 44029700441, 'apk_size': src.stat().st_size, 'apk_sha256': digest(src),
+                      'gzip_size': packed.stat().st_size, 'gzip_sha256': digest(packed), 'parts': parts}
+          (output / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
+          print(json.dumps(manifest, indent=2))
+          PY
+      - name: Stage chunks on the session branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git pull --ff-only origin arena/85f2bc67-react-native-lingua
+          git add .apk-transfer
+          git commit -m 'Temporarily stage tested planning demo APK'
+          git push origin HEAD:arena/85f2bc67-react-native-lingua
