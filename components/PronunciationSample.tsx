@@ -21,14 +21,14 @@ export function PronunciationSample({ sample }: { sample: Sample }) {
       </View>
       <Text className="font-poppins-semibold text-xs text-text-primary mt-4">Read along</Text>
       <Text className="body-sm text-text-secondary mt-1" testID="pronunciation-transcript">{sample.lines.join(" · ")}</Text>
-      <View className="flex-row gap-2 mt-4">
-        <TouchableOpacity onPress={play} className="flex-1 min-h-11 rounded-xl bg-lingua-teal flex-row items-center justify-center px-2 py-2" accessibilityRole="button" accessibilityLabel="Play pronunciation sample" accessibilityHint="Plays the selected words and phrases from the beginning." testID="play-pronunciation">
+      <View className="flex-row flex-wrap gap-2 mt-4">
+        <TouchableOpacity onPress={play} className="basis-[128px] grow shrink min-h-11 rounded-xl bg-lingua-teal flex-row items-center justify-center px-2 py-2" accessibilityRole="button" accessibilityLabel="Play pronunciation sample" accessibilityHint="Plays the selected words and phrases from the beginning." testID="play-pronunciation">
           <Ionicons name="play" size={16} color="#FFFFFF" />
-          <Text className="font-poppins-semibold text-sm text-white ml-2">Play sample</Text>
+          <Text className="font-poppins-semibold text-sm text-white ml-2 shrink text-center">Play sample</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={stop} className="flex-1 min-h-11 rounded-xl border border-lingua-teal flex-row items-center justify-center px-2 py-2" accessibilityRole="button" accessibilityLabel="Stop pronunciation sample" testID="stop-pronunciation">
+        <TouchableOpacity onPress={stop} className="basis-[128px] grow shrink min-h-11 rounded-xl border border-lingua-teal flex-row items-center justify-center px-2 py-2" accessibilityRole="button" accessibilityLabel="Stop pronunciation sample" testID="stop-pronunciation">
           <Ionicons name="stop" size={16} color="#14675D" />
-          <Text className="font-poppins-semibold text-sm text-lingua-teal ml-2">Stop</Text>
+          <Text className="font-poppins-semibold text-sm text-lingua-teal ml-2 shrink text-center">Stop</Text>
         </TouchableOpacity>
       </View>
       {error && <Text className="body-sm text-text-secondary mt-3" accessibilityLiveRegion="polite">The sample could not play. You can still read the words above.</Text>}
