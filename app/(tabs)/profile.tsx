@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { AccountControls } from "@/components/AccountControls";
 import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
 import { MotionSticker } from "@/components/MotionSticker";
+import { SoundEffectsControl } from "@/components/SoundEffectsControl";
 import { CREATOR_CREDIT } from "@/constants/branding";
 import { getCourseUnits } from "@/data/courses";
 import { LANGUAGES } from "@/data/languages";
@@ -80,6 +81,9 @@ export default function ProfileScreen() {
             );
           })}
         </View>
+
+        <Text className="font-poppins-semibold text-base text-text-primary mt-6 mb-3">Listening preferences</Text>
+        <SoundEffectsControl />
 
         <View className="mt-6 rounded-2xl border border-border bg-white p-5">
           <Text className="font-poppins-semibold text-base text-text-primary">About Lingua</Text>

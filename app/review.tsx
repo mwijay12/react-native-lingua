@@ -12,12 +12,15 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { FeedbackPanel } from "@/components/FeedbackPanel";
 import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
 import { MotionSticker } from "@/components/MotionSticker";
 import { QuestionInput } from "@/components/QuestionInput";
+import { SoundEffectsControl } from "@/components/SoundEffectsControl";
 import { getCourseUnits } from "@/data/courses";
 import { isAvailableLanguage, LANGUAGES } from "@/data/languages";
 import { useLearningHydration } from "@/hooks/useLearningHydration";
+import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { isCorrectAnswer } from "@/lib/practice";
 import { getReviewQuestions, type ReviewQuestion } from "@/lib/studyProgress";
 import { useLanguageStore } from "@/store/languageStore";
@@ -37,6 +40,7 @@ export default function ReviewScreen() {
   const reviewLanguage = isAvailableLanguage(course) ? course : selectedLanguage;
   const { reviewItems, clearReviewQuestion, completeReview } = useLearningStore();
   const hydration = useLearningHydration();
+  const sounds = useSoundEffects();
   const [phase, setPhase] = useState<Phase>("intro");
   const [questions, setQuestions] = useState<ReviewQuestion[]>([]);
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -67,6 +71,7 @@ export default function ReviewScreen() {
       clearReviewQuestion(question.lesson.id, question.activity.id);
       setCorrectCount((count) => count + 1);
       setFeedback("correct");
+      sounds.correct();
     } else {
       setFeedback("incorrect");
     }
@@ -83,6 +88,7 @@ export default function ReviewScreen() {
     finished.current = true;
     completeReview();
     setPhase("finished");
+    sounds.celebrate();
   };
 
   if (hydration !== "ready") return <LearningHydrationScreen status={hydration} />;
@@ -90,13 +96,13 @@ export default function ReviewScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FBF8F1" }}>
       <View className="w-full max-w-[720px] self-center flex-row items-center px-5 py-3 border-b border-border">
-        <TouchableOpacity onPress={goBack} accessibilityRole="button" accessibilityLabel="Go back" hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+        <TouchableOpacity onPress={goBack} accessibilityRole="button" accessibilityLabel="Go back" className="w-11 h-11 justify-center">
           <Ionicons name="chevron-back" size={24} color="#183B37" />
         </TouchableOpacity>
         <Text className="flex-1 text-center font-poppins-semibold text-base text-text-primary">
           {phase === "practice" ? "Review practice" : "Review"}
         </Text>
-        <View style={{ width: 24 }} />
+        <SoundEffectsControl compact />
       </View>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <ScrollView
@@ -179,13 +185,13 @@ export default function ReviewScreen() {
               <QuestionInput activity={question.activity} answer={answer} disabled={feedback !== null} onChange={setAnswer} onSubmit={checkAnswer} />
               {question.activity.hint && !feedback && <Text className="body-sm text-text-secondary mt-4">Hint: {question.activity.hint}</Text>}
               {feedback && (
-                <View className={`rounded-2xl p-4 mt-4 ${feedback === "correct" ? "bg-[#EDF8F1]" : "bg-[#FFF1F0]"}`} accessibilityLiveRegion="polite" testID="review-feedback">
+                <FeedbackPanel kind={feedback} testID="review-feedback">
                   <Text className="font-poppins-semibold text-sm text-text-primary">
                     {feedback === "correct" ? "Correct! Removed from review." : "Not quite. This stays in review."}
                   </Text>
                   {feedback === "incorrect" && <Text className="body-sm text-text-secondary mt-1">Answer: {question.activity.correctAnswer}</Text>}
                   {question.activity.explanation && <Text className="body-sm text-text-secondary mt-1">{question.activity.explanation}</Text>}
-                </View>
+                </FeedbackPanel>
               )}
               {feedback ? (
                 <TouchableOpacity onPress={advance} className="bg-lingua-teal rounded-2xl items-center py-4 mt-6" accessibilityRole="button" testID={questionIndex + 1 === questions.length ? "finish-review-button" : "next-review-question-button"}>

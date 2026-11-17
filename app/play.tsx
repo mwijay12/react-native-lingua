@@ -4,14 +4,17 @@ import { useRef, useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { FeedbackPanel } from "@/components/FeedbackPanel";
 import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
 import { MotionSticker } from "@/components/MotionSticker";
 import { QuestionInput } from "@/components/QuestionInput";
 import { RewardAlbum } from "@/components/RewardAlbum";
+import { SoundEffectsControl } from "@/components/SoundEffectsControl";
 import { images } from "@/constants/images";
 import { getCourseUnits } from "@/data/courses";
 import { LANGUAGES } from "@/data/languages";
 import { useLearningHydration } from "@/hooks/useLearningHydration";
+import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { isCorrectAnswer } from "@/lib/practice";
 import { getMixPool, getRewardBadges, makeQuickMix, MIX_QUESTION_LIMIT, type MixQuestion } from "@/lib/quickMix";
 import { useLanguageStore } from "@/store/languageStore";
@@ -24,6 +27,7 @@ type Feedback = "correct" | "incorrect" | null;
 export default function PlayScreen() {
   const router = useRouter();
   const learningHydration = useLearningHydration();
+  const sounds = useSoundEffects();
   const playHydration = usePlayHydrationStatus((state) => state.status);
   const saveStatus = usePlaySaveStatus((state) => state.status);
   const selectedLanguage = useLanguageStore((state) => state.selectedLanguage);
@@ -74,6 +78,7 @@ export default function PlayScreen() {
     if (isCorrectAnswer(answer, question.activity.correctAnswer)) {
       setCorrectCount((value) => value + 1);
       setFeedback("correct");
+      sounds.correct();
     } else {
       setFeedback("incorrect");
     }
@@ -90,6 +95,7 @@ export default function PlayScreen() {
     finished.current = true;
     completeMix(correctCount, questions.length);
     setPhase("finished");
+    sounds.celebrate();
   };
 
   if (learningHydration !== "ready") return <LearningHydrationScreen status={learningHydration} />;
@@ -98,11 +104,11 @@ export default function PlayScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FBF8F1" }}>
       <View className="w-full max-w-[720px] self-center flex-row items-center px-5 py-3 border-b border-border">
-        <TouchableOpacity onPress={goBack} accessibilityRole="button" accessibilityLabel="Go back" hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+        <TouchableOpacity onPress={goBack} accessibilityRole="button" accessibilityLabel="Go back" className="w-11 h-11 justify-center">
           <Ionicons name="chevron-back" size={24} color="#183B37" />
         </TouchableOpacity>
         <Text className="flex-1 text-center font-poppins-semibold text-base text-text-primary">{phase === "playing" ? "Quick Mix" : "Play & collect"}</Text>
-        <View style={{ width: 24 }} />
+        <SoundEffectsControl compact />
       </View>
       <ScrollView key={phase === "playing" ? `${phase}-${questionIndex}` : phase} showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         {saveStatus === "error" && phase !== "playing" && (
@@ -137,6 +143,7 @@ export default function PlayScreen() {
                     : `Mix questions from your completed ${language.name} lessons.`}
               </Text>
               <Text className="caption mt-2">Round stars are just for fun: no extra XP, daily sessions or changes to your review list.</Text>
+              <Text className="caption mt-2">Use the speaker above to turn feedback sounds on or off.</Text>
               {questionCount > 0 && language ? (
                 <TouchableOpacity onPress={start} className="bg-lingua-teal rounded-2xl items-center py-4 mt-4" accessibilityRole="button" testID="start-mix-button">
                   <Text className="font-poppins-semibold text-base text-white">Play {questionCount}-question mix</Text>
@@ -168,11 +175,11 @@ export default function PlayScreen() {
             <Text className="body-sm text-text-secondary mb-5">Choose one answer. Take your time.</Text>
             <QuestionInput activity={question.activity} answer={answer} disabled={feedback !== null} onChange={setAnswer} onSubmit={check} />
             {feedback && (
-              <View className={`rounded-2xl p-4 mt-4 ${feedback === "correct" ? "bg-[#E5F3ED]" : "bg-[#FFF1E8]"}`} accessibilityLiveRegion="polite" testID="mix-feedback">
+              <FeedbackPanel kind={feedback} testID="mix-feedback">
                 <Text className="font-poppins-semibold text-sm text-text-primary">{feedback === "correct" ? "Lovely work! You found it." : "Good try! Here is the answer."}</Text>
                 {feedback === "incorrect" && <Text className="body-sm text-text-secondary mt-1">Answer: {question.activity.correctAnswer}</Text>}
                 {question.activity.explanation && <Text className="body-sm text-text-secondary mt-1">{question.activity.explanation}</Text>}
-              </View>
+              </FeedbackPanel>
             )}
             {feedback ? (
               <TouchableOpacity onPress={advance} className="bg-lingua-teal rounded-2xl items-center py-4 mt-6" accessibilityRole="button" testID={questionIndex + 1 === questions.length ? "finish-mix-button" : "next-mix-button"}>

@@ -11,6 +11,8 @@ module.exports = {
     newArchEnabled: true,
     android: {
       package: "com.jsmastery.duolingoclone.demo",
+      // Audio is playback only; the demo must not ask for microphone access.
+      blockedPermissions: ["android.permission.RECORD_AUDIO"],
       adaptiveIcon: {
         backgroundColor: "#155F57",
         foregroundImage: "./assets/images/android-icon-foreground.png",

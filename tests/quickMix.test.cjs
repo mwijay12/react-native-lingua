@@ -51,6 +51,37 @@ test("Quick Mix uses the current course, completed lessons or a first-lesson pre
   assert.deepEqual(getMixPool([invalid], []), { questions: [], preview: true });
 });
 
+test("adding travel and planning lessons preserves XP and stickers while extending the course and mix", () => {
+  const codes = ["sw", "en", "fr"];
+  const oldCourses = codes.map((code) => getCourseUnits(code).slice(0, 3).flatMap((unit) => unit.lessons));
+  const travelCourses = codes.map((code) => getCourseUnits(code).slice(0, 4).flatMap((unit) => unit.lessons));
+  assert.deepEqual(oldCourses.map((course) => course.length), [8, 8, 11]);
+  assert.deepEqual(travelCourses.map((course) => course.length), [10, 10, 13]);
+  assert.deepEqual(courses.map((course) => course.length), [12, 12, 15]);
+  assert.equal(oldCourses.flat().reduce((sum, lesson) => sum + lesson.xpReward, 0), 305);
+  assert.equal(travelCourses.flat().reduce((sum, lesson) => sum + lesson.xpReward, 0), 395);
+  const play = { roundsCompleted: 1, perfectRounds: 1 };
+  const history = { "2026-01-01": { lessons: 1, reviews: 1 } };
+  for (const previous of [oldCourses, travelCourses]) {
+    const completed = previous.flat().map((lesson) => lesson.id);
+    assert.deepEqual(getRewardBadges(courses, completed, history, play), getRewardBadges(previous, completed, history, play));
+    for (const [index, course] of previous.entries()) {
+      assert.deepEqual(courses[index].slice(0, course.length).map((lesson) => lesson.id), course.map((lesson) => lesson.id));
+    }
+  }
+  assert.deepEqual(courses.map((course, index) => Math.round(oldCourses[index].length / course.length * 100)), [67, 67, 73]);
+  assert.deepEqual(courses.map((course, index) => Math.round(travelCourses[index].length / course.length * 100)), [83, 83, 87]);
+  for (const [index, code] of codes.entries()) {
+    for (const suffix of ["travel-places", "planning-days", "planning-meet"]) {
+      const newLesson = `${code}-${suffix}`;
+      const pool = getMixPool(courses[index], [newLesson]);
+      assert.equal(pool.preview, false);
+      assert.ok(pool.questions.length >= 3);
+      assert.ok(pool.questions.every((question) => question.lessonId === newLesson));
+    }
+  }
+});
+
 test("round counts and sticker milestones reflect real progress only", () => {
   const initial = { roundsCompleted: 0, perfectRounds: 0 };
   assert.equal(recordMixRound(initial, 4, 3), initial);
