@@ -152,10 +152,18 @@ jobs:
         with:
           ref: arena/85f2bc67-react-native-lingua
           fetch-depth: 0
-      - name: Require both fresh-install smoke tests to pass
+      # This workflow's three prerequisite jobs retest the exact APK after a
+      # Pixel Launcher ANR interrupted the original general smoke. The old
+      # workflow's overall conclusion cannot be used as the handoff gate.
+      - name: Verify the APK build and native audio check
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh run watch 44032616442 --exit-status --interval 30
+        run: |
+          build="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/44032616442/jobs" --jq '.jobs[] | select(.name == "Build installable test APK") | .conclusion')"
+          audio="$(gh run view 44032656190 --json status,conclusion --jq '.status + ":" + .conclusion')"
+          test "$build" = success
+          test "$audio" = completed:success
+          echo 'APK build and offline native playback checks passed.'
       - uses: actions/download-artifact@v4
         with:
           name: Lingua-Demo-APK
