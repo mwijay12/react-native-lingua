@@ -6,6 +6,7 @@ on:
       - "arena/85f2bc67-react-native-lingua"
     paths:
       - ".github/workflows/temporary-native-audio.yml"
+      - "scripts/temporary-native-audio-check.py"
   workflow_dispatch:
 
 permissions:

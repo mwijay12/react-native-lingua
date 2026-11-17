@@ -19,16 +19,18 @@ def annotation(title, message):
 def active_tracks(dump, pids):
     found = {}
     for line in dump.splitlines():
-        match = re.search(r"\byes\s+(\d+)\s*/\s*\d+\s+(.*)", line)
+        # Android 15 emulator dumps may show just the client PID, while newer
+        # builds may show PID/UID and extra port-volume fields.
+        match = re.match(r"\s*(?:F\d\s+)?(?:[SP?]\s+)?\d+\s+yes\s+(\d+)(?:\s*/\s*\d+)?\s+(.*)", line)
         if not match or match.group(1) not in pids:
             continue
         fields = match.group(2).split()
-        # Android 15 AudioFlinger playback fields after pid/uid: session,
-        # port, state, flags, format, channel mask, rate, stream, usage,
-        # content type, five volume values, port mute, server frame counter.
-        if len(fields) > 16:
+        # After the client: session, port, state, flags, format, mask, rate,
+        # stream, usage, content type and four volume values precede Server.
+        if len(fields) > 14:
+            index = 16 if len(fields) > 16 and fields[15] in ("true", "false") else 14
             try:
-                found[(match.group(1), fields[0], fields[1])] = int(fields[16], 16)
+                found[(match.group(1), fields[0], fields[1])] = int(fields[index], 16)
             except ValueError:
                 pass
     return found
@@ -38,7 +40,10 @@ def dump(name, pids):
     result = smoke.adb("shell", "dumpsys", "media.audio_flinger", check=False)
     text = result.stdout.decode("utf-8", "replace")
     (smoke.OUT / f"native-audio-{name}.txt").write_text(text)
-    relevant = [line.strip() for line in text.splitlines() if any(re.search(rf"\b{pid}\s*/", line) for pid in pids)]
+    relevant = [line.strip() for line in text.splitlines() if any(
+        re.match(rf"\s*(?:F\d\s+)?(?:[SP?]\s+)?\d+\s+(?:yes|no)\s+{pid}(?:\s*/\s*\d+)?\s+", line)
+        for pid in pids
+    )]
     annotation(f"AudioFlinger {name}", " | ".join(relevant) or "No audio track for the app PID")
     if result.returncode != 0:
         raise RuntimeError(f"AudioFlinger dump failed: {result.stderr.decode('utf-8', 'replace')}")
