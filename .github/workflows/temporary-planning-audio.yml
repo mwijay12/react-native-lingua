@@ -1,0 +1,65 @@
+name: Temporary offline planning audio check
+
+on:
+  push:
+    branches:
+      - "arena/85f2bc67-react-native-lingua"
+    paths:
+      - ".github/workflows/temporary-planning-audio.yml"
+      - "scripts/temporary-planning-audio.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  audio:
+    name: Verify new offline pronunciation playback
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Wait for the APK build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          deadline=$((SECONDS + 2700))
+          while (( SECONDS < deadline )); do
+            job="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/44029700441/jobs" --jq '.jobs[] | select(.name == "Build installable test APK") | "\(.status):\(.conclusion)"')"
+            if [[ "$job" == "completed:success" ]]; then exit 0; fi
+            if [[ "$job" == completed:* ]]; then echo "APK build failed: $job" >&2; exit 1; fi
+            sleep 20
+          done
+          echo 'Timed out waiting for the APK build' >&2
+          exit 1
+      - name: Download demo APK
+        uses: actions/download-artifact@v4
+        with:
+          name: Lingua-Demo-APK
+          path: artifacts
+          run-id: 44029700441
+          github-token: ${{ github.token }}
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Observe playback with network disabled
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: python3 scripts/temporary-planning-audio.py artifacts/Lingua-Demo.apk
+      - name: Upload audio diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Planning-Audio-Diagnostics
+          path: android-smoke/
+          if-no-files-found: warn
+          retention-days: 3
