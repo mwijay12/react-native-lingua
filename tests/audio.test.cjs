@@ -47,6 +47,64 @@ test("each bundled pronunciation sample is labelled and matches its lesson", () 
   }
 });
 
+test("web audio reports blocked playback and ignores canceled or released requests", async () => {
+  const { createWebAudioPlayback } = require("../lib/webAudioPlayback.ts");
+  const media = new EventTarget();
+  let nextPlay = () => Promise.resolve();
+  let pauses = 0;
+  let loads = 0;
+  let errors = 0;
+  let removeAttribute = "";
+  Object.assign(media, {
+    currentTime: 8,
+    pause() { pauses += 1; },
+    play() { return nextPlay(); },
+    removeAttribute(name) { removeAttribute = name; },
+    load() { loads += 1; },
+  });
+  const playback = createWebAudioPlayback(media, () => { errors += 1; });
+  const flush = () => new Promise((resolve) => setImmediate(resolve));
+
+  nextPlay = () => Promise.reject(new Error("autoplay blocked"));
+  playback.play();
+  assert.equal(media.currentTime, 0, "playback must restart from the beginning");
+  await flush();
+  assert.equal(errors, 1);
+
+  let rejectOldPlay;
+  nextPlay = () => new Promise((_resolve, reject) => { rejectOldPlay = reject; });
+  playback.play();
+  playback.stop();
+  rejectOldPlay(new Error("play was stopped"));
+  await flush();
+  assert.equal(errors, 1, "a stopped request must not show a stale error");
+
+  nextPlay = () => new Promise((_resolve, reject) => { rejectOldPlay = reject; });
+  playback.play();
+  nextPlay = () => Promise.resolve();
+  playback.play();
+  rejectOldPlay(new Error("superseded by a replay"));
+  await flush();
+  assert.equal(errors, 1, "a newer request must not inherit an older failure");
+
+  media.dispatchEvent(new Event("error"));
+  assert.equal(errors, 2, "media errors during playback must be reported");
+  media.dispatchEvent(new Event("error"));
+  assert.equal(errors, 2, "one media failure should only be reported once");
+
+  nextPlay = () => new Promise((_resolve, reject) => { rejectOldPlay = reject; });
+  playback.play();
+  playback.dispose();
+  rejectOldPlay(new Error("player was released"));
+  await flush();
+  media.dispatchEvent(new Event("error"));
+  playback.play();
+  assert.equal(errors, 2, "a released player must not report stale failures");
+  assert.equal(removeAttribute, "src");
+  assert.equal(loads, 1);
+  assert.ok(pauses >= 4);
+});
+
 test("sound preferences survive rapid toggles and storage failures without touching progress", async () => {
   const saved = JSON.stringify({ state: { effectsEnabled: false }, version: 1 });
   let stored = saved;
