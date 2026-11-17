@@ -29,13 +29,24 @@ jobs:
           path: .planning-diagnostics/smoke
           run-id: 44032616442
           github-token: ${{ github.token }}
-      - name: Download runner job log
+      - name: Download upgrade screenshots and logs
+        uses: actions/download-artifact@v4
+        with:
+          name: Planning-Upgrade-Diagnostics
+          path: .planning-diagnostics/upgrade
+          run-id: 44032656166
+          github-token: ${{ github.token }}
+      - name: Download available runner job logs
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if ! gh api "repos/$GITHUB_REPOSITORY/actions/jobs/133874117694/logs" > .planning-diagnostics/job.log; then
-            echo 'Job log is not available yet; screenshots and logcat will still be staged.'
-            rm -f .planning-diagnostics/job.log
+          if ! gh run view 44032616442 --job 133874117694 --log > .planning-diagnostics/smoke-job.log; then
+            echo 'Smoke job log is not available yet.'
+            rm -f .planning-diagnostics/smoke-job.log
+          fi
+          if ! gh run view 44032656166 --job 133868026138 --log > .planning-diagnostics/upgrade-job.log; then
+            echo 'Upgrade job log is not available yet.'
+            rm -f .planning-diagnostics/upgrade-job.log
           fi
       - name: Stage diagnostics temporarily
         run: |
