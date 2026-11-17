@@ -1,0 +1,593 @@
+Upgrade the illustrated demo in place	Set up job	﻿2026-11-17T06:38:10.7661810Z Current runner version: '2.338.2'
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7680947Z ##[group]Runner Image Provisioner
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7681628Z Hosted Compute Agent
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7682225Z Version: 20261103.629
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7682791Z Commit: 15dbd9ccb5dbf34fae002b6ed1a2670f52df37bc
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7683357Z Build Date: 2026-11-03T17:26:59Z
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7684035Z Worker ID: {1d56027f-c91c-4d21-9701-71a01e2e7bcd}
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7684591Z Region: us-west-2
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7684992Z Cloud: AWS
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7685427Z ##[endgroup]
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7686511Z ##[group]Operating System
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7686949Z Ubuntu
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7687344Z 24.04.5
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7687711Z LTS
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7688099Z ##[endgroup]
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7688523Z ##[group]Runner Image
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7688960Z Image: ubuntu-24.04
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7689663Z Version: 20261111.127.1
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7690459Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261111.127/images/ubuntu/Ubuntu2404-Readme.md
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7691809Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261111.127
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7692522Z ##[endgroup]
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7693467Z ##[group]GITHUB_TOKEN Permissions
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7695205Z Actions: read
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7695668Z Contents: write
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7696073Z Metadata: read
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7696506Z ##[endgroup]
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7698035Z Secret source: Actions
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7698661Z Cache mode: write
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7699472Z Prepare workflow directory
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7931237Z Prepare all required actions
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:10.7967485Z Getting action download info
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:11.2033183Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:12.8736507Z Download action repository 'actions/download-artifact@v4' (SHA:d3f86a106a0bac45b974a628896c90dbdf5c8093)
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:13.2242723Z Download action repository 'reactivecircus/android-emulator-runner@v2' (SHA:a421e43855164a8197daf9d8d40fe71c6996bb0d)
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:13.5017337Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+Upgrade the illustrated demo in place	Set up job	2026-11-17T06:38:13.9003801Z Complete job name: Upgrade the illustrated demo in place
+Upgrade the illustrated demo in place	Run actions/checkout@v4	﻿2026-11-17T06:38:13.9762747Z ##[group]Run actions/checkout@v4
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:13.9764002Z with:
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:13.9764782Z   repository: mwijay12/react-native-lingua
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:13.9771333Z   token: ***
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:13.9772077Z   ssh-strict: true
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:13.9772802Z   ssh-user: git
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:13.9773573Z   persist-credentials: true
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:13.9774383Z   clean: true
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:13.9775149Z   sparse-checkout-cone-mode: true
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:13.9776017Z   fetch-depth: 1
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:13.9776751Z   fetch-tags: false
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:13.9777522Z   show-progress: true
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:13.9778250Z   lfs: false
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:13.9778956Z   submodules: false
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:13.9779950Z   set-safe-directory: true
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:13.9780795Z   allow-unsafe-pr-checkout: false
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:13.9781851Z ##[endgroup]
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:17.7731780Z Syncing repository: mwijay12/react-native-lingua
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:17.7733053Z ##[group]Getting Git version info
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:17.7733554Z Working directory is '/home/runner/work/react-native-lingua/react-native-lingua'
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:17.7734277Z [command]/usr/bin/git version
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.0927962Z git version 2.56.1
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.0942107Z ##[endgroup]
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.0953579Z Temporarily overriding HOME='/home/runner/work/_temp/cefe943e-cf6e-4f59-a031-66d25441ed26' before making global git config changes
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.0954518Z Adding repository directory to the temporary git global config as a safe directory
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.0957760Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/react-native-lingua/react-native-lingua
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1001730Z Deleting the contents of '/home/runner/work/react-native-lingua/react-native-lingua'
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1004711Z ##[group]Initializing the repository
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1007988Z [command]/usr/bin/git init /home/runner/work/react-native-lingua/react-native-lingua
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1538342Z hint: Using 'master' as the name for the initial branch. This default branch name
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1539065Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1539725Z hint: to use in all of your new repositories, which will suppress this warning,
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1540331Z hint: call:
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1540547Z hint:
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1540850Z hint: 	git config --global init.defaultBranch <name>
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1541230Z hint:
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1541621Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1542069Z hint: 'development'. The just-created branch can be renamed via this command:
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1542401Z hint:
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1542624Z hint: 	git branch -m <name>
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1542889Z hint:
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1543324Z hint: Disable this message with "git config set advice.defaultBranchName false"
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1545120Z Initialized empty Git repository in /home/runner/work/react-native-lingua/react-native-lingua/.git/
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1554277Z [command]/usr/bin/git remote add origin https://github.com/mwijay12/react-native-lingua
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1610241Z ##[endgroup]
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1610780Z ##[group]Disabling automatic garbage collection
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1613400Z [command]/usr/bin/git config --local gc.auto 0
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1637477Z ##[endgroup]
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1637905Z ##[group]Setting up auth
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1642561Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.1669945Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.5419787Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.5445579Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.5598989Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.5627525Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.5800485Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.5820672Z ##[endgroup]
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.5821272Z ##[group]Fetching the repository
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:18.5835508Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +e8c493fedaaf0a6f1b4750d407fcf539b64721ca:refs/remotes/origin/arena/85f2bc67-react-native-lingua
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:19.7318530Z From https://github.com/mwijay12/react-native-lingua
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:19.7320065Z  * [new ref]         e8c493fedaaf0a6f1b4750d407fcf539b64721ca -> origin/arena/85f2bc67-react-native-lingua
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:19.7322437Z ##[endgroup]
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:19.7323021Z ##[group]Determining the checkout info
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:19.7330036Z ##[endgroup]
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:19.7330689Z [command]/usr/bin/git sparse-checkout disable
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:19.7410380Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:19.7419987Z ##[group]Checking out the ref
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:19.7423792Z [command]/usr/bin/git checkout --progress --force -B arena/85f2bc67-react-native-lingua refs/remotes/origin/arena/85f2bc67-react-native-lingua
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:19.8889749Z Switched to a new branch 'arena/85f2bc67-react-native-lingua'
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:19.8897253Z branch 'arena/85f2bc67-react-native-lingua' set up to track 'origin/arena/85f2bc67-react-native-lingua'.
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:19.8905836Z ##[endgroup]
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:19.8946845Z [command]/usr/bin/git log -1 --format=%H
+Upgrade the illustrated demo in place	Run actions/checkout@v4	2026-11-17T06:38:19.8970012Z e8c493fedaaf0a6f1b4750d407fcf539b64721ca
+Upgrade the illustrated demo in place	Download previous illustrated demo	﻿2026-11-17T06:38:19.9154741Z ##[group]Run actions/download-artifact@v4
+Upgrade the illustrated demo in place	Download previous illustrated demo	2026-11-17T06:38:19.9155056Z with:
+Upgrade the illustrated demo in place	Download previous illustrated demo	2026-11-17T06:38:19.9155332Z   name: Lingua-Demo-APK
+Upgrade the illustrated demo in place	Download previous illustrated demo	2026-11-17T06:38:19.9155571Z   path: baseline
+Upgrade the illustrated demo in place	Download previous illustrated demo	2026-11-17T06:38:19.9155817Z   run-id: 44022259614
+Upgrade the illustrated demo in place	Download previous illustrated demo	2026-11-17T06:38:19.9157655Z   github-token: ***
+Upgrade the illustrated demo in place	Download previous illustrated demo	2026-11-17T06:38:19.9157886Z   merge-multiple: false
+Upgrade the illustrated demo in place	Download previous illustrated demo	2026-11-17T06:38:19.9158169Z   repository: mwijay12/react-native-lingua
+Upgrade the illustrated demo in place	Download previous illustrated demo	2026-11-17T06:38:19.9158504Z ##[endgroup]
+Upgrade the illustrated demo in place	Download previous illustrated demo	2026-11-17T06:38:20.0319578Z Downloading single artifact
+Upgrade the illustrated demo in place	Download previous illustrated demo	2026-11-17T06:38:20.0424498Z (node:2153) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Upgrade the illustrated demo in place	Download previous illustrated demo	2026-11-17T06:38:20.0425437Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Upgrade the illustrated demo in place	Download previous illustrated demo	2026-11-17T06:38:20.0643754Z (node:2153) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+Upgrade the illustrated demo in place	Download previous illustrated demo	2026-11-17T06:38:20.3061256Z Preparing to download the following artifacts:
+Upgrade the illustrated demo in place	Download previous illustrated demo	2026-11-17T06:38:20.3062219Z - Lingua-Demo-APK (ID: 14301613662, Size: 44331091, Expected Digest: sha256:abd4cbb07be105bb0f83a0f4bfef9cb15beea041940040f93bbde9d96bdda6c6)
+Upgrade the illustrated demo in place	Download previous illustrated demo	2026-11-17T06:38:20.3087640Z Downloading artifact '14301613662' from 'mwijay12/react-native-lingua'
+Upgrade the illustrated demo in place	Download previous illustrated demo	2026-11-17T06:38:20.6518482Z Redirecting to blob download url: https://productionresultssa8.blob.core.windows.net/actions-results/54cc8577-57e3-80a0-94fa-73daa6deae8e/workflow-job-run-312af418-c415-55da-80d8-125e383b0508/artifacts/06ccb4d05db6896b5b39386c3652f3096cbf5197b30cd79f74fd123e85d1216d.zip
+Upgrade the illustrated demo in place	Download previous illustrated demo	2026-11-17T06:38:20.6520498Z Starting download of artifact to: /home/runner/work/react-native-lingua/react-native-lingua/baseline
+Upgrade the illustrated demo in place	Download previous illustrated demo	2026-11-17T06:38:21.0513794Z (node:2153) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+Upgrade the illustrated demo in place	Download previous illustrated demo	2026-11-17T06:38:24.1197642Z SHA256 digest of downloaded artifact is abd4cbb07be105bb0f83a0f4bfef9cb15beea041940040f93bbde9d96bdda6c6
+Upgrade the illustrated demo in place	Download previous illustrated demo	2026-11-17T06:38:24.1198804Z Artifact download completed successfully.
+Upgrade the illustrated demo in place	Download previous illustrated demo	2026-11-17T06:38:24.1199470Z Total of 1 artifact(s) downloaded
+Upgrade the illustrated demo in place	Download previous illustrated demo	2026-11-17T06:38:24.1206470Z Download artifact has finished successfully
+Upgrade the illustrated demo in place	Wait for the new APK build	﻿2026-11-17T06:38:24.1331201Z ##[group]Run deadline=$((SECONDS + 2700))
+Upgrade the illustrated demo in place	Wait for the new APK build	2026-11-17T06:38:24.1331654Z ^[[36;1mdeadline=$((SECONDS + 2700))^[[0m
+Upgrade the illustrated demo in place	Wait for the new APK build	2026-11-17T06:38:24.1331999Z ^[[36;1mwhile (( SECONDS < deadline )); do^[[0m
+Upgrade the illustrated demo in place	Wait for the new APK build	2026-11-17T06:38:24.1332574Z ^[[36;1m  job="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/44032616442/jobs" --jq '.jobs[] | select(.name == "Build installable test APK") | "\(.status):\(.conclusion)"')"^[[0m
+Upgrade the illustrated demo in place	Wait for the new APK build	2026-11-17T06:38:24.1333205Z ^[[36;1m  if [[ "$job" == "completed:success" ]]; then exit 0; fi^[[0m
+Upgrade the illustrated demo in place	Wait for the new APK build	2026-11-17T06:38:24.1333588Z ^[[36;1m  if [[ "$job" == completed:* ]]; then echo "APK build failed: $job" >&2; exit 1; fi^[[0m
+Upgrade the illustrated demo in place	Wait for the new APK build	2026-11-17T06:38:24.1333930Z ^[[36;1m  sleep 20^[[0m
+Upgrade the illustrated demo in place	Wait for the new APK build	2026-11-17T06:38:24.1334177Z ^[[36;1mdone^[[0m
+Upgrade the illustrated demo in place	Wait for the new APK build	2026-11-17T06:38:24.1334431Z ^[[36;1mecho 'Timed out waiting for the APK build' >&2^[[0m
+Upgrade the illustrated demo in place	Wait for the new APK build	2026-11-17T06:38:24.1334721Z ^[[36;1mexit 1^[[0m
+Upgrade the illustrated demo in place	Wait for the new APK build	2026-11-17T06:38:24.4582914Z shell: /usr/bin/bash -e {0}
+Upgrade the illustrated demo in place	Wait for the new APK build	2026-11-17T06:38:24.4583354Z env:
+Upgrade the illustrated demo in place	Wait for the new APK build	2026-11-17T06:38:24.4585530Z   GH_TOKEN: ***
+Upgrade the illustrated demo in place	Wait for the new APK build	2026-11-17T06:38:24.4585779Z ##[endgroup]
+Upgrade the illustrated demo in place	Download the new demo	﻿2026-11-17T06:53:22.4556300Z ##[group]Run actions/download-artifact@v4
+Upgrade the illustrated demo in place	Download the new demo	2026-11-17T06:53:22.4556632Z with:
+Upgrade the illustrated demo in place	Download the new demo	2026-11-17T06:53:22.4556853Z   name: Lingua-Demo-APK
+Upgrade the illustrated demo in place	Download the new demo	2026-11-17T06:53:22.4557076Z   path: current
+Upgrade the illustrated demo in place	Download the new demo	2026-11-17T06:53:22.4557366Z   run-id: 44032616442
+Upgrade the illustrated demo in place	Download the new demo	2026-11-17T06:53:22.4559541Z   github-token: ***
+Upgrade the illustrated demo in place	Download the new demo	2026-11-17T06:53:22.4559806Z   merge-multiple: false
+Upgrade the illustrated demo in place	Download the new demo	2026-11-17T06:53:22.4560057Z   repository: mwijay12/react-native-lingua
+Upgrade the illustrated demo in place	Download the new demo	2026-11-17T06:53:22.4560440Z ##[endgroup]
+Upgrade the illustrated demo in place	Download the new demo	2026-11-17T06:53:22.5742772Z Downloading single artifact
+Upgrade the illustrated demo in place	Download the new demo	2026-11-17T06:53:22.5813898Z (node:2709) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Upgrade the illustrated demo in place	Download the new demo	2026-11-17T06:53:22.5814829Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Upgrade the illustrated demo in place	Download the new demo	2026-11-17T06:53:22.5982100Z (node:2709) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+Upgrade the illustrated demo in place	Download the new demo	2026-11-17T06:53:22.8401303Z Preparing to download the following artifacts:
+Upgrade the illustrated demo in place	Download the new demo	2026-11-17T06:53:22.8402664Z - Lingua-Demo-APK (ID: 14306507427, Size: 44724017, Expected Digest: sha256:60af28f328413c18a92ec33a41516d4f787dd3ec4ef13cd7e95f768d50ab1ef5)
+Upgrade the illustrated demo in place	Download the new demo	2026-11-17T06:53:22.8428362Z Downloading artifact '14306507427' from 'mwijay12/react-native-lingua'
+Upgrade the illustrated demo in place	Download the new demo	2026-11-17T06:53:23.1648909Z Redirecting to blob download url: https://productionresultssa2.blob.core.windows.net/actions-results/77e69a28-7a2d-8ff4-b3be-1e7f4a20d47d/workflow-job-run-3d77b3eb-5288-5a82-971d-30d220206032/artifacts/06ccb4d05db6896b5b39386c3652f3096cbf5197b30cd79f74fd123e85d1216d.zip
+Upgrade the illustrated demo in place	Download the new demo	2026-11-17T06:53:23.1650603Z Starting download of artifact to: /home/runner/work/react-native-lingua/react-native-lingua/current
+Upgrade the illustrated demo in place	Download the new demo	2026-11-17T06:53:23.5590082Z (node:2709) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+Upgrade the illustrated demo in place	Download the new demo	2026-11-17T06:53:26.7751612Z SHA256 digest of downloaded artifact is 60af28f328413c18a92ec33a41516d4f787dd3ec4ef13cd7e95f768d50ab1ef5
+Upgrade the illustrated demo in place	Download the new demo	2026-11-17T06:53:26.7752791Z Artifact download completed successfully.
+Upgrade the illustrated demo in place	Download the new demo	2026-11-17T06:53:26.7753166Z Total of 1 artifact(s) downloaded
+Upgrade the illustrated demo in place	Download the new demo	2026-11-17T06:53:26.7758524Z Download artifact has finished successfully
+Upgrade the illustrated demo in place	Enable KVM	﻿2026-11-17T06:53:26.7855585Z ##[group]Run echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+Upgrade the illustrated demo in place	Enable KVM	2026-11-17T06:53:26.7856330Z ^[[36;1mecho 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules^[[0m
+Upgrade the illustrated demo in place	Enable KVM	2026-11-17T06:53:26.7856805Z ^[[36;1msudo udevadm control --reload-rules^[[0m
+Upgrade the illustrated demo in place	Enable KVM	2026-11-17T06:53:26.7857109Z ^[[36;1msudo udevadm trigger --name-match=kvm^[[0m
+Upgrade the illustrated demo in place	Enable KVM	2026-11-17T06:53:26.7883257Z shell: /usr/bin/bash -e {0}
+Upgrade the illustrated demo in place	Enable KVM	2026-11-17T06:53:26.7883672Z ##[endgroup]
+Upgrade the illustrated demo in place	Enable KVM	2026-11-17T06:53:26.8003702Z KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"
+Upgrade the illustrated demo in place	Test the upgrade offline	﻿2026-11-17T06:53:26.8290857Z ##[group]Run reactivecircus/android-emulator-runner@v2
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8291192Z with:
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8291420Z   api-level: 35
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8291668Z   arch: x86_64
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8291900Z   target: google_apis
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8292189Z   profile: pixel_2
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8292472Z   disable-animations: true
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8292869Z   emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8293486Z   script: python3 scripts/smoke-android-planning-upgrade.py baseline/Lingua-Demo.apk current/Lingua-Demo.apk
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8293928Z   cores: 2
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8294145Z   avd-name: test
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8294382Z   force-avd-creation: true
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8294681Z   emulator-boot-timeout: 600
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8294973Z   emulator-port: 5554
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8295245Z   disable-spellchecker: false
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8295511Z   disable-linux-hw-accel: auto
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8295781Z   enable-hw-keyboard: false
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8296121Z   channel: stable
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8296354Z ##[endgroup]
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8732943Z ##[group]Configure emulator
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8734012Z API level: 35
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8734269Z System image API level: 35
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8734905Z target: google_apis
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8735240Z CPU architecture: x86_64
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8735564Z Hardware profile: pixel_2
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8736822Z Cores: 2
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8737318Z RAM size: 
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8737581Z Heap size: 
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8737818Z SD card path or size: 
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8738043Z Disk size: 
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8738281Z AVD name: test
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8738501Z force avd creation: true
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8738775Z Emulator boot timeout: 600
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8739428Z emulator port: 5554
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8740045Z emulator options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8740672Z disable animations: true
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8741001Z disable spellchecker: false
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8741365Z disable Linux hardware acceleration: false
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8741747Z enable hardware keyboard: false
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8742126Z Channel: 0 (stable)
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8742434Z Script:
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8742900Z python3 scripts/smoke-android-planning-upgrade.py baseline/Lingua-Demo.apk current/Lingua-Demo.apk
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8743394Z Pre emulator launch script:
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8743985Z ##[endgroup]
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:26.8744442Z ##[group]Install Android SDK
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:27.1285568Z [command]/usr/bin/sh -c \yes | sdkmanager --licenses > /dev/null
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:38.3856284Z Installing latest build tools, platform tools, and platform.
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:38.3866381Z [command]/usr/bin/sh -c \sdkmanager --install 'build-tools;37.0.0' platform-tools 'platforms;android-35'> /dev/null
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:39.4059627Z Installing latest emulator.
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:39.4066837Z [command]/usr/bin/sh -c \sdkmanager --install emulator --channel=0 > /dev/null
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:46.0601844Z Installing system images.
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:53:46.0611575Z [command]/usr/bin/sh -c \sdkmanager --install 'system-images;android-35;google_apis;x86_64' --channel=0 > /dev/null
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:14.1692407Z ##[endgroup]
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:14.1695511Z ##[group]Create AVD
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:14.1695800Z Creating AVD.
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:14.1705699Z [command]/usr/bin/sh -c \echo no | avdmanager create avd --force -n test --package 'system-images;android-35;google_apis;x86_64' --device 'pixel_2'
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:14.7362013Z Loading local repository...                                                     
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:14.7380860Z [=========                              ] 25% Loading local repository...       
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:14.7405350Z [=========                              ] 25% Fetch remote repository...        
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:14.7406373Z [=======================================] 100% Fetch remote repository...       
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:15.3099412Z Auto-selecting single ABI x86_64
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:15.6284224Z [command]/usr/bin/sh -c \printf 'hw.cpu.ncore=2\n' >> /home/runner/.android/avd/test.avd/config.ini
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:15.6303367Z ##[endgroup]
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:15.6304805Z ##[group]Launch Emulator
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:15.6305212Z Starting emulator.
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:15.6313211Z [command]/usr/bin/sh -c \/usr/local/lib/android/sdk/emulator/emulator -port 5554 -avd test -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim &
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:15.6401598Z INFO         | Android emulator version 37.2.13.0 (build_id 16740729) (CL:N/A)
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:15.6402168Z INFO         | Graphics backend: gfxstream
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:15.6402705Z INFO         | Found systemPath /usr/local/lib/android/sdk/system-images/android-35/google_apis/x86_64/
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3572815Z INFO         | Saving last run QEMU version for the AVD to 2
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3573269Z INFO         | Increasing RAM size to 2560MB
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3573764Z ##############################################################################
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3574341Z ##                        WARNING - ACTION REQUIRED                         ##
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3574852Z ##  Consider using the '-metrics-collection' flag to help improve the       ##
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3575409Z ##  emulator by sending anonymized usage data. Or use the '-no-metrics'     ##
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3575928Z ##  flag to bypass this warning and turn off the metrics collection.        ##
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3576683Z ##  In a future release this warning will turn into a one-time blocking     ##
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3577072Z ##  prompt to ask for explicit user input regarding metrics collection.     ##
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3577448Z ##                                                                          ##
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3577795Z ##  Please see '-help-metrics-collection' for more details. You can use     ##
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3578203Z ##  '-metrics-to-file' or '-metrics-to-console' flags to see what type of   ##
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3578630Z ##  data is being collected by emulator as part of usage statistics.        ##
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3578964Z ##############################################################################
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3579486Z INFO         | Guest GLES Driver: Auto (ext controls)
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3579885Z INFO         | emuglConfig_init: vulkan_mode_selected:swiftshader gles_mode_selected:swiftshader
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3580286Z INFO         | Checking system compatibility:
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3580595Z INFO         |   Checking: hasSufficientDiskSpace
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3580921Z INFO         |      Ok: Disk space requirements to run avd: `test` are met
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3581290Z INFO         |   Checking: hasSufficientHwGpu
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3581607Z INFO         |      Ok: Hardware GPU compatibility checks are not required
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3581933Z INFO         |   Checking: hasSufficientSystem
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3582257Z INFO         |      Ok: System requirements to run avd: `test` are met
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3582865Z WARNING      | Feature QuickbootFileBacked is disabled due to stability issues, if you really want that, the environment variable ANDROID_EMU_FORCE_QUICKBOOT_FILE_BACKED need to set to 1
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3583505Z ERROR        | Unable to connect to adb daemon on port: 5037
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3597537Z INFO         | Storing crashdata in: /tmp/android-runner/emu-crash-37.2.13.db, detection is enabled for process: 3047
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3598791Z INFO         | Initializing gfxstream backend
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3605345Z INFO         | startOpenglesRendererImpl: gpu info
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3605682Z INFO         | 
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3608393Z INFO         | initIcdPaths: ICD set to 'swiftshader', using Swiftshader ICD
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3609483Z INFO         | Setting ICD filenames for the loader = /usr/local/lib/android/sdk/emulator/lib64/vulkan/vk_swiftshader_icd.json
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3614288Z INFO         | SharedLibrary::open for [/usr/local/lib/android/sdk/emulator/qemu/linux-x86_64/lib64/vulkan/libvulkan.so]
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3615308Z INFO         | SharedLibrary::open for [/usr/local/lib/android/sdk/emulator/qemu/linux-x86_64/lib64/vulkan/libvulkan.so.1]
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3615965Z INFO         | SharedLibrary::open for [/usr/local/lib/android/sdk/emulator/lib64/vulkan/libvulkan.so]
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.3616574Z INFO         | Added library: /usr/local/lib/android/sdk/emulator/lib64/vulkan/libvulkan.so
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.4679678Z INFO         | Selecting Vulkan device: SwiftShader Device (Subzero), Version: 1.3.0
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.4680340Z INFO         | Using Vulkan externalMemoryMode: OpaqueFd for VkEmulation
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5172291Z INFO         | Format VK_FORMAT_G10X6_B10X6R10X6_2PLANE_422_UNORM_3PACK16 does not support YCbCr sampler conversion
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5195451Z INFO         | SharedLibrary::open for [libX11]
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5196016Z WARNING      | Could not open libX11.so, try libX11.so.6
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5196352Z INFO         | SharedLibrary::open for [libX11.so.6]
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5196708Z INFO         | SharedLibrary::open for [libX11-xcb]
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5197056Z WARNING      | Could not open libX11-xcb.so, try libX11-xcb.so.1
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5197432Z INFO         | SharedLibrary::open for [libX11-xcb.so.1]
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5561791Z INFO         | Initializing VkEmulation features:
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5562406Z INFO         |     glInteropSupported: false
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5563085Z INFO         |     useDeferredCommands: true
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5563409Z INFO         |     createResourceWithRequirements: true
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5563761Z INFO         |     useVulkanComposition: false
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5564089Z INFO         |     useVulkanNativeSwapchain: false
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5564392Z INFO         |     enable guestRenderDoc: false
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5564716Z INFO         |     ASTC LDR emulation mode: Gpu
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5565034Z INFO         |     enable ETC2 emulation: true
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5565388Z INFO         |     enable Ycbcr emulation: false
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5565764Z INFO         |     guestVulkanOnly: false
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5566074Z INFO         |     useDedicatedAllocations: false
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5566367Z INFO         |     guestVulkanMaxApiVersion: 1.3.0
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5566746Z INFO         |     enableProtectedMemoryEmulation: false
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5568049Z INFO         | Graphics Adapter Vendor Google (Google Inc.)
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5568608Z INFO         | Graphics Adapter Android Emulator OpenGL ES Translator (Google SwiftShader)
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5569106Z INFO         | Graphics API Version OpenGL ES 3.0 (OpenGL ES 3.0 SwiftShader 4.0.0.1)
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5570884Z INFO         | Graphics API Extensions GL_OES_EGL_sync GL_OES_EGL_image GL_OES_EGL_image_external GL_OES_depth24 GL_OES_depth32 GL_OES_element_index_uint GL_OES_texture_float GL_OES_texture_float_linear GL_OES_compressed_paletted_texture GL_OES_compressed_ETC1_RGB8_texture GL_OES_depth_texture GL_OES_texture_half_float GL_OES_texture_half_float_linear GL_OES_packed_depth_stencil GL_OES_vertex_half_float GL_OES_standard_derivatives GL_OES_texture_npot GL_OES_rgb8_rgba8 GL_EXT_color_buffer_float GL_EXT_color_buffer_half_float GL_EXT_texture_format_BGRA8888 GL_APPLE_texture_format_BGRA8888 
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5572497Z INFO         | Graphics Device Extensions N/A
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5572814Z INFO         | Disabling sparse binding feature support
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5636818Z INFO         | Sending adb public key [QAAAAJFfNxaPvuTRQkZbhZMwbQdvTt2PGwsfjOeg9THKGm0OiPY/0d0Ah578iOJMk+5dfPjEbr0Lv/VchB4eBR0w+5aScIZhgsWSeyWQW6GsWK/lMoWGLguCjT1Kz8ZRk+YfhgR8D84CFlSHc/AKTX1MtKkcFAY0ZMZhI2MsxpPTvqUQPAJr/atNTczidc5XZlJpVET9+RdKej/bpxbKCv/ewLM+Cxcq6IsE0aLKSPGXzJITlYI1FeQ8RfYcckb9Qe6l2BzIDHvZcBYjfj07nwjQtOq6MVyjSB+g+vpr9CE+YPUqaDYOwt3rt+netACu8EB7PDM3jH08zOsCGvLN8ICSvblMdG6qfNqvM7+uiudr4QilWARH0JQz3ADMFCnAU2DJfyPQaPpWQMIVwLDkPI9H8REe9Edos4ZolFe+xvI0zdzf1YCyLb/MhxDdb14SGnJHWrBHHaY6ktKL+iU5N9NCyCO+l62hbXzcaaXbEVq2A0+DZhL84LIGZSj4r56F1CpoNsP+YNHxaeOeLKTGWWlEEZW7slsP7YCHcuN/viSaotatVycIDMzBVYNUayiNhnL2ZrMPSaGMBxBj564XlJmeTTryzVssu1pb9FOS7DMBugnWPUAGeITgxedb97/HZ4ZxTEAf7gp8SA+aJVMXes8JTNNOoNtTAjSAujNTNLg7ysFIAuR1lwEAAQA= runner@unknown]
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5640220Z INFO         | Userspace boot properties:
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5641458Z INFO         |   androidboot.boot_devices=pci0000:00/0000:00:03.0 pci0000:00/0000:00:06.0
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5642080Z INFO         |   androidboot.dalvik.vm.heapsize=576m
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5642818Z INFO         |   androidboot.debug.hwui.renderer=skiagl
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5643312Z INFO         |   androidboot.debug.sf.nobootanimation=1
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5643715Z INFO         |   androidboot.hardware=ranchu
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5644164Z INFO         |   androidboot.hardware.gltransport=pipe
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5644535Z INFO         |   androidboot.hardware.vulkan=ranchu
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5644839Z INFO         |   androidboot.logcat=*:V
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5645167Z INFO         |   androidboot.opengles.version=196608
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5645481Z INFO         |   androidboot.qemu=1
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5648011Z INFO         |   androidboot.qemu.adb.pubkey=QAAAAJFfNxaPvuTRQkZbhZMwbQdvTt2PGwsfjOeg9THKGm0OiPY/0d0Ah578iOJMk+5dfPjEbr0Lv/VchB4eBR0w+5aScIZhgsWSeyWQW6GsWK/lMoWGLguCjT1Kz8ZRk+YfhgR8D84CFlSHc/AKTX1MtKkcFAY0ZMZhI2MsxpPTvqUQPAJr/atNTczidc5XZlJpVET9+RdKej/bpxbKCv/ewLM+Cxcq6IsE0aLKSPGXzJITlYI1FeQ8RfYcckb9Qe6l2BzIDHvZcBYjfj07nwjQtOq6MVyjSB+g+vpr9CE+YPUqaDYOwt3rt+netACu8EB7PDM3jH08zOsCGvLN8ICSvblMdG6qfNqvM7+uiudr4QilWARH0JQz3ADMFCnAU2DJfyPQaPpWQMIVwLDkPI9H8REe9Edos4ZolFe+xvI0zdzf1YCyLb/MhxDdb14SGnJHWrBHHaY6ktKL+iU5N9NCyCO+l62hbXzcaaXbEVq2A0+DZhL84LIGZSj4r56F1CpoNsP+YNHxaeOeLKTGWWlEEZW7slsP7YCHcuN/viSaotatVycIDMzBVYNUayiNhnL2ZrMPSaGMBxBj564XlJmeTTryzVssu1pb9FOS7DMBugnWPUAGeITgxedb97/HZ4ZxTEAf7gp8SA+aJVMXes8JTNNOoNtTAjSAujNTNLg7ysFIAuR1lwEAAQA= runner@unknown
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5651036Z INFO         |   androidboot.qemu.avd_name=test
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5651746Z INFO         |   androidboot.qemu.camera_hq_edge_processing=0
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5652087Z INFO         |   androidboot.qemu.camera_protocol_ver=1
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5652407Z INFO         |   androidboot.qemu.cpuvulkan.version=4206592
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5652803Z INFO         |   androidboot.qemu.gltransport.drawFlushInterval=800
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5653167Z INFO         |   androidboot.qemu.gltransport.name=pipe
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5653514Z INFO         |   androidboot.qemu.hwcodec.avcdec=2
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5653844Z INFO         |   androidboot.qemu.hwcodec.hevcdec=2
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5654159Z INFO         |   androidboot.qemu.hwcodec.vpxdec=2
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5654557Z INFO         |   androidboot.qemu.settings.system.screen_off_timeout=2147483647
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5654932Z INFO         |   androidboot.qemu.skin=1080x1920
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5655259Z INFO         |   androidboot.qemu.virtiowifi=1
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5655567Z INFO         |   androidboot.qemu.vsync=60
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5655888Z INFO         |   androidboot.serialno=EMULATOR37X2X13X0
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5656345Z INFO         |   androidboot.vbmeta.digest=b3271ba499104f4631ae3723913d5c12574e01715fce5b82d60beed097ead264
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5656761Z INFO         |   androidboot.vbmeta.hash_alg=sha256
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5657061Z INFO         |   androidboot.vbmeta.size=6720
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5657400Z INFO         |   androidboot.veritymode=enforcing
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.5778272Z WARNING: cannnot unmap ptr 0x7fa4d0801000 as it is in the protected range from 0x7fa430800000 to 0x7fa4d0a00000
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:16.6026430Z INFO         | Monitoring duration of emulator setup.
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:17.5901469Z INFO         | Activated packet streamer for bluetooth emulation
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:17.5901944Z INFO         | Successfully initialized netsim WiFi
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:17.5946856Z INFO         | Setting display: 0 configuration to: 1080x1920, dpi: 420x420 
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:17.5947316Z INFO         | setDisplayActiveConfig: id:0, 1080x1920
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:17.5947680Z INFO         | emulatorSetupEnvironment: Environment scene is not required
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:17.6011225Z USER_INFO    | Emulator is performing a full startup. This may take upto two minutes, or more.
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:17.6012191Z WARNING      | Failed to process .ini file /home/runner/.android/emu-update-last-check.ini for reading.
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:17.7234303Z WARNING      | Failed to process .ini file /home/runner/.android/emu-update-last-check.ini for reading.
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:25.6358475Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:25.6402085Z * daemon not running; starting now at tcp:5037
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:25.7552513Z * daemon started successfully
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:25.7559390Z adb: device offline
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:25.7563096Z The process '/usr/local/lib/android/sdk/platform-tools/adb' failed with exit code 1
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:27.7601396Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:27.7635516Z adb: device offline
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:27.7642794Z The process '/usr/local/lib/android/sdk/platform-tools/adb' failed with exit code 1
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:29.7674342Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:29.7806330Z 
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:31.7884486Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:31.8095710Z 
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:33.8148348Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:33.8287417Z 
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:35.8368874Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:35.8558986Z 
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:37.8634193Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:37.8887089Z 
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:39.8928163Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:39.9203704Z 
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:41.9242587Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:41.9428854Z 
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:43.9473652Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:43.9677027Z 
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:45.9734261Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:45.9939903Z 
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:47.1435433Z INFO         | Boot completed in 31483 ms
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:47.1438516Z INFO         | Increasing screen off timeout, logcat buffer size to 2M.
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:47.9985237Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:48.0306252Z 1
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:48.0339881Z Emulator booted.
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:48.0341020Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell input keyevent 82
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:54.9691040Z Disabling animations.
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:54.9707487Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell settings put global window_animation_scale 0.0
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:55.0970879Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell settings put global transition_animation_scale 0.0
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:55.1719872Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell settings put global animator_duration_scale 0.0
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:55.2196792Z ##[endgroup]
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:54:55.2217688Z [command]/usr/bin/sh -c python3 scripts/smoke-android-planning-upgrade.py baseline/Lingua-Demo.apk current/Lingua-Demo.apk
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:55:10.8105071Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:55:13.2282194Z Found: Try the demo
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:55:13.2868909Z Tapped: Try the demo
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:55:16.6418689Z Found: Choose a language
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:55:18.8561362Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:55:21.0821280Z Found: Continue
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:55:21.1041230Z Tapped: Continue
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:55:23.4476274Z Found: TODAY’S STUDY
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:55:25.8397388Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:55:31.1262252Z Found after scrolling: 2 sessions per day
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:55:33.3087858Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:55:35.4024230Z Found: 2 sessions per day
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:55:35.4223069Z Tapped: 2 sessions per day
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:55:37.4639497Z Found: Learn
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:55:37.4833191Z Tapped: Learn
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:55:40.4163773Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:55:48.6322870Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:55:53.8330640Z Found after scrolling: Lesson 1: Kiswahili Greetings
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:55:55.8905654Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:55:57.9881149Z Found: Lesson 1: Kiswahili Greetings
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:55:58.0072495Z Tapped: Lesson 1: Kiswahili Greetings
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:03.6268405Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:08.8258453Z Found after scrolling: UNDERSTAND THE IDEA
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:10.8825516Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:12.9465558Z Found after scrolling: Words to learn
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:18.1200560Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:23.3107793Z Found after scrolling: Start practice
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:25.3474936Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:27.4180393Z Found: Start practice
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:27.4364002Z Tapped: Start practice
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:29.4428918Z Found: Goodbye
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:29.4608898Z Tapped: Goodbye
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:32.3290780Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:34.3987588Z Found after scrolling: Check answer
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:36.4039984Z Found: Check answer
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:36.4222068Z Tapped: Check answer
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:39.2927707Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:41.3690971Z Found: Not quite. Try again.
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:43.3804854Z Found after scrolling: Thank you
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:46.2710837Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:48.3330794Z Found: Thank you
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:48.3513396Z Tapped: Thank you
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:50.3940468Z Found after scrolling: Check answer
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:53.2642442Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:55.3156653Z Found: Check answer
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:55.3330150Z Tapped: Check answer
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:56:57.3473113Z Found: Correct!
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:00.2493422Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:02.2801392Z Found after scrolling: Next question
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:04.2786119Z Found: Next question
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:04.2989993Z Tapped: Next question
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:07.2413712Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:09.3044126Z Found: Kwaheri
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:09.3224962Z Tapped: Kwaheri
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:11.3515838Z Found after scrolling: Check answer
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:14.2282202Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:16.3008142Z Found: Check answer
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:16.3198608Z Tapped: Check answer
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:18.3369021Z Found: Correct!
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:21.1900792Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:23.2713337Z Found after scrolling: Next question
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:25.2702018Z Found: Next question
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:25.2877945Z Tapped: Next question
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:28.1634669Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:30.2517533Z Found: Type your answer
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:30.2895917Z Tapped: Type your answer
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:33.8492380Z Found after scrolling: Check answer
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:35.8660170Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:37.9185178Z Found: Check answer
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:37.9365483Z Tapped: Check answer
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:39.9760737Z Found: Correct!
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:42.8380234Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:44.8836026Z Found after scrolling: Finish lesson
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:46.8769623Z Found: Finish lesson
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:46.8949759Z Tapped: Finish lesson
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:49.7914139Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:51.8508011Z Found: You earned 10 XP.
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:53.8505300Z Found: 2 of 3 correct on the first try.
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:56.7971583Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:57:58.8765512Z Found after scrolling: Done
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:00.8734414Z Found: Done
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:00.8941955Z Tapped: Done
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:03.7595132Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:05.8511321Z Found: Choose a lesson
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:07.8680359Z Found: Home
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:07.8853889Z Tapped: Home
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:10.7453146Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:15.9669540Z Found after scrolling: Play Quick Mix and collect stickers
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:18.0003566Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:20.0895279Z Found: Play Quick Mix and collect stickers
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:20.1085653Z Tapped: Play Quick Mix and collect stickers
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:22.5716931Z Found after scrolling: Mix questions from your completed Kiswahili lessons
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:25.0047415Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:27.0897194Z Found after scrolling: Play 2-question mix
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:29.0945390Z Found: Play 2-question mix
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:29.1152922Z Tapped: Play 2-question mix
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:31.9717445Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:34.0612202Z Found: Which word means "Goodbye"?
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:36.0841016Z Found after scrolling: Kwaheri
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:38.9322938Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:40.9694511Z Found: Kwaheri
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:40.9878230Z Tapped: Kwaheri
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:43.0169039Z Found after scrolling: Check answer
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:45.9508423Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:48.0030330Z Found: Check answer
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:48.0214374Z Tapped: Check answer
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:50.0599664Z Found: Lovely work! You found it.
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:52.9256059Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:54.9807309Z Found after scrolling: Next question
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:56.9928136Z Found: Next question
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:57.0118759Z Tapped: Next question
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:58:59.8925428Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:01.9503191Z Found: What does "Asante" mean?
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:03.9648389Z Found after scrolling: Thank you
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:06.8928808Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:08.9729584Z Found: Thank you
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:08.9919253Z Tapped: Thank you
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:11.0305176Z Found after scrolling: Check answer
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:13.8661591Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:15.9381733Z Found: Check answer
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:15.9566777Z Tapped: Check answer
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:17.9860555Z Found: Lovely work! You found it.
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:20.8535954Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:22.9322402Z Found after scrolling: Finish mix
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:24.9317927Z Found: Finish mix
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:24.9497386Z Tapped: Finish mix
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:27.8578414Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:29.9309756Z Found: 2 / 2 round stars
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:31.9481548Z Found after scrolling: Play rewards saved on this device.
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:34.8327731Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:36.9071495Z Found after scrolling: New stickers for your book!
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:39.1400324Z Found after scrolling: Done
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:41.8443113Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:43.9188567Z Found: Done
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:43.9375357Z Tapped: Done
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:46.2620255Z Found after scrolling: Play Quick Mix and collect stickers
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:48.8486122Z Dismissed emulator Pixel Launcher dialog
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:50.9381690Z Found: Play Quick Mix and collect stickers
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:50.9571968Z Tapped: Play Quick Mix and collect stickers
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:53.4416454Z Found: Sound effects
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:56.1845754Z Traceback (most recent call last):
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:56.1846596Z   File "/home/runner/work/react-native-lingua/react-native-lingua/scripts/smoke-android-planning-upgrade.py", line 114, in <module>
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:56.1847285Z     main(Path(sys.argv[1]), Path(sys.argv[2]))
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:56.1847806Z   File "/home/runner/work/react-native-lingua/react-native-lingua/scripts/smoke-android-planning-upgrade.py", line 43, in main
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:56.1848386Z     smoke.assert_sound_effects(True)
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:56.1848946Z   File "/home/runner/work/react-native-lingua/react-native-lingua/scripts/smoke-android-demo.py", line 202, in assert_sound_effects
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:56.1849910Z     raise RuntimeError(f"Sound effects switch did not report {enabled}: {[node.attrib for node in switches]}")
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:56.1852905Z RuntimeError: Sound effects switch did not report True: []
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:56.2021378Z ##[error]The process '/usr/bin/sh' failed with exit code 1
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:56.2027627Z ##[group]Terminate Emulator
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:56.2028177Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 emu kill
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:56.2043784Z OK: killing emulator, bye bye
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:56.2044304Z OK
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:56.2053465Z INFO         | Wait for emulator (pid 3047) 20 seconds to shutdown gracefully before kill;you can set environment variable ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL(in seconds) to change the default value (20 seconds)
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:56.2054319Z 
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:56.2054878Z ##[endgroup]
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:56.2184345Z USER_INFO    | Snapshots have been disabled by the user, save request is ignored.
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:56.2184888Z INFO         | Saving snapshot 'default_boot' took 0 ms
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:56.6761013Z ERROR        | stop: Not implemented
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:56.6762001Z WARNING      | Emulator client has not yet been configured.. Call configure me first!
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:56.6865260Z INFO         | removeAll
+Upgrade the illustrated demo in place	Test the upgrade offline	2026-11-17T06:59:56.7381728Z WARNING      | Netsim Wifi dns:///localhost:45467 is gone due to Stream removed (CANCELLED)
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	﻿2026-11-17T06:59:57.0196089Z ##[group]Run actions/upload-artifact@v4
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:57.0196410Z with:
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:57.0196677Z   name: Planning-Upgrade-Diagnostics
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:57.0196944Z   path: android-smoke/
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:57.0197185Z   if-no-files-found: warn
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:57.0197429Z   retention-days: 3
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:57.0197686Z   compression-level: 6
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:57.0197928Z   overwrite: false
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:57.0198232Z   include-hidden-files: false
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:57.0198475Z env:
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:57.0198712Z   ANDROID_AVD_HOME: /home/runner/.android/avd
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:57.0199004Z ##[endgroup]
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:57.1506471Z (node:3962) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:57.1507117Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:57.1579610Z With the provided path, there will be 4 files uploaded
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:57.1580303Z Artifact name is valid!
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:57.1580850Z Root directory input is valid!
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:57.6641576Z Beginning upload of artifact content to blob storage
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:57.6896525Z (node:3962) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:58.3386456Z Uploaded bytes 284654
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:58.4295624Z Finished uploading artifact content to blob storage!
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:58.4296287Z SHA256 digest of uploaded artifact zip is 41f967fc647ae34091f318fbf05043cc714f8e0087fea4775a68c4b5bab98f85
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:58.4297116Z Finalizing artifact upload
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:58.8451276Z Artifact Planning-Upgrade-Diagnostics.zip successfully finalized. Artifact ID 14307366331
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:58.8452164Z Artifact Planning-Upgrade-Diagnostics has been successfully uploaded! Final size is 284654 bytes. Artifact ID is 14307366331
+Upgrade the illustrated demo in place	Upload upgrade diagnostics	2026-11-17T06:59:58.8457586Z Artifact download URL: https://github.com/mwijay12/react-native-lingua/actions/runs/44032656166/artifacts/14307366331
+Upgrade the illustrated demo in place	Post Run actions/checkout@v4	﻿2026-11-17T06:59:58.8620720Z Post job cleanup.
+Upgrade the illustrated demo in place	Post Run actions/checkout@v4	2026-11-17T06:59:58.9302966Z [command]/usr/bin/git version
+Upgrade the illustrated demo in place	Post Run actions/checkout@v4	2026-11-17T06:59:58.9339404Z git version 2.56.1
+Upgrade the illustrated demo in place	Post Run actions/checkout@v4	2026-11-17T06:59:58.9371001Z Temporarily overriding HOME='/home/runner/work/_temp/baa47e45-799f-406c-9b92-f9eda543d4d9' before making global git config changes
+Upgrade the illustrated demo in place	Post Run actions/checkout@v4	2026-11-17T06:59:58.9371767Z Adding repository directory to the temporary git global config as a safe directory
+Upgrade the illustrated demo in place	Post Run actions/checkout@v4	2026-11-17T06:59:58.9375849Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/react-native-lingua/react-native-lingua
+Upgrade the illustrated demo in place	Post Run actions/checkout@v4	2026-11-17T06:59:58.9413138Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Upgrade the illustrated demo in place	Post Run actions/checkout@v4	2026-11-17T06:59:58.9440696Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Upgrade the illustrated demo in place	Post Run actions/checkout@v4	2026-11-17T06:59:58.9622567Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Upgrade the illustrated demo in place	Post Run actions/checkout@v4	2026-11-17T06:59:58.9653026Z http.https://github.com/.extraheader
+Upgrade the illustrated demo in place	Post Run actions/checkout@v4	2026-11-17T06:59:58.9661779Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+Upgrade the illustrated demo in place	Post Run actions/checkout@v4	2026-11-17T06:59:58.9687914Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Upgrade the illustrated demo in place	Post Run actions/checkout@v4	2026-11-17T06:59:58.9861364Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Upgrade the illustrated demo in place	Post Run actions/checkout@v4	2026-11-17T06:59:58.9890932Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Upgrade the illustrated demo in place	Complete job	﻿2026-11-17T06:59:59.0179587Z Cleaning up orphan processes
+Upgrade the illustrated demo in place	Complete job	2026-11-17T06:59:59.0565628Z Terminate orphan process: pid (3147) (adb)
+Upgrade the illustrated demo in place	Complete job	2026-11-17T06:59:59.0628328Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/download-artifact@v4, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
