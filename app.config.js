@@ -14,6 +14,8 @@ export default {
     },
     android: {
       package: "com.jsmastery.duolingoclone",
+      // This release only plays bundled audio; live voice is still disabled.
+      blockedPermissions: ["android.permission.RECORD_AUDIO"],
       adaptiveIcon: {
         backgroundColor: "#155F57",
         foregroundImage: "./assets/images/android-icon-foreground.png",

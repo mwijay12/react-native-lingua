@@ -108,7 +108,7 @@ def screen_size():
     return tuple(map(int, sizes[-1]))
 
 
-def scroll_to(text, direction="down", max_swipes=8, exact=False):
+def scroll_to(text, direction="down", max_swipes=14, exact=False):
     width, height = screen_size()
     # Navigation can restore a different scroll position on different devices.
     # Try the expected direction first, then search back in the other direction.
@@ -130,13 +130,21 @@ def scroll_to(text, direction="down", max_swipes=8, exact=False):
     raise RuntimeError(f"Could not scroll to {text!r}")
 
 
-def complete_lesson(title, answers, *, lesson_number=1, wrong_first=False, screenshot_name=None, reward=10):
+def complete_lesson(title, answers, *, lesson_number=1, wrong_first=False, screenshot_name=None, reward=10, listen=False):
     label = f"Lesson {lesson_number}: {title}"
     scroll_to(label)
     tap(label)
-    wait_for("UNDERSTAND THE IDEA")
     if screenshot_name:
         screenshot(screenshot_name)
+    if listen:
+        scroll_to("Play pronunciation sample")
+        tap("Play pronunciation sample")
+        # The emulator runs without speakers, but playback must not prompt for
+        # a microphone or block the lesson while the device is offline.
+        time.sleep(1)
+        tap("Stop pronunciation sample")
+        scroll_to("Read along", direction="up")
+    scroll_to("UNDERSTAND THE IDEA")
     scroll_to("Words to learn")
     scroll_to("Start practice")
     tap("Start practice")
@@ -180,9 +188,21 @@ def change_course(language):
     scroll_to("YOUR LEARNING PATH", direction="up")
 
 
+def assert_sound_effects(enabled):
+    wait_for("Sound effects", exact=True)
+    root = dump_ui()
+    switches = [node for node in root.iter("node") if node.get("content-desc") == "Sound effects"]
+    if len(switches) != 1 or switches[0].get("checked") != str(enabled).lower():
+        raise RuntimeError(f"Sound effects switch did not report {enabled}: {[node.attrib for node in switches]}")
+
+
 def play_kiswahili_mix(*, preview):
     scroll_to("Play Quick Mix and collect stickers", direction="up")
     tap("Play Quick Mix and collect stickers")
+    if preview:
+        assert_sound_effects(True)
+        tap("Sound effects", exact=True)
+        assert_sound_effects(False)
     source = "Try a preview from your first Kiswahili lesson" if preview else "Mix questions from your completed Kiswahili lessons"
     scroll_to(source, direction="up")
     scroll_to("Play 2-question mix")
@@ -217,6 +237,9 @@ def play_kiswahili_mix(*, preview):
 def main(apk):
     adb("install", "-r", str(apk))
     adb("shell", "pm", "clear", PACKAGE)
+    # The installed demo and its learning audio should work without a network.
+    adb("shell", "svc", "wifi", "disable", check=False)
+    adb("shell", "svc", "data", "disable", check=False)
     adb("logcat", "-c")
     adb("shell", "am", "start", "-n", f"{PACKAGE}/.MainActivity")
     wait_for("Try the demo")
@@ -245,6 +268,9 @@ def main(apk):
     wait_for("Kiswahili")
     scroll_to("Play Quick Mix and collect stickers", direction="up")
     tap("Play Quick Mix and collect stickers")
+    assert_sound_effects(False)
+    tap("Sound effects", exact=True)
+    assert_sound_effects(True)
     scroll_to("2 / 6 collected")
     scroll_to("Mix Maker")
     scroll_to("Bright Star")
@@ -267,7 +293,7 @@ def main(apk):
 
     tap("Learn")
     wait_for("Kiswahili: First Steps")
-    complete_lesson("Kiswahili Greetings", [("choice", "Thank you"), ("choice", "Kwaheri"), ("text", "Asante")], wrong_first=True, screenshot_name="07-kiswahili")
+    complete_lesson("Kiswahili Greetings", [("choice", "Thank you"), ("choice", "Kwaheri"), ("text", "Asante")], wrong_first=True, screenshot_name="07-kiswahili", listen=True)
 
     # A missed answer stays saved after the lesson. A wrong review keeps it;
     # a later correct review removes it, with no additional XP.
@@ -305,20 +331,23 @@ def main(apk):
     complete_lesson("Numbers 1–10", [("choice", "Two"), ("choice", "Tano"), ("text", "Tatu"), ("choice", "Kumi"), ("choice", "Nane")], lesson_number=3, screenshot_name="08-everyday-numbers")
     complete_lesson("Everyday conversation", [("choice", "No"), ("choice", "Samahani"), ("text", "Ndiyo"), ("choice", "Sielewi")], lesson_number=6)
     complete_lesson("People and the present", [("choice", "Ninasoma"), ("choice", "unasoma"), ("text", "Anasoma"), ("choice", "Present tense"), ("choice", "I am reading a book")], lesson_number=7, reward=15, screenshot_name="08-foundation-sw")
+    complete_lesson("Places around town", [("choice", "Market"), ("choice", "Hospitali"), ("text", "Shule"), ("choice", "Soko liko wapi?"), ("choice", "The market is nearby")], lesson_number=9, reward=15, listen=True, screenshot_name="08-travel-sw")
     change_course("English")
     wait_for("English: First Steps")
-    complete_lesson("English Greetings", [("choice", "Good morning"), ("choice", "Thank you"), ("text", "Please")], screenshot_name="09-english")
+    complete_lesson("English Greetings", [("choice", "Good morning"), ("choice", "Thank you"), ("text", "Please")], screenshot_name="09-english", listen=True)
     complete_lesson("Family", [("choice", "Father"), ("choice", "Sister"), ("text", "Family"), ("choice", "This is my mother.")], lesson_number=4, screenshot_name="10-everyday-family")
     complete_lesson("I am, you are, she is", [("choice", "is"), ("choice", "are"), ("text", "am"), ("choice", "He is here."), ("choice", "I'm")], lesson_number=7, reward=15, screenshot_name="10-foundation-en")
+    complete_lesson("Places around town", [("choice", "Bus stop"), ("choice", "Hospital"), ("text", "School"), ("choice", "Where is the market?"), ("choice", "Not far away")], lesson_number=9, reward=15, listen=True, screenshot_name="10-travel-en")
     change_course("French")
     wait_for("Bonjour! Greetings")
-    complete_lesson("Bonjour! Greetings", [("choice", "Hello / Good day"), ("choice", "Au revoir"), ("text", "Merci")], screenshot_name="11-french")
+    complete_lesson("Bonjour! Greetings", [("choice", "Hello / Good day"), ("choice", "Au revoir"), ("text", "Merci")], screenshot_name="11-french", listen=True)
     complete_lesson("Food & drinks", [("choice", "Water"), ("choice", "Le pain"), ("text", "Le riz"), ("choice", "Tea")], lesson_number=8, screenshot_name="12-everyday-food")
     complete_lesson("Nouns and articles", [("choice", "une"), ("choice", "les livres"), ("text", "le"), ("choice", "The article shortens before a vowel"), ("choice", "There is a book")], lesson_number=11, reward=15, screenshot_name="12-foundation-fr")
+    complete_lesson("Finding the way", [("choice", "To the left"), ("choice", "Arrêtez"), ("text", "A droite"), ("choice", "Straight ahead"), ("choice", "Turn left")], lesson_number=13, reward=15, listen=True, screenshot_name="12-travel-fr")
 
     tap("Home")
-    scroll_to("12 / 2", direction="up")
-    scroll_to("115 XP")
+    scroll_to("15 / 2", direction="up")
+    scroll_to("160 XP")
     scroll_to("Play Quick Mix and collect stickers", direction="up")
     tap("Play Quick Mix and collect stickers")
     scroll_to("6 / 6 collected")
@@ -327,10 +356,10 @@ def main(apk):
     adb("shell", "am", "force-stop", PACKAGE)
     adb("shell", "am", "start", "-n", f"{PACKAGE}/.MainActivity")
     wait_for("French")
-    scroll_to("12 / 2")
-    scroll_to("115 XP")
+    scroll_to("15 / 2")
+    scroll_to("160 XP")
     screenshot("13-relaunch")
-    print("Android smoke test passed: Quick Mix, stickers, three courses, foundation lessons, review, goal, progress, relaunch, creator credit and disabled AI.", flush=True)
+    print("Android smoke test passed offline: pronunciation controls, sound setting, travel lessons, Quick Mix, stickers, review, progress, relaunch and disabled AI.", flush=True)
 
 
 if __name__ == "__main__":

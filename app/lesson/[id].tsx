@@ -13,28 +13,34 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { FeedbackPanel } from "@/components/FeedbackPanel";
 import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
 import { LessonIcon } from "@/components/LessonIcon";
 import { MotionSticker } from "@/components/MotionSticker";
+import { PronunciationSample } from "@/components/PronunciationSample";
 import { QuestionInput } from "@/components/QuestionInput";
-import { images } from "@/constants/images";
+import { SoundEffectsControl } from "@/components/SoundEffectsControl";
+import { pronunciationSamples } from "@/constants/audio";
+import { images, unitScenes } from "@/constants/images";
 import { isAvailableLanguage } from "@/data/languages";
 import { LESSONS } from "@/data/lessons";
 import { UNITS } from "@/data/units";
 import { useLearningHydration } from "@/hooks/useLearningHydration";
+import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { isCorrectAnswer } from "@/lib/practice";
 import { useLearningStore } from "@/store/learningStore";
 
 type Phase = "review" | "practice" | "finished";
 type Feedback = "correct" | "incorrect" | null;
 
-// Lessons are local text practice. They never start a microphone or AI session.
+// Lessons use local practice and selected recordings, never a microphone or AI session.
 export default function LessonScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const lesson = LESSONS.find((item) => item.id === id);
   const { completeLesson, addMistake, reviewItems } = useLearningStore();
   const hydration = useLearningHydration();
+  const sounds = useSoundEffects();
   const [phase, setPhase] = useState<Phase>("review");
   const [questionIndex, setQuestionIndex] = useState(0);
   const [answer, setAnswer] = useState("");
@@ -77,7 +83,9 @@ export default function LessonScreen() {
     );
   }
 
-  const lessonCourse = UNITS.find((unit) => unit.id === lesson.unitId)?.languageCode;
+  const unit = UNITS.find((item) => item.id === lesson.unitId);
+  const lessonCourse = unit?.languageCode;
+  const sample = pronunciationSamples[lesson.id];
   const activity = lesson.activities[questionIndex];
   const updateAnswer = (value: string) => {
     setAnswer(value);
@@ -89,6 +97,7 @@ export default function LessonScreen() {
       answeredCorrectly.current = true;
       if (attempts === 0) setFirstTryCorrect((count) => count + 1);
       setFeedback("correct");
+      sounds.correct();
     } else {
       addMistake(lesson.id, activity.id);
       setAttempts((count) => count + 1);
@@ -110,18 +119,19 @@ export default function LessonScreen() {
     completeLesson(lesson.id);
     setEarnedXp(!alreadyCompleted);
     setPhase("finished");
+    sounds.celebrate();
   };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FBF8F1" }}>
       <View className="w-full max-w-[720px] self-center flex-row items-center px-5 py-3 border-b border-border">
-        <TouchableOpacity onPress={goBack} accessibilityRole="button" accessibilityLabel="Go back" hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+        <TouchableOpacity onPress={goBack} accessibilityRole="button" accessibilityLabel="Go back" className="w-11 h-11 justify-center">
           <Ionicons name="chevron-back" size={24} color="#183B37" />
         </TouchableOpacity>
         <Text className="flex-1 text-center font-poppins-semibold text-base text-text-primary" numberOfLines={1}>
           {phase === "practice" ? "Practice" : phase === "finished" ? "Well done!" : "Lesson"}
         </Text>
-        <View style={{ width: 24 }} />
+        <SoundEffectsControl compact />
       </View>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <ScrollView
@@ -132,6 +142,11 @@ export default function LessonScreen() {
         >
           {phase === "review" && (
             <>
+              {unit && (
+                <View className="rounded-[22px] overflow-hidden mb-5" testID="lesson-scene">
+                  <Image source={unitScenes[(unit.order - 1) % unitScenes.length]} style={styles.lessonScene} resizeMode="cover" accessible={false} />
+                </View>
+              )}
               <View className="flex-row items-center mb-3">
                 <View className="w-14 h-14 rounded-2xl bg-[#E5F3ED] items-center justify-center mr-3">
                   <LessonIcon icon={lesson.icon} size={50} />
@@ -148,6 +163,7 @@ export default function LessonScreen() {
                   Read the key ideas, words and phrases, then answer the questions. Pronunciations are approximate guides.
                 </Text>
               </View>
+              {sample && <PronunciationSample sample={sample} />}
               {!!lesson.notes?.length && (
                 <View className="mb-6" testID="lesson-notes">
                   <Text className="font-poppins-semibold text-[10px] tracking-[1px] text-lingua-teal mb-2">UNDERSTAND THE IDEA</Text>
@@ -213,7 +229,7 @@ export default function LessonScreen() {
                 <Text className="body-sm text-text-secondary mt-4">Hint: {activity.hint}</Text>
               )}
               {feedback && (
-                <View className={`rounded-2xl p-4 mt-4 ${feedback === "correct" ? "bg-[#EDF8F1]" : "bg-[#FFF1F0]"}`} accessibilityLiveRegion="polite" testID="answer-feedback">
+                <FeedbackPanel kind={feedback} testID="answer-feedback">
                   <Text className="font-poppins-semibold text-sm text-text-primary">
                     {feedback === "correct" ? "Correct!" : "Not quite. Try again."}
                   </Text>
@@ -226,7 +242,7 @@ export default function LessonScreen() {
                   {feedback === "correct" && activity.explanation && (
                     <Text className="body-sm text-text-secondary mt-1">{activity.explanation}</Text>
                   )}
-                </View>
+                </FeedbackPanel>
               )}
               {feedback === "correct" ? (
                 <TouchableOpacity onPress={advance} className="bg-lingua-teal rounded-2xl items-center py-4 mt-6" accessibilityRole="button" testID={questionIndex + 1 === lesson.activities.length ? "finish-lesson-button" : "next-question-button"}>
@@ -285,6 +301,6 @@ export default function LessonScreen() {
 
 const styles = StyleSheet.create({
   content: { width: "100%", maxWidth: 720, alignSelf: "center", paddingHorizontal: 20, paddingTop: 20, paddingBottom: 40, flexGrow: 1 },
+  lessonScene: { width: "100%", aspectRatio: 2.4, maxHeight: 160 },
   finishCat: { width: 105, height: 120 },
-
 });

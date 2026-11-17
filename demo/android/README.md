@@ -2,13 +2,22 @@
 
 This is a **test-only**, separately identified Android app. It includes beginner
 courses in Kiswahili, English and French, English menus, offline vocabulary and
-practice questions, including everyday numbers, family, food and conversation.
-There are 27 playable lessons: eight each in Kiswahili and English, and eleven
-in French. Each course has two foundation lessons with grammar explanations,
-examples and practice feedback. Earlier lessons also include context notes.
-The app retains Lingua's cat-and-parrot identity, with original SVG learning
-doodles and gentle motion. Artwork remains visible and still when the device's
-reduced-motion setting is on; lessons work the same way offline.
+practice questions, including everyday topics and places and directions.
+There are 33 playable lessons: ten each in Kiswahili and English, and thirteen
+in French. Each course has two foundation lessons and two travel lessons with
+explanations, examples and practice feedback. Earlier lessons also include
+context notes. The app retains Lingua's cat-and-parrot identity, with four
+illustrated scenes, original SVG doodles and gentle motion. Artwork remains
+visible and still when the device's reduced-motion setting is on.
+
+Nine generated pronunciation samples (greetings and both travel lessons in each
+course) are bundled in the APK. Tap Play sample to listen and follow the visible
+transcript; Stop and leaving the lesson stop playback. Other lessons have
+written pronunciation guides. These samples are learning aids and accents or
+pronunciations can vary. Short feedback chimes are on by default and can be
+muted via the speaker on lesson, review or Quick Mix screens, or in Profile.
+That switch does not mute pronunciation samples. All these assets work offline;
+no microphone is used or requested. The build checks the APK's final permissions.
 
 XP, completed lessons, study sessions, the daily goal and missed questions are
 stored on the device, not synced to an account. XP is awarded only the first
@@ -24,8 +33,11 @@ saved questions per set. A correct answer removes a question; a wrong answer
 leaves it for another review. Reviewing does not award extra XP. Switching
 courses does not erase progress or another course's review list. Existing
 earned version-1 XP and completions are retained, while fictional sample XP and
-streaks from earlier versions are not counted as real progress. If saved
-progress or the selected course cannot be read, the app offers a retry without resetting it.
+streaks from earlier versions are not counted as real progress. Adding lessons
+can lower a course's completion percentage because the total has grown, but
+earned XP, completed lessons and existing sticker milestones remain unchanged.
+If saved progress or the selected course cannot be read, the app offers a retry
+without resetting it.
 
 **Quick Mix** is an untimed, offline round of up to three shuffled
 multiple-choice questions from completed lessons in the selected course. A new

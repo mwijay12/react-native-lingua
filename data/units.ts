@@ -29,6 +29,14 @@ export const UNITS: Unit[] = [
     ],
   },
   {
+    id: 'sw-unit-4',
+    languageCode: 'sw',
+    title: 'Places & directions',
+    description: 'Find familiar places and ask for the way in Kiswahili.',
+    order: 4,
+    lessonIds: ['sw-travel-places', 'sw-travel-directions'],
+  },
+  {
     id: 'en-unit-1',
     languageCode: 'en',
     title: 'English: First Steps',
@@ -54,6 +62,14 @@ export const UNITS: Unit[] = [
       'en-foundation-be',
       'en-foundation-present',
     ],
+  },
+  {
+    id: 'en-unit-4',
+    languageCode: 'en',
+    title: 'Places & directions',
+    description: 'Find familiar places and ask for the way in English.',
+    order: 4,
+    lessonIds: ['en-travel-places', 'en-travel-directions'],
   },
   {
     id: 'es-unit-1',
@@ -89,6 +105,14 @@ export const UNITS: Unit[] = [
       'fr-foundation-etre',
       'fr-foundation-articles',
     ],
+  },
+  {
+    id: 'fr-unit-4',
+    languageCode: 'fr',
+    title: 'Places & directions',
+    description: 'Find familiar places and ask for the way in French.',
+    order: 4,
+    lessonIds: ['fr-travel-places', 'fr-travel-directions'],
   },
   {
     id: 'ja-unit-1',

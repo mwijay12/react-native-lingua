@@ -25,16 +25,17 @@ const { isCorrectAnswer, normalizeAnswer } = require("../lib/practice.ts");
 const agentSession = require("../app/api/agent-session+api.ts");
 const streamToken = require("../app/api/stream-token+api.ts");
 
-test("each launch course has ordered, complete and playable lessons in all three units", () => {
+test("each launch course has ordered, complete and playable lessons in all four units", () => {
   assert.equal(new Set(LESSONS.map((lesson) => lesson.id)).size, LESSONS.length);
   assert.equal(new Set(UNITS.map((unit) => unit.id)).size, UNITS.length);
   assert.deepEqual(getCourseUnits(null), []);
   const activityIds = new Set();
   for (const code of ["sw", "en", "fr"]) {
     const units = getCourseUnits(code);
-    assert.deepEqual(units.map((unit) => unit.id), [`${code}-unit-1`, `${code}-unit-2`, `${code}-unit-3`]);
-    assert.deepEqual(units.map((unit) => unit.order), [1, 2, 3]);
+    assert.deepEqual(units.map((unit) => unit.id), [`${code}-unit-1`, `${code}-unit-2`, `${code}-unit-3`, `${code}-unit-4`]);
+    assert.deepEqual(units.map((unit) => unit.order), [1, 2, 3, 4]);
     assert.equal(units[2].lessons.length, 2);
+    assert.deepEqual(units[3].lessonIds, [`${code}-travel-places`, `${code}-travel-directions`]);
     assert.deepEqual(units[1].lessonIds, ["numbers", "family", "food", "conversation"].map((topic) => `${code}-everyday-${topic}`));
     for (const unit of units) {
       assert.equal(unit.lessons.length, unit.lessonIds.length, `${unit.id} has a missing lesson`);
@@ -45,7 +46,7 @@ test("each launch course has ordered, complete and playable lessons in all three
         assert.ok(lesson.vocabulary.length > 0 && lesson.phrases.length > 0, `${id} has no material`);
         assert.ok(lesson.notes?.length > 0, `${id} has no language context`);
         for (const note of lesson.notes) assert.ok(note.title && note.body && note.example, `${id} has an incomplete note`);
-        if (unit.order === 3) {
+        if (unit.order === 3 || unit.order === 4) {
           assert.ok(lesson.notes.length >= 2 && lesson.activities.length >= 5, `${id} needs a deeper explanation and practice`);
           assert.ok(lesson.activities.every((activity) => activity.explanation), `${id} needs answer explanations`);
         }

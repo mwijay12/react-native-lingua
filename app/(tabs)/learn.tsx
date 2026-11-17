@@ -1,12 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
 import { LearningSticker, type StickerKind } from "@/components/LearningSticker";
 import { LessonCard } from "@/components/LessonCard";
 import { MotionSticker } from "@/components/MotionSticker";
+import { unitScenes } from "@/constants/images";
 import { colors } from "@/constants/theme";
 import { getCourseUnits } from "@/data/courses";
 import { LANGUAGES } from "@/data/languages";
@@ -14,8 +15,8 @@ import { useLearningHydration } from "@/hooks/useLearningHydration";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLearningStore } from "@/store/learningStore";
 
-const UNIT_STICKERS: StickerKind[] = ["talk", "people", "book"];
-const UNIT_BACKGROUNDS = ["bg-[#FCF1DB]", "bg-[#EAF5EE]", "bg-[#F0ECF8]"];
+const UNIT_STICKERS: StickerKind[] = ["talk", "people", "book", "globe"];
+const UNIT_BACKGROUNDS = ["bg-[#FCF1DB]", "bg-[#EAF5EE]", "bg-[#F0ECF8]", "bg-[#FFF1E8]"];
 
 export default function LearnScreen() {
   const router = useRouter();
@@ -77,17 +78,21 @@ export default function LearnScreen() {
               <Text className="font-poppins-semibold text-xs text-lingua-teal">Review mistakes →</Text>
             </TouchableOpacity>
           </View>
+          <Text className="caption mt-2">New lessons can change this percentage; your XP and completed lessons stay saved.</Text>
         </View>
 
         {units.map((unit) => (
           <View key={unit.id} className="mb-6" testID={`course-unit-${unit.id}`}>
-            <View className={`flex-row items-center rounded-[20px] px-4 py-3 mb-3 ${UNIT_BACKGROUNDS[(unit.order - 1) % UNIT_BACKGROUNDS.length]}`}>
-              <View className="flex-1 pr-2">
-                <Text className="font-poppins-semibold text-[10px] tracking-[0.8px] text-lingua-teal">UNIT {unit.order}</Text>
-                <Text className="font-poppins-semibold text-lg text-text-primary mt-1">{unit.title}</Text>
-                <Text className="body-sm text-text-secondary mt-1">{unit.description}</Text>
+            <View className={`rounded-[20px] overflow-hidden mb-3 ${UNIT_BACKGROUNDS[(unit.order - 1) % UNIT_BACKGROUNDS.length]}`}>
+              <Image source={unitScenes[(unit.order - 1) % unitScenes.length]} style={styles.unitScene} resizeMode="cover" accessible={false} />
+              <View className="flex-row items-center px-4 py-4">
+                <View className="flex-1 pr-2">
+                  <Text className="font-poppins-semibold text-[10px] tracking-[0.8px] text-lingua-teal">UNIT {unit.order} · {unit.lessons.filter((lesson) => completedLessonIds.includes(lesson.id)).length} / {unit.lessons.length} COMPLETE</Text>
+                  <Text className="font-poppins-semibold text-lg text-text-primary mt-1">{unit.title}</Text>
+                  <Text className="body-sm text-text-secondary mt-1">{unit.description}</Text>
+                </View>
+                <LearningSticker kind={UNIT_STICKERS[(unit.order - 1) % UNIT_STICKERS.length]} size={58} />
               </View>
-              <LearningSticker kind={UNIT_STICKERS[(unit.order - 1) % UNIT_STICKERS.length]} size={58} />
             </View>
             <View className="gap-3">
               {unit.lessons.map((lesson) => (
@@ -109,4 +114,7 @@ export default function LearnScreen() {
   );
 }
 
-const styles = StyleSheet.create({ content: { width: "100%", maxWidth: 720, alignSelf: "center", paddingHorizontal: 20, paddingBottom: 36 } });
+const styles = StyleSheet.create({
+  content: { width: "100%", maxWidth: 720, alignSelf: "center", paddingHorizontal: 20, paddingBottom: 36 },
+  unitScene: { width: "100%", aspectRatio: 2.1, maxHeight: 180 },
+});

@@ -44,10 +44,11 @@ If you prefer visual learning, this is the perfect resource for you. Follow our 
 
 Created by Mwijay. This version provides beginner Kiswahili, English and French
 courses with English instructions, local practice questions, and on-device XP
-and lesson progress. The 27 playable lessons cover everyday topics and include
-context notes, plus six foundation lessons on useful language patterns. Lingua's
-cat and parrot companions remain part of its identity. Original SVG learning
-doodles add a playful path and celebration without changing the lessons. The
+and lesson progress. The 33 playable lessons cover everyday topics, useful
+language patterns and a new places-and-directions unit in each course. Each
+lesson includes context notes; the six new travel lessons have examples and
+answer explanations. Lingua's cat and parrot companions, original SVG doodles
+and four illustrated unit scenes make the learning path more playful. The
 standalone [Android demo](demo/android/README.md) has no sign-in or analytics.
 
 The doodles in `components/LearningSticker.tsx` are original, hand-drawn shapes
@@ -55,8 +56,27 @@ in Lingua's palette. `MotionSticker` keeps decoration in reserved space, never
 intercepts touches, and moves it gently only while its screen is focused and the
 app is active. Device reduced-motion settings keep the drawings still (including
 the tab indicator); artwork and learning content are never hidden until an
-animation runs. The selected cat and parrot remain the existing image assets.
-The approach is adapted for a native app from the [motion-lab prompt pack](https://github.com/mwijay12/motion-lab/blob/main/motion-lab/docs/agent-prompt-pack.md).
+animation runs. Correct-answer panels have a small one-shot emphasis, also
+respecting reduced motion and screen focus. The selected cat and parrot remain
+the existing image assets. The approach is adapted for a native app from the
+[motion-lab prompt pack](https://github.com/mwijay12/motion-lab/blob/main/motion-lab/docs/agent-prompt-pack.md).
+
+Nine short, generated pronunciation samples cover the greeting lesson and both
+travel lessons in each language. Tap **Play sample** to hear the selected words
+and phrases in the on-screen transcript; tap **Stop** or leave the lesson to
+stop. Other lessons still use written, approximate pronunciation guides. The
+recordings are learning aids, not a substitute for feedback from a fluent
+speaker; pronunciations and accents can vary. The installed native app bundles
+the audio for offline playback; the web build must first load its assets from
+its host.
+
+Short, original feedback chimes play after correct answers and completed lesson,
+review or Quick Mix sessions. They are on by default and can be muted using the
+speaker in those screens or **Profile → Listening preferences**. This setting
+is stored separately from study and play progress; it does not mute the
+explicitly tapped pronunciation samples. Audio playback never records speech or
+starts an AI service. The Android configuration removes microphone permission
+from this playback-only build, and the demo build checks the final APK.
 
 The study dashboard has a configurable daily session goal, a rolling seven-day
 activity view and per-course completion. A finished lesson or review set counts
@@ -65,9 +85,12 @@ XP. Missed lesson questions are saved to an on-device review list for the
 selected course. A correct answer in review clears a question, while a missed
 answer stays for another set. Review awards no XP. Existing lesson progress is
 preserved on upgrade, but old completions are not assigned fictional study
-dates. Goals and history use the device's local calendar and do not sync. If
-saved progress or the selected course cannot be read, Lingua offers a retry
-instead of treating it as an empty profile or overwriting it.
+dates. The additional lessons change the course-completion denominator, so a
+previously complete course may show a lower percentage; earned XP, completed
+lessons and existing sticker milestones remain intact. Goals and history use
+the device's local calendar and do not sync. If saved progress or the selected
+course cannot be read, Lingua offers a retry instead of treating it as an empty
+profile or overwriting it.
 
 The dashboard's **Quick Mix** offers an untimed round of up to three shuffled
 multiple-choice questions from completed lessons in the current course. New
@@ -88,8 +111,8 @@ source changes and must be disabled or secured separately.
 ## <a name="introduction">✨ Introduction</a>
 
 This is an Expo and React Native language-learning project based on the original
-tutorial below. The current starter build focuses on local, text-based lessons;
-real-time AI teaching remains future work.
+tutorial below. The current starter build focuses on local lessons with selected
+recorded pronunciation samples; real-time AI teaching remains future work.
 
 If you're getting started and need assistance or face any bugs, join our active Discord community with over **50k+** members. It's a place where people help each other out.
 

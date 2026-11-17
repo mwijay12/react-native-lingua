@@ -74,6 +74,12 @@ jobs:
           BUILD_TOOLS="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
           "$BUILD_TOOLS/apksigner" verify --verbose --print-certs artifacts/Lingua-Demo.apk
           "$BUILD_TOOLS/aapt" dump badging artifacts/Lingua-Demo.apk > artifacts/APK-info.txt
+          "$BUILD_TOOLS/aapt" dump permissions artifacts/Lingua-Demo.apk > artifacts/APK-permissions.txt
+          if grep -Fq 'android.permission.RECORD_AUDIO' artifacts/APK-permissions.txt; then
+            echo 'Playback-only demo must not request microphone permission.' >&2
+            exit 1
+          fi
+          echo 'Verified: the built APK does not request RECORD_AUDIO.'
           sed -n '1,25p' artifacts/APK-info.txt
       - name: Upload APK
         uses: actions/upload-artifact@v4
