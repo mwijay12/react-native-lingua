@@ -57,7 +57,9 @@ def dismiss_launcher_dialog(root):
     # covering the app. Do not dismiss errors from Lingua itself.
     if root is None or not find_node(root, "Pixel Launcher isn't responding"):
         return False
-    button = find_node(root, "Wait", exact=True) or find_node(root, "Close app", exact=True)
+    # Closing this background launcher prevents its ANR dialog from repeatedly
+    # covering the foreground demo while a slow emulator is under load.
+    button = find_node(root, "Close app", exact=True) or find_node(root, "Wait", exact=True)
     if not button:
         return False
     _, _, x, y = button
@@ -194,12 +196,18 @@ def change_course(language):
     scroll_to("YOUR LEARNING PATH", direction="up")
 
 
-def assert_sound_effects(enabled):
-    wait_for("Sound effects", exact=True)
-    root = dump_ui()
-    switches = [node for node in root.iter("node") if node.get("content-desc") == "Sound effects"]
-    if len(switches) != 1 or switches[0].get("checked") != str(enabled).lower():
-        raise RuntimeError(f"Sound effects switch did not report {enabled}: {[node.attrib for node in switches]}")
+def assert_sound_effects(enabled, timeout=30):
+    deadline = time.monotonic() + timeout
+    last_switches = []
+    while time.monotonic() < deadline:
+        root = dump_ui()
+        if root is None or dismiss_launcher_dialog(root):
+            continue
+        last_switches = [node.attrib for node in root.iter("node") if node.get("content-desc") == "Sound effects"]
+        if len(last_switches) == 1 and last_switches[0].get("checked") == str(enabled).lower():
+            return
+        time.sleep(0.5)
+    raise RuntimeError(f"Sound effects switch did not report {enabled}: {last_switches}")
 
 
 def play_kiswahili_mix(*, preview):
