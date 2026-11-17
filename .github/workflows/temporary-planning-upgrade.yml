@@ -32,7 +32,7 @@ jobs:
         run: |
           deadline=$((SECONDS + 2700))
           while (( SECONDS < deadline )); do
-            job="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/44029700441/jobs" --jq '.jobs[] | select(.name == "Build installable test APK") | "\(.status):\(.conclusion)"')"
+            job="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/44032616442/jobs" --jq '.jobs[] | select(.name == "Build installable test APK") | "\(.status):\(.conclusion)"')"
             if [[ "$job" == "completed:success" ]]; then exit 0; fi
             if [[ "$job" == completed:* ]]; then echo "APK build failed: $job" >&2; exit 1; fi
             sleep 20
@@ -44,7 +44,7 @@ jobs:
         with:
           name: Lingua-Demo-APK
           path: current
-          run-id: 44029700441
+          run-id: 44032616442
           github-token: ${{ github.token }}
       - name: Enable KVM
         run: |
@@ -83,12 +83,12 @@ jobs:
       - name: Require both fresh-install smoke tests to pass
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh run watch 44029700441 --exit-status --interval 30
+        run: gh run watch 44032616442 --exit-status --interval 30
       - uses: actions/download-artifact@v4
         with:
           name: Lingua-Demo-APK
           path: current
-          run-id: 44029700441
+          run-id: 44032616442
           github-token: ${{ github.token }}
       - name: Split compressed APK and create checksums
         run: |
@@ -118,7 +118,7 @@ jobs:
                   file = output / f'part-{index:02d}'
                   file.write_bytes(chunk)
                   parts.append({'name': file.name, 'size': len(chunk), 'sha256': hashlib.sha256(chunk).hexdigest()})
-          manifest = {'source_run': 44029700441, 'apk_size': src.stat().st_size, 'apk_sha256': digest(src),
+          manifest = {'source_run': 44032616442, 'apk_size': src.stat().st_size, 'apk_sha256': digest(src),
                       'gzip_size': packed.stat().st_size, 'gzip_sha256': digest(packed), 'parts': parts}
           (output / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
           print(json.dumps(manifest, indent=2))
