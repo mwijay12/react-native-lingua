@@ -93,4 +93,7 @@ The script clears the demo's existing data, completes a lesson in the old build,
 installs the new build in place and checks saved progress, replay and relaunch.
 For an upgrade from the study-dashboard demo to Quick Mix, run
 `python3 scripts/smoke-android-play-upgrade.py old.apk new.apk` instead. It
-checks the selected course, goal, XP and review alongside the new rewards.
+checks the selected course, goal, XP and review alongside the new rewards. For
+an upgrade from the Quick Mix demo to the illustrated/audio demo, use
+`python3 scripts/smoke-android-content-upgrade.py old.apk new.apk`; it also
+checks preserved stickers, the new course totals, mute and offline samples.

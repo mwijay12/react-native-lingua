@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Text, TouchableOpacity, View } from "react-native";
+import type { KeyboardEvent } from "react";
+import { Platform, Text, TouchableOpacity, View } from "react-native";
 
 import {
   retryAudioSettingsSave,
@@ -21,9 +22,20 @@ export function SoundEffectsControl({ compact = false }: { compact?: boolean }) 
     else if (!loading) setEnabled(!enabled);
   };
   const icon = failed ? "alert-circle-outline" : enabled && !loading ? "volume-high-outline" : "volume-mute-outline";
+  // React Native Web handles Enter for a switch, but not Space. Keep native
+  // behavior unchanged and prevent Space from scrolling the page on web.
+  const webKeyboard = Platform.OS === "web" && !failed ? {
+    onKeyDownCapture: (event: KeyboardEvent<HTMLElement>) => {
+      if (event.key === " ") {
+        event.preventDefault();
+        if (!event.repeat && !loading) toggle();
+      }
+    },
+  } : {};
 
   const control = (
     <TouchableOpacity
+      {...webKeyboard}
       onPress={toggle}
       disabled={loading}
       accessibilityRole={failed ? "button" : "switch"}
