@@ -44,12 +44,13 @@ If you prefer visual learning, this is the perfect resource for you. Follow our 
 
 Created by Mwijay. This version provides beginner Kiswahili, English and French
 courses with English instructions, local practice questions, and on-device XP
-and lesson progress. The 33 playable lessons cover everyday topics, useful
-language patterns and a new places-and-directions unit in each course. Each
-lesson includes context notes; the six new travel lessons have examples and
-answer explanations. Lingua's cat and parrot companions, original SVG doodles
-and four illustrated unit scenes make the learning path more playful. The
-standalone [Android demo](demo/android/README.md) has no sign-in or analytics.
+and lesson progress. The 39 playable lessons cover everyday topics, useful
+language patterns, travel, days of the week and making plans. Each course has
+two days-and-plans lessons; together they add 44 questions with examples and
+answer explanations. Every lesson includes context notes. Lingua's cat and
+parrot companions, original SVG doodles and five illustrated unit scenes make
+the learning path more playful. The standalone [Android demo](demo/android/README.md)
+has no sign-in or analytics.
 
 The doodles in `components/LearningSticker.tsx` are original, hand-drawn shapes
 in Lingua's palette. `MotionSticker` keeps decoration in reserved space, never
@@ -61,14 +62,15 @@ respecting reduced motion and screen focus. The selected cat and parrot remain
 the existing image assets. The approach is adapted for a native app from the
 [motion-lab prompt pack](https://github.com/mwijay12/motion-lab/blob/main/motion-lab/docs/agent-prompt-pack.md).
 
-Nine short, generated pronunciation samples cover the greeting lesson and both
-travel lessons in each language. Tap **Play sample** to hear the selected words
-and phrases in the on-screen transcript; tap **Stop** or leave the lesson to
-stop. Other lessons still use written, approximate pronunciation guides. The
-recordings are learning aids, not a substitute for feedback from a fluent
-speaker; pronunciations and accents can vary. The installed native app bundles
-the audio for offline playback; the web build must first load its assets from
-its host.
+Fifteen short, generated pronunciation samples cover the greeting lesson, both
+travel lessons and both days-and-plans lessons in each language. Tap **Play
+sample** to hear the selected words and phrases in the on-screen transcript;
+tap **Stop** or leave the lesson to stop. The controls wrap on narrow screens or
+when text is enlarged. Other lessons still use written, approximate pronunciation
+guides. The generated recordings have not been human-reviewed and are learning
+aids, not a substitute for feedback from a fluent speaker; pronunciations and
+accents can vary. The installed native app bundles the audio for offline
+playback; the web build must first load its assets from its host.
 
 Short, original feedback chimes play after correct answers and completed lesson,
 review or Quick Mix sessions. They are on by default and can be muted using the
