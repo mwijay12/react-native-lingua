@@ -1,0 +1,39 @@
+{
+  "source_run": 44032616442,
+  "apk_size": 96733458,
+  "apk_sha256": "b0e03925857d285bd9cb0aeecdee24e4fead95f25c0a2728bb25f2c195460821",
+  "gzip_size": 46704461,
+  "gzip_sha256": "e452fe06960e7ebb5348d9d49eb805d9e30d83917f41cdc008e4fcea0f0ed143",
+  "parts": [
+    {
+      "name": "part-00",
+      "size": 8388608,
+      "sha256": "33b87ff7e83ce210aba63614a61a5bae3cdb551a57a270c07a8cf4222033eeff"
+    },
+    {
+      "name": "part-01",
+      "size": 8388608,
+      "sha256": "4a39c2bb971e67d540d5b708c2174101c66cc65d190af79407273f328e99f3ab"
+    },
+    {
+      "name": "part-02",
+      "size": 8388608,
+      "sha256": "f9ec6da3d689b89c0fc43fb6294a858249a9998378ad0a9318ba24bc30745de9"
+    },
+    {
+      "name": "part-03",
+      "size": 8388608,
+      "sha256": "b3f531a46766d8e4c747418c3208a1d80878e96aaf3843897dd56f7043898364"
+    },
+    {
+      "name": "part-04",
+      "size": 8388608,
+      "sha256": "ca6959a3ee6b1c544bd7576d8d592cd03dfb90e31e0032adf445a4fbbcf80e4f"
+    },
+    {
+      "name": "part-05",
+      "size": 4761421,
+      "sha256": "1378c9d6dfb81cfd50c6887661de750391c86f9e1d2e5fa06f5968d13dfff1d5"
+    }
+  ]
+}
