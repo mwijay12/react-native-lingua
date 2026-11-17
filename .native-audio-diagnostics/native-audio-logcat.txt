@@ -1,0 +1,6 @@
+--------- beginning of main
+11-17 04:52:39.863 I/ReactNativeJS( 2672): Running "main"
+11-17 04:53:07.035 I/ExoPlayerImpl( 2672): Init 4636767 [AndroidXMedia3/1.8.0] [emu64xa, sdk_gphone64_x86_64, Google, 35]
+11-17 04:53:07.047 I/ExoPlayerImpl( 2672): Init 76b0b9 [AndroidXMedia3/1.8.0] [emu64xa, sdk_gphone64_x86_64, Google, 35]
+11-17 04:53:07.124 I/ExoPlayerImpl( 2672): Init 83c2712 [AndroidXMedia3/1.8.0] [emu64xa, sdk_gphone64_x86_64, Google, 35]
+11-17 04:53:17.940 D/AudioTrack( 2672): getTimestamp_l(18): device stall time corrected using current time 93636286148
