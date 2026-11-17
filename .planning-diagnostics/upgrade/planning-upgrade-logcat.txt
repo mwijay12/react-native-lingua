@@ -1,2 +1,0 @@
---------- beginning of main
-11-17 06:55:07.002 I/ReactNativeJS( 3072): Running "main"
