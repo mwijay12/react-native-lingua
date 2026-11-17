@@ -10,6 +10,8 @@ web-build/
 expo-env.d.ts
 
 # Native
+# Installable builds are generated artifacts, not source files.
+*.apk
 .kotlin/
 *.orig.*
 *.jks
