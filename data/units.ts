@@ -37,6 +37,14 @@ export const UNITS: Unit[] = [
     lessonIds: ['sw-travel-places', 'sw-travel-directions'],
   },
   {
+    id: 'sw-unit-5',
+    languageCode: 'sw',
+    title: 'Days & plans',
+    description: 'Name the days and make a simple plan in Kiswahili.',
+    order: 5,
+    lessonIds: ['sw-planning-days', 'sw-planning-meet'],
+  },
+  {
     id: 'en-unit-1',
     languageCode: 'en',
     title: 'English: First Steps',
@@ -70,6 +78,14 @@ export const UNITS: Unit[] = [
     description: 'Find familiar places and ask for the way in English.',
     order: 4,
     lessonIds: ['en-travel-places', 'en-travel-directions'],
+  },
+  {
+    id: 'en-unit-5',
+    languageCode: 'en',
+    title: 'Days & plans',
+    description: 'Name the days and make a simple plan in English.',
+    order: 5,
+    lessonIds: ['en-planning-days', 'en-planning-meet'],
   },
   {
     id: 'es-unit-1',
@@ -113,6 +129,14 @@ export const UNITS: Unit[] = [
     description: 'Find familiar places and ask for the way in French.',
     order: 4,
     lessonIds: ['fr-travel-places', 'fr-travel-directions'],
+  },
+  {
+    id: 'fr-unit-5',
+    languageCode: 'fr',
+    title: 'Days & plans',
+    description: 'Name the days and make a simple plan in French.',
+    order: 5,
+    lessonIds: ['fr-planning-days', 'fr-planning-meet'],
   },
   {
     id: 'ja-unit-1',

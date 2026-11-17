@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check a Quick Mix demo-to-illustrated/audio demo upgrade on Android.
+"""Check a Quick Mix demo-to-current-content demo upgrade on Android.
 
 Usage: python3 scripts/smoke-android-content-upgrade.py old.apk new.apk
 Both test-signed APKs must use the same demo package. This clears demo data.
@@ -49,13 +49,13 @@ def main(old_apk, new_apk):
     smoke.scroll_to("1 / 2", direction="up", exact=True)
     smoke.scroll_to("10 XP", exact=True)
     smoke.tap("Profile")
-    smoke.scroll_to("0 / 10 lessons")
+    smoke.scroll_to("0 / 12 lessons")
     smoke.scroll_to("Sound effects", exact=True)
     smoke.assert_sound_effects(True)
     smoke.tap("Sound effects", exact=True)
     smoke.assert_sound_effects(False)
     smoke.change_course("Kiswahili")
-    smoke.wait_for("1 of 10 completed")
+    smoke.wait_for("1 of 12 completed")
     smoke.tap("Home")
     smoke.scroll_to("1 question saved for this course")
     smoke.scroll_to("Play Quick Mix and collect stickers", direction="up")

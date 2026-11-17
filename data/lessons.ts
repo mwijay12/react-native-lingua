@@ -3,6 +3,7 @@ import { STARTER_LESSONS } from './starterLessons';
 import { EVERYDAY_LESSONS } from './everydayLessons';
 import { FOUNDATION_LESSONS } from './foundationLessons';
 import { TRAVEL_LESSONS } from './travelLessons';
+import { PLANNING_LESSONS } from './planningLessons';
 import { LESSON_NOTES } from './lessonNotes';
 
 const LESSON_DATA: Lesson[] = [
@@ -10,6 +11,7 @@ const LESSON_DATA: Lesson[] = [
   ...EVERYDAY_LESSONS,
   ...FOUNDATION_LESSONS,
   ...TRAVEL_LESSONS,
+  ...PLANNING_LESSONS,
   // ─── Spanish ───────────────────────────────────────────────────────────────
 
   {

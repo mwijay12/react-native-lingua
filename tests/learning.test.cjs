@@ -25,17 +25,18 @@ const { isCorrectAnswer, normalizeAnswer } = require("../lib/practice.ts");
 const agentSession = require("../app/api/agent-session+api.ts");
 const streamToken = require("../app/api/stream-token+api.ts");
 
-test("each launch course has ordered, complete and playable lessons in all four units", () => {
+test("each launch course has ordered, complete and playable lessons in all five units", () => {
   assert.equal(new Set(LESSONS.map((lesson) => lesson.id)).size, LESSONS.length);
   assert.equal(new Set(UNITS.map((unit) => unit.id)).size, UNITS.length);
   assert.deepEqual(getCourseUnits(null), []);
   const activityIds = new Set();
   for (const code of ["sw", "en", "fr"]) {
     const units = getCourseUnits(code);
-    assert.deepEqual(units.map((unit) => unit.id), [`${code}-unit-1`, `${code}-unit-2`, `${code}-unit-3`, `${code}-unit-4`]);
-    assert.deepEqual(units.map((unit) => unit.order), [1, 2, 3, 4]);
+    assert.deepEqual(units.map((unit) => unit.id), [`${code}-unit-1`, `${code}-unit-2`, `${code}-unit-3`, `${code}-unit-4`, `${code}-unit-5`]);
+    assert.deepEqual(units.map((unit) => unit.order), [1, 2, 3, 4, 5]);
     assert.equal(units[2].lessons.length, 2);
     assert.deepEqual(units[3].lessonIds, [`${code}-travel-places`, `${code}-travel-directions`]);
+    assert.deepEqual(units[4].lessonIds, [`${code}-planning-days`, `${code}-planning-meet`]);
     assert.deepEqual(units[1].lessonIds, ["numbers", "family", "food", "conversation"].map((topic) => `${code}-everyday-${topic}`));
     for (const unit of units) {
       assert.equal(unit.lessons.length, unit.lessonIds.length, `${unit.id} has a missing lesson`);
@@ -46,7 +47,7 @@ test("each launch course has ordered, complete and playable lessons in all four 
         assert.ok(lesson.vocabulary.length > 0 && lesson.phrases.length > 0, `${id} has no material`);
         assert.ok(lesson.notes?.length > 0, `${id} has no language context`);
         for (const note of lesson.notes) assert.ok(note.title && note.body && note.example, `${id} has an incomplete note`);
-        if (unit.order === 3 || unit.order === 4) {
+        if (unit.order >= 3) {
           assert.ok(lesson.notes.length >= 2 && lesson.activities.length >= 5, `${id} needs a deeper explanation and practice`);
           assert.ok(lesson.activities.every((activity) => activity.explanation), `${id} needs answer explanations`);
         }
@@ -66,6 +67,27 @@ test("each launch course has ordered, complete and playable lessons in all four 
         }
       }
     }
+  }
+});
+
+test("the planning unit teaches complete weekday sets and useful time words", () => {
+  const expectedDays = {
+    sw: ["Jumatatu", "Jumanne", "Jumatano", "Alhamisi", "Ijumaa", "Jumamosi", "Jumapili"],
+    en: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+    fr: ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"],
+  };
+  const expectedTimes = {
+    sw: ["Leo", "Kesho", "Jana", "Sasa", "Baadaye"],
+    en: ["Today", "Tomorrow", "Yesterday", "Now", "Later"],
+    fr: ["Aujourd'hui", "Demain", "Hier", "Maintenant", "Plus tard"],
+  };
+  for (const code of ["sw", "en", "fr"]) {
+    const planning = getCourseUnits(code)[4].lessons;
+    assert.deepEqual(planning[0].vocabulary.map((item) => item.word), expectedDays[code]);
+    assert.deepEqual(planning[1].vocabulary.map((item) => item.word), expectedTimes[code]);
+    assert.deepEqual(planning.map((lesson) => lesson.xpReward), [15, 15]);
+    assert.deepEqual(planning.map((lesson) => lesson.activities.length), code === "en" ? [7, 7] : [8, 7]);
+    assert.ok(planning.every((lesson) => lesson.activities.filter((activity) => activity.type === "translate").length >= 2));
   }
 });
 

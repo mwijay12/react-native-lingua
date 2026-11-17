@@ -2,19 +2,22 @@
 
 This is a **test-only**, separately identified Android app. It includes beginner
 courses in Kiswahili, English and French, English menus, offline vocabulary and
-practice questions, including everyday topics and places and directions.
-There are 33 playable lessons: ten each in Kiswahili and English, and thirteen
-in French. Each course has two foundation lessons and two travel lessons with
-explanations, examples and practice feedback. Earlier lessons also include
-context notes. The app retains Lingua's cat-and-parrot identity, with four
-illustrated scenes, original SVG doodles and gentle motion. Artwork remains
-visible and still when the device's reduced-motion setting is on.
+practice questions, including everyday topics, travel, days of the week and
+making plans. There are 39 playable lessons: twelve each in Kiswahili and
+English, and fifteen in French. Each course has two foundation lessons, two
+travel lessons and two days-and-plans lessons with explanations, examples and
+practice feedback. The six new lessons add 44 questions and 15 XP each.
+Earlier lessons also include context notes. The app retains Lingua's
+cat-and-parrot identity, with five illustrated scenes, original SVG doodles and
+gentle motion. Artwork remains visible and still when the device's
+reduced-motion setting is on.
 
-Nine generated pronunciation samples (greetings and both travel lessons in each
-course) are bundled in the APK. Tap Play sample to listen and follow the visible
-transcript; Stop and leaving the lesson stop playback. Other lessons have
-written pronunciation guides. These samples are learning aids and accents or
-pronunciations can vary. Short feedback chimes are on by default and can be
+Fifteen generated pronunciation samples (greetings, both travel lessons and
+both days-and-plans lessons in each course) are bundled in the APK. Tap Play
+sample to listen and follow the visible transcript; Stop and leaving the lesson
+stop playback. Other lessons have written pronunciation guides. The recordings
+are generated learning aids, not human-reviewed pronunciation references;
+accents and pronunciations can vary. Short feedback chimes are on by default and can be
 muted via the speaker on lesson, review or Quick Mix screens, or in Profile.
 That switch does not mute pronunciation samples. All these assets work offline;
 no microphone is used or requested. The build checks the APK's final permissions.
@@ -77,8 +80,10 @@ EXPO_OFFLINE=1 ./gradlew :app:assembleRelease --no-daemon --max-workers=2
 The output is `app/build/outputs/apk/release/app-release.apk` relative to the
 last directory above. The release variant embeds the JavaScript bundle and does
 not require a Metro server. It is still **debug-key-signed** and for testing.
-The GitHub Actions workflow uploads the APK and then installs and navigates it
-on an Android emulator. Artifacts expire after three days.
+The GitHub Actions workflow uploads the APK and then runs the general and
+six-lesson planning smoke tests on Android emulators without a network. The
+emulators have no speakers, so these checks cannot judge audible pronunciation.
+Artifacts expire after three days.
 
 `prepare-android-demo.mjs` creates an ignored, isolated copy under `.expo/`;
 it doesn't alter the production source. It copies no `.env` files and removes
@@ -94,6 +99,12 @@ installs the new build in place and checks saved progress, replay and relaunch.
 For an upgrade from the study-dashboard demo to Quick Mix, run
 `python3 scripts/smoke-android-play-upgrade.py old.apk new.apk` instead. It
 checks the selected course, goal, XP and review alongside the new rewards. For
-an upgrade from the Quick Mix demo to the illustrated/audio demo, use
+an upgrade from the Quick Mix demo to the current demo, use
 `python3 scripts/smoke-android-content-upgrade.py old.apk new.apk`; it also
-checks preserved stickers, the new course totals, mute and offline samples.
+checks preserved stickers, the new course totals, mute and offline samples. For
+an upgrade from the four-unit illustrated/audio demo to the days-and-plans
+version, use `python3 scripts/smoke-android-planning-upgrade.py old.apk new.apk`.
+It checks the selected course, goal, XP, review, completed lessons, stickers and
+mute setting, then practises a new lesson and relaunches while offline. These
+upgrade scripts clear the demo's data before setting up their test learner; do
+not run them against a personal installation with progress you want to keep.

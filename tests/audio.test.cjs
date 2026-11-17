@@ -22,6 +22,7 @@ const { normalizeAnswer } = require("../lib/practice.ts");
 test("each bundled pronunciation sample is labelled and matches its lesson", () => {
   const expected = ["sw", "en", "fr"].flatMap((code) => [
     `${code}-lesson-1`, `${code}-travel-places`, `${code}-travel-directions`,
+    `${code}-planning-days`, `${code}-planning-meet`,
   ]);
   assert.deepEqual(Object.keys(pronunciationSamples).sort(), expected.sort());
   for (const [lessonId, sample] of Object.entries(pronunciationSamples)) {
@@ -34,6 +35,12 @@ test("each bundled pronunciation sample is labelled and matches its lesson", () 
     ]);
     for (const line of sample.lines) {
       assert.ok(material.has(normalizeAnswer(line)), `${lessonId}: transcript line not taught in the lesson: ${line}`);
+    }
+    if (lessonId.includes("-planning-")) {
+      assert.deepEqual(sample.lines.map(normalizeAnswer), [
+        ...lesson.vocabulary.map((item) => normalizeAnswer(item.word)),
+        ...lesson.phrases.map((item) => normalizeAnswer(item.text)),
+      ], `${lessonId}: the sample should cover its words and phrases in order`);
     }
     const audio = fs.readFileSync(sample.source);
     assert.ok(audio.length > 1000 && audio.length < 250_000, `${lessonId}: unexpected recording size`);

@@ -8,6 +8,7 @@ import firstStepsScene from "@/assets/images/scenes/first-steps.jpg";
 import everydayLifeScene from "@/assets/images/scenes/everyday-life.jpg";
 import foundationsScene from "@/assets/images/scenes/language-foundations.jpg";
 import travelScene from "@/assets/images/scenes/places-and-travel.jpg";
+import planningScene from "@/assets/images/scenes/days-and-plans.jpg";
 
 // The same original companions appear throughout the app.
 export const images = {
@@ -21,6 +22,7 @@ export const images = {
   everydayLifeScene,
   foundationsScene,
   travelScene,
+  planningScene,
 } as const;
 
 // Unit order is shared by all launch courses. Keep images in one place so
@@ -30,4 +32,5 @@ export const unitScenes = [
   images.everydayLifeScene,
   images.foundationsScene,
   images.travelScene,
+  images.planningScene,
 ] as const;

@@ -15,8 +15,8 @@ import { useLearningHydration } from "@/hooks/useLearningHydration";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLearningStore } from "@/store/learningStore";
 
-const UNIT_STICKERS: StickerKind[] = ["talk", "people", "book", "globe"];
-const UNIT_BACKGROUNDS = ["bg-[#FCF1DB]", "bg-[#EAF5EE]", "bg-[#F0ECF8]", "bg-[#FFF1E8]"];
+const UNIT_STICKERS: StickerKind[] = ["talk", "people", "book", "globe", "numbers"];
+const UNIT_BACKGROUNDS = ["bg-[#FCF1DB]", "bg-[#EAF5EE]", "bg-[#F0ECF8]", "bg-[#FFF1E8]", "bg-[#FCF1DB]"];
 
 export default function LearnScreen() {
   const router = useRouter();

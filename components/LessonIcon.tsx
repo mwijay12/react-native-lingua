@@ -13,6 +13,7 @@ const stickers: Record<string, StickerKind> = {
   "☕": "cup",
   "📍": "globe",
   "🧭": "globe",
+  "📅": "numbers",
 };
 
 export function LessonIcon({ icon, size = 42 }: { icon?: string; size?: number }) {

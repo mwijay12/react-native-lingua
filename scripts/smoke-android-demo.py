@@ -130,7 +130,8 @@ def scroll_to(text, direction="down", max_swipes=14, exact=False):
     raise RuntimeError(f"Could not scroll to {text!r}")
 
 
-def complete_lesson(title, answers, *, lesson_number=1, wrong_first=False, screenshot_name=None, reward=10, listen=False):
+def complete_lesson(title, answers, *, lesson_number=1, wrong_first=False, wrong_answer="Goodbye",
+                    screenshot_name=None, reward=10, listen=False, sample_text=None, already_completed=False):
     label = f"Lesson {lesson_number}: {title}"
     scroll_to(label)
     tap(label)
@@ -144,13 +145,15 @@ def complete_lesson(title, answers, *, lesson_number=1, wrong_first=False, scree
         time.sleep(1)
         tap("Stop pronunciation sample")
         scroll_to("Read along", direction="up")
+        if sample_text:
+            scroll_to(sample_text, direction="up")
     scroll_to("UNDERSTAND THE IDEA")
     scroll_to("Words to learn")
     scroll_to("Start practice")
     tap("Start practice")
     for index, (kind, answer) in enumerate(answers):
         if wrong_first and index == 0:
-            tap("Goodbye")
+            tap(wrong_answer, exact=True)
             scroll_to("Check answer")
             tap("Check answer")
             wait_for("Not quite. Try again.")
@@ -168,7 +171,10 @@ def complete_lesson(title, answers, *, lesson_number=1, wrong_first=False, scree
         action = "Finish lesson" if index == len(answers) - 1 else "Next question"
         scroll_to(action)
         tap(action)
-    wait_for(f"You earned {reward} XP.")
+    if already_completed:
+        wait_for("You have already earned XP for this lesson.")
+    else:
+        wait_for(f"You earned {reward} XP.")
     if wrong_first:
         wait_for(f"{len(answers) - 1} of {len(answers)} correct on the first try.")
     scroll_to("Done")
