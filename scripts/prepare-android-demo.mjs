@@ -25,6 +25,7 @@ rmSync(output, { recursive: true, force: true });
 mkdirSync(output, { recursive: true });
 for (const name of [
   "app", "assets", "components", "constants", "data", "hooks", "lib", "store", "types",
+  "patches", "plugins", "scripts/harden-async-storage.cjs",
   "babel.config.js", "global.css", "postcss.config.mjs", "tsconfig.json",
   "nativewind-env.d.ts",
 ]) {

@@ -78,7 +78,7 @@ export default function LearnScreen() {
               <Text className="font-poppins-semibold text-xs text-lingua-teal">Review mistakes →</Text>
             </TouchableOpacity>
           </View>
-          <Text className="caption mt-2">New lessons can change this percentage; your XP and completed lessons stay saved.</Text>
+          <Text className="caption mt-2">New lessons can change this percentage; your XP and completed lessons are tracked separately.</Text>
         </View>
 
         {units.map((unit) => (

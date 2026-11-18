@@ -14,6 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FeedbackPanel } from "@/components/FeedbackPanel";
 import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
+import { LearningSaveMessage } from "@/components/LearningSaveMessage";
 import { MotionSticker } from "@/components/MotionSticker";
 import { QuestionInput } from "@/components/QuestionInput";
 import { SoundEffectsControl } from "@/components/SoundEffectsControl";
@@ -24,7 +25,7 @@ import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { isCorrectAnswer } from "@/lib/practice";
 import { getReviewQuestions, type ReviewQuestion } from "@/lib/studyProgress";
 import { useLanguageStore } from "@/store/languageStore";
-import { useLearningStore } from "@/store/learningStore";
+import { useLearningSaveStatus, useLearningStore } from "@/store/learningStore";
 
 type Phase = "intro" | "practice" | "finished";
 type Feedback = "correct" | "incorrect" | null;
@@ -39,6 +40,7 @@ export default function ReviewScreen() {
   // review action should show that lesson's mistakes without switching courses.
   const reviewLanguage = isAvailableLanguage(course) ? course : selectedLanguage;
   const { reviewItems, clearReviewQuestion, completeReview } = useLearningStore();
+  const saveStatus = useLearningSaveStatus((state) => state.status);
   const hydration = useLearningHydration();
   const sounds = useSoundEffects();
   const [phase, setPhase] = useState<Phase>("intro");
@@ -118,7 +120,7 @@ export default function ReviewScreen() {
                 <View className="flex-1 pr-2">
                   <Text className="h2">Review your mistakes</Text>
                   <Text className="body-md text-text-secondary mt-2">
-                    Return to questions you missed in this course. Your review list is saved on this device.
+                    Return to questions you missed in this course. Review is local to this device.
                   </Text>
                 </View>
                 <MotionSticker kind="review" size={70} testID="review-sticker" />
@@ -130,7 +132,7 @@ export default function ReviewScreen() {
                   </View>
                   <View className="flex-1">
                     <Text className="font-poppins-semibold text-lg text-text-primary" testID="review-count">
-                      {availableQuestions.length} {availableQuestions.length === 1 ? "question" : "questions"} saved
+                      {availableQuestions.length} {availableQuestions.length === 1 ? "question" : "questions"} {saveStatus === "saved" ? "saved" : "in review"}
                     </Text>
                     <Text className="body-sm text-text-secondary">{language?.name ?? "Selected course"}</Text>
                   </View>
@@ -151,7 +153,7 @@ export default function ReviewScreen() {
                     <View key={lesson.id} className="flex-row items-center py-3 border-b border-border">
                       <Ionicons name="book-outline" size={18} color="#60736C" />
                       <Text className="font-poppins-medium text-sm text-text-primary flex-1 ml-3">{lesson.title}</Text>
-                      <Text className="caption">{availableQuestions.filter((item) => item.lesson.id === lesson.id).length} saved</Text>
+                      <Text className="caption">{availableQuestions.filter((item) => item.lesson.id === lesson.id).length} {saveStatus === "saved" ? "saved" : "in review"}</Text>
                     </View>
                   ))}
                   <TouchableOpacity onPress={start} className="bg-lingua-teal rounded-2xl items-center py-4 mt-6" accessibilityRole="button" testID="start-review-button">
@@ -217,6 +219,7 @@ export default function ReviewScreen() {
               <Text className="body-sm text-text-secondary text-center mt-2">
                 {availableQuestions.length} {availableQuestions.length === 1 ? "question remains" : "questions remain"} in this course. This session counts toward today’s goal.
               </Text>
+              <LearningSaveMessage className="text-center mt-2" testID="review-save-status" />
               <TouchableOpacity onPress={goBack} className="bg-lingua-teal rounded-2xl items-center py-4 px-8 mt-7" accessibilityRole="button" testID="review-done-button">
                 <Text className="font-poppins-semibold text-base text-white">Done</Text>
               </TouchableOpacity>

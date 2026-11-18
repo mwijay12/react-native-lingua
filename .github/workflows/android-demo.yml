@@ -14,6 +14,9 @@ on:
       - "hooks/**"
       - "demo/android/**"
       - "lib/**"
+      - "patches/**"
+      - "plugins/**"
+      - "scripts/harden-async-storage.cjs"
       - "scripts/prepare-android-demo.mjs"
       - "scripts/smoke-android-*.py"
       - "store/**"
@@ -24,9 +27,15 @@ on:
       - "global.css"
       - "tsconfig.json"
   workflow_dispatch:
+    inputs:
+      baseline_run_id:
+        description: "Optional run ID containing the Lingua-Demo-APK baseline for an isolated in-place upgrade test"
+        required: false
+        type: string
 
 permissions:
   contents: read
+  actions: read
 
 env:
   CI: "1"
@@ -49,6 +58,8 @@ jobs:
           java-version: "17"
       - name: Install project dependencies
         run: npm ci --legacy-peer-deps --ignore-scripts --no-audit --no-fund
+      - name: Apply and verify native storage safeguards
+        run: npm run harden-storage
       - name: Validate source and lesson content
         run: |
           npm run lint
@@ -155,6 +166,90 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Lingua-Demo-Planning-Smoke
+          path: android-smoke/
+          if-no-files-found: warn
+          retention-days: 3
+
+  storage-fault-test:
+    name: Android storage-failure safety
+    needs: apk
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: Lingua-Demo-APK
+          path: artifacts
+      - name: Enable KVM for the emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Inject faults into synthetic demo storage only
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: python3 scripts/smoke-android-storage-failures.py artifacts/Lingua-Demo.apk
+      - name: Upload fault-test screenshots and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lingua-Demo-Storage-Smoke
+          path: android-smoke/
+          if-no-files-found: warn
+          retention-days: 3
+
+  p0-upgrade-test:
+    name: Isolated P0 in-place upgrade
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.baseline_run_id != '' }}
+    needs: apk
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: Lingua-Demo-APK
+          path: artifacts
+      - name: Download explicitly selected baseline APK
+        uses: actions/download-artifact@v4
+        with:
+          name: Lingua-Demo-APK
+          path: baseline
+          run-id: ${{ inputs.baseline_run_id }}
+          github-token: ${{ github.token }}
+      - name: Verify baseline artifact checksum
+        run: |
+          expected="$(awk 'NR == 1 {print $1}' baseline/SHA256SUMS.txt)"
+          actual="$(sha256sum baseline/Lingua-Demo.apk | awk '{print $1}')"
+          test -n "$expected" && test "$actual" = "$expected"
+          echo "Baseline SHA-256: $actual"
+      - name: Enable KVM for the emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Upgrade a synthetic learner without clearing after installation
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: python3 scripts/smoke-android-p0-upgrade.py baseline/Lingua-Demo.apk artifacts/Lingua-Demo.apk
+      - name: Upload upgrade screenshots and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lingua-Demo-P0-Upgrade
           path: android-smoke/
           if-no-files-found: warn
           retention-days: 3

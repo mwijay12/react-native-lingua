@@ -67,6 +67,7 @@ test("a saved four-unit learner keeps progress and can practise the new lessons"
   const writes = [];
   const storage = {
     async getItem(key) { return stored[key] ?? null; },
+    async multiGet(keys) { return Promise.all(keys.map(async (key) => [key, await this.getItem(key)])); },
     async setItem(key, value) { writes.push(key); stored[key] = value; },
     async removeItem(key) { delete stored[key]; },
   };

@@ -15,7 +15,7 @@ import { useLearningHydration } from "@/hooks/useLearningHydration";
 import { useStudyDate } from "@/hooks/useStudyDate";
 import { getReviewQuestions, lastSevenDays, localDateKey, sessionCount, type DailyGoal } from "@/lib/studyProgress";
 import { useLanguageStore } from "@/store/languageStore";
-import { useLearningStore } from "@/store/learningStore";
+import { useLearningSaveStatus, useLearningStore } from "@/store/learningStore";
 
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const GOALS: DailyGoal[] = [1, 2, 3];
@@ -24,6 +24,7 @@ export default function HomeScreen() {
   const { user } = useUser();
   const { selectedLanguage } = useLanguageStore();
   const { totalXp, completedLessonIds, dailyGoal, setDailyGoal, activityByDate, reviewItems } = useLearningStore();
+  const saveStatus = useLearningSaveStatus((state) => state.status);
   const hydration = useLearningHydration();
   const now = useStudyDate();
   const firstName = user?.firstName ?? "Learner";
@@ -179,7 +180,9 @@ export default function HomeScreen() {
           <View className="flex-1">
             <Text className="font-poppins-semibold text-sm text-text-primary">Review missed questions</Text>
             <Text className="caption mt-1" testID="home-review-count">
-              {reviewCount === 0 ? "No questions saved for this course" : `${reviewCount} ${reviewCount === 1 ? "question" : "questions"} saved for this course`}
+              {saveStatus === "saved"
+                ? reviewCount === 0 ? "No questions saved for this course" : `${reviewCount} ${reviewCount === 1 ? "question" : "questions"} saved for this course`
+                : reviewCount === 0 ? "No questions in review for this course" : `${reviewCount} ${reviewCount === 1 ? "question" : "questions"} in review for this course`}
             </Text>
           </View>
           <Ionicons name="arrow-forward" size={19} color="#14675D" />
@@ -187,7 +190,9 @@ export default function HomeScreen() {
 
         <View className="flex-row items-center justify-between mb-3">
           <Text className="font-poppins-semibold text-lg text-text-primary">Your progress</Text>
-          <Text className="caption">SAVED ON DEVICE</Text>
+          <Text className="caption" testID="home-save-status">
+            {saveStatus === "saved" ? "SAVED ON DEVICE" : saveStatus === "saving" ? "SAVING…" : saveStatus === "error" ? "NOT SAVED YET" : "ON THIS DEVICE"}
+          </Text>
         </View>
         <View className="flex-row gap-3 mb-4">
           <View className="flex-1 bg-white border border-border rounded-[20px] p-4">

@@ -15,7 +15,7 @@ export function RewardAlbum({ badges }: { badges: readonly RewardBadge[] }) {
         </View>
         <Text className="font-poppins-semibold text-sm text-text-primary" testID="reward-count">{collected} / {badges.length} collected</Text>
       </View>
-      <Text className="body-sm text-text-secondary mb-4">Little milestones, saved on this device. There is no rush.</Text>
+      <Text className="body-sm text-text-secondary mb-4">Little milestones for your sticker book. There is no rush.</Text>
       <View className="flex-row flex-wrap justify-between">
         {badges.map((badge) => (
           <View

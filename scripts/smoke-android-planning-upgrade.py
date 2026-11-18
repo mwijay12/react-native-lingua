@@ -57,7 +57,7 @@ def main(old_apk, new_apk):
     smoke.scroll_to("2 / 2", direction="up", exact=True)
     smoke.scroll_to("25 XP", exact=True)
     smoke.tap("Profile")
-    smoke.scroll_to("0 / 10 lessons")
+    smoke.scroll_to(f"0 / {old_english_total} lessons")
     smoke.scroll_to("Sound effects", exact=True)
     smoke.assert_sound_effects(False)
     smoke.screenshot("planning-upgrade-before")

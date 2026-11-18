@@ -23,24 +23,41 @@ That switch does not mute pronunciation samples. All these assets work offline;
 no microphone is used or requested. The build checks the APK's final permissions.
 
 XP, completed lessons, study sessions, the daily goal and missed questions are
-stored on the device, not synced to an account. XP is awarded only the first
+stored locally after a successful write, not synced to an account. XP is awarded only the first
 time each lesson is completed. A completed lesson (including a replay) or a
 completed review set counts as one session toward the daily goal; the goal can
 be set to one, two or three sessions across all courses. Days follow the
 device's local calendar. The seven-day view counts days with a finished session,
 not a streak, and dates are not invented for lessons completed in older versions.
 
-A wrong answer in a lesson is saved for review even if the learner then retries
+A wrong answer in a lesson is added for review even if the learner then retries
 it correctly. The review list shows the selected course and practises up to ten
-saved questions per set. A correct answer removes a question; a wrong answer
+questions per set. A correct answer removes a question; a wrong answer
 leaves it for another review. Reviewing does not award extra XP. Switching
 courses does not erase progress or another course's review list. Existing
 earned version-1 XP and completions are retained, while fictional sample XP and
 streaks from earlier versions are not counted as real progress. Adding lessons
 can lower a course's completion percentage because the total has grown, but
 earned XP, completed lessons and existing sticker milestones remain unchanged.
-If saved progress or the selected course cannot be read, the app offers a retry
-without resetting it.
+If a progress or course write is pending or fails, the app shows its status and
+a retry for the current snapshot. Keep the app open until saving succeeds;
+changes still only in memory can be lost when it closes. Course selection waits
+for an acknowledged write before continuing. If saved data cannot be read, is
+unexpected or comes from a newer version, the app blocks overwriting it and
+provides a retry or guidance to reopen the newer version. Do not uninstall as a
+recovery step: local app data can be removed. Older version-0 sample XP is
+recomputed from recognized completed lessons; old IDs are retained even if a
+lesson is no longer known, without inventing its XP. Version-1 earned XP is kept.
+
+The Node tests simulate storage failures, delayed writes, older/newer formats,
+retries and reopening. A local, version-checked patch also prevents AsyncStorage
+and Android's default SQLite corruption handler from deleting the database on
+open failure. Unknown database versions and ambiguous legacy Expo-scoped data
+are blocked and kept for recovery; there is not yet an automatic recovery tool.
+These safeguards are not a backup and cannot recover data already lost, protect
+against uninstall, or cover every possible failure. They require a rebuilt native
+app; Expo Go and old binaries do not contain the patch. Native tests on isolated
+emulators do not replace testing on actual Android devices or TalkBack.
 
 **Quick Mix** is an untimed, offline round of up to three shuffled
 multiple-choice questions from completed lessons in the selected course. A new
@@ -69,6 +86,7 @@ With Node 22, Java 17 and the Android SDK installed:
 
 ```sh
 npm ci --legacy-peer-deps --ignore-scripts --no-audit --no-fund
+npm run harden-storage
 npm run lint && npm run typecheck && npm test
 node scripts/prepare-android-demo.mjs
 cd .expo/android-demo
@@ -108,3 +126,13 @@ It checks the selected course, goal, XP, review, completed lessons, stickers and
 mute setting, then practises a new lesson and relaunches while offline. These
 upgrade scripts clear the demo's data before setting up their test learner; do
 not run them against a personal installation with progress you want to keep.
+
+For the P0 baseline (which already has the planning lessons), the manually
+triggered workflow accepts the baseline Actions run ID and runs
+`smoke-android-p0-upgrade.py` on an isolated emulator. This wrapper refuses
+physical devices and clears only the initial synthetic demo profile. A separate
+emulator-only storage test injects synthetic empty records, unexpected database
+schemas, corruption and old scoped files. It requires an `adb root` emulator
+and replaces only that test installation's files. Neither script should be used
+on personal data. The optional baseline artifact is time-limited, so select a
+still-available compatible baseline when running the workflow.

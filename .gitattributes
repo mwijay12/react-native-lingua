@@ -1,0 +1,3 @@
+# Unified patches must retain the context marker on blank lines and the exact
+# upstream whitespace on removed lines so they apply byte-for-byte.
+patches/*.patch whitespace=-blank-at-eol

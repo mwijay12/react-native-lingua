@@ -1,6 +1,7 @@
 import "../global.css";
 
 import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
+import { PendingSaveBanner } from "@/components/PendingSaveBanner";
 import { posthog } from "@/lib/posthog";
 import { useLanguageHydrationStatus, useLanguageStore } from "@/store/languageStore";
 import { ClerkProvider, useUser } from "@clerk/expo";
@@ -10,6 +11,8 @@ import { Stack, useGlobalSearchParams, usePathname } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { PostHogProvider } from "posthog-react-native";
 import { useEffect, useRef } from "react";
+import { View } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
@@ -80,23 +83,26 @@ export default function RootLayout() {
       }}
     >
       <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-        {languageHydration !== "ready" ? (
-          <LearningHydrationScreen status={languageHydration} storage="course" />
-        ) : (
-          <>
-            <ClerkIdentifier />
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="index" />
-              <Stack.Screen name="onboarding" />
-              <Stack.Screen name="(auth)" />
-              <Stack.Screen name="language-select" />
-              <Stack.Screen name="(tabs)" />
-              <Stack.Screen name="lesson/[id]" />
-              <Stack.Screen name="review" />
-              <Stack.Screen name="play" />
-            </Stack>
-          </>
-        )}
+        <SafeAreaProvider>
+          {languageHydration !== "ready" ? (
+            <LearningHydrationScreen status={languageHydration} storage="course" />
+          ) : (
+            <View className="flex-1">
+              <ClerkIdentifier />
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="index" />
+                <Stack.Screen name="onboarding" />
+                <Stack.Screen name="(auth)" />
+                <Stack.Screen name="language-select" />
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="lesson/[id]" />
+                <Stack.Screen name="review" />
+                <Stack.Screen name="play" />
+              </Stack>
+              <PendingSaveBanner />
+            </View>
+          )}
+        </SafeAreaProvider>
       </ClerkProvider>
     </PostHogProvider>
   );
