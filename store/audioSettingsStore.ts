@@ -1,36 +1,26 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
-import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
+
+import { protectedAsyncStorage } from "@/lib/protectedAsyncStorage";
+import { createProtectedStorage, protectRehydration, StorageProblem, type HydrationFailure, type SaveStatus } from "@/lib/protectedStorage";
+import { isSavedAudioSettings } from "@/lib/savedDataValidation";
 
 type HydrationStatus = "loading" | "ready" | "error";
-type SaveStatus = "saved" | "saving" | "error";
-export const useAudioSettingsHydration = create<{ status: HydrationStatus }>(() => ({ status: "loading" }));
-export const useAudioSettingsSaveStatus = create<{ status: SaveStatus }>(() => ({ status: "saved" }));
+export const useAudioSettingsHydration = create<{ status: HydrationStatus; reason: HydrationFailure | null }>(
+  () => ({ status: "loading", reason: null }),
+);
+export const useAudioSettingsSaveStatus = create<{ status: SaveStatus }>(() => ({ status: "idle" }));
 
 const STORAGE_KEY = "audio-settings";
 const STORAGE_VERSION = 1;
-let latestWrite = 0;
-let pendingWrite = Promise.resolve();
-
-// Keep this preference separate from learning and play progress. Serialize
-// writes so rapid toggles cannot restore an older value after a slower write.
-const settingsStorage: StateStorage = {
-  getItem: (name) => AsyncStorage.getItem(name),
-  setItem: (name, value) => {
-    const sequence = ++latestWrite;
-    useAudioSettingsSaveStatus.setState({ status: "saving" });
-    pendingWrite = pendingWrite.then(async () => {
-      try {
-        await AsyncStorage.setItem(name, value);
-        if (sequence === latestWrite) useAudioSettingsSaveStatus.setState({ status: "saved" });
-      } catch {
-        if (sequence === latestWrite) useAudioSettingsSaveStatus.setState({ status: "error" });
-      }
-    });
-    return pendingWrite;
-  },
-  removeItem: (name) => AsyncStorage.removeItem(name),
-};
+const protectedStorage = createProtectedStorage({
+  storage: protectedAsyncStorage(AsyncStorage),
+  version: STORAGE_VERSION,
+  validateState: isSavedAudioSettings,
+  hydrationStatus: () => useAudioSettingsHydration.getState().status,
+  setSaveStatus: (status) => useAudioSettingsSaveStatus.setState({ status }),
+});
 
 interface AudioSettings {
   effectsEnabled: boolean;
@@ -43,38 +33,46 @@ export const useAudioSettingsStore = create<AudioSettings>()(
       effectsEnabled: true,
       setEffectsEnabled: (enabled) => {
         // Never overwrite a setting that could not be read.
-        if (useAudioSettingsHydration.getState().status === "ready") set({ effectsEnabled: enabled });
+        if (useAudioSettingsHydration.getState().status === "ready" && typeof enabled === "boolean") {
+          set({ effectsEnabled: enabled });
+        }
       },
     }),
     {
       name: STORAGE_KEY,
       version: STORAGE_VERSION,
-      storage: createJSONStorage(() => settingsStorage),
+      storage: createJSONStorage(() => protectedStorage.storage),
       partialize: ({ effectsEnabled }) => ({ effectsEnabled }),
-      migrate: (saved, version) => {
-        if (version > STORAGE_VERSION) throw new Error("Sound settings were saved by a newer version.");
-        return saved as Pick<AudioSettings, "effectsEnabled">;
-      },
-      merge: (saved, current) => {
-        const data = saved && typeof saved === "object" ? saved as Partial<AudioSettings> : {};
-        return { ...current, effectsEnabled: typeof data.effectsEnabled === "boolean" ? data.effectsEnabled : true };
-      },
       onRehydrateStorage: () => {
-        useAudioSettingsHydration.setState({ status: "loading" });
+        useAudioSettingsHydration.setState({ status: "loading", reason: null });
         return (_state, error) => {
-          if (error) useAudioSettingsHydration.setState({ status: "error" });
+          if (error) useAudioSettingsHydration.setState({
+            status: "error",
+            reason: error instanceof StorageProblem ? error.reason : "read",
+          });
         };
       },
     },
   ),
 );
 
-useAudioSettingsStore.persist.onFinishHydration(() => useAudioSettingsHydration.setState({ status: "ready" }));
-if (useAudioSettingsStore.persist.hasHydrated()) useAudioSettingsHydration.setState({ status: "ready" });
+useAudioSettingsStore.persist.onFinishHydration(() => {
+  protectedStorage.finishHydration();
+  useAudioSettingsHydration.setState({ status: "ready", reason: null });
+});
+if (useAudioSettingsStore.persist.hasHydrated()) {
+  protectedStorage.finishHydration();
+  useAudioSettingsHydration.setState({ status: "ready", reason: null });
+}
+protectRehydration(
+  useAudioSettingsStore.persist,
+  () => useAudioSettingsHydration.getState().status,
+  () => useAudioSettingsSaveStatus.getState().status,
+);
 
 export function retryAudioSettingsSave() {
   if (useAudioSettingsHydration.getState().status !== "ready" || useAudioSettingsSaveStatus.getState().status !== "error") return;
-  void settingsStorage.setItem(STORAGE_KEY, JSON.stringify({
+  void protectedStorage.storage.setItem(STORAGE_KEY, JSON.stringify({
     state: { effectsEnabled: useAudioSettingsStore.getState().effectsEnabled },
     version: STORAGE_VERSION,
   }));

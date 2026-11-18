@@ -97,9 +97,11 @@ it fails, keep the app open and retry the current snapshot. Closing the app
 before a successful save can lose recent changes. A course selection waits for
 its save before continuing. If progress or a course cannot be read, has an
 unexpected format, or belongs to a newer version, Lingua does not replace it
-with defaults. Retry or reopen the newer version as appropriate; uninstalling
-can remove local data. Supported older migrations keep earned XP and lesson IDs
-without inventing study dates. Progress is not synced or backed up to an account.
+with defaults. The same safeguards cover Quick Mix reward counters and the
+sound-effects preference without changing their rules. Retry or reopen the newer
+version as appropriate; uninstalling can remove local data. Supported older
+migrations keep earned XP and lesson IDs without inventing study dates. Progress
+is not synced or backed up to an account.
 
 AsyncStorage 2.2.0 has a version-checked local native safety patch in
 `patches/async-storage-2.2.0.patch`. It avoids destructive Android database

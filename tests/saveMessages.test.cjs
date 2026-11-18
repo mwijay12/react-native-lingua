@@ -14,7 +14,9 @@ require.extensions[".tsx"] = (module, filename) => {
 function loadComponents() {
   const model = {
     progress: "idle", course: "idle", progressHydration: "ready", courseHydration: "ready",
-    progressReason: null, courseReason: null, progressRetries: 0, courseRetries: 0, reads: [],
+    progressReason: null, courseReason: null, playReason: null, soundReason: null,
+    soundHydration: "ready", soundSave: "idle", soundEnabled: true,
+    progressRetries: 0, courseRetries: 0, reads: [],
   };
   const learning = {
     useLearningSaveStatus: (selector) => selector({ status: model.progress }),
@@ -28,9 +30,18 @@ function loadComponents() {
     useLanguageStore: { persist: { rehydrate: () => model.reads.push("course") } },
     retryLanguageSave: async () => { model.courseRetries += 1; },
   };
-  const rn = { Text: "Text", View: "View", TouchableOpacity: "TouchableOpacity", ActivityIndicator: "ActivityIndicator", ScrollView: "ScrollView" };
+  const audio = {
+    useAudioSettingsHydration: (selector) => selector({ status: model.soundHydration, reason: model.soundReason }),
+    useAudioSettingsSaveStatus: (selector) => selector({ status: model.soundSave }),
+    useAudioSettingsStore: Object.assign(
+      (selector) => selector({ effectsEnabled: model.soundEnabled, setEffectsEnabled: (value) => { model.soundEnabled = value; } }),
+      { persist: { rehydrate: () => model.reads.push("sound") } },
+    ),
+    retryAudioSettingsSave: () => model.reads.push("sound-save"),
+  };
+  const rn = { Text: "Text", View: "View", TouchableOpacity: "TouchableOpacity", ActivityIndicator: "ActivityIndicator", ScrollView: "ScrollView", Platform: { OS: "android" } };
   const jsxRuntime = { jsx: (type, props) => ({ type, props }), jsxs: (type, props) => ({ type, props }) };
-  for (const filename of ["../components/LearningSaveMessage.tsx", "../components/PendingSaveBanner.tsx", "../components/LearningHydrationScreen.tsx"]) {
+  for (const filename of ["../components/LearningSaveMessage.tsx", "../components/PendingSaveBanner.tsx", "../components/LearningHydrationScreen.tsx", "../components/SoundEffectsControl.tsx"]) {
     delete require.cache[require.resolve(filename)];
   }
   const original = Module._load;
@@ -39,9 +50,14 @@ function loadComponents() {
       if (request === "react/jsx-runtime") return jsxRuntime;
       if (request === "react-native") return rn;
       if (request === "react-native-safe-area-context") return { SafeAreaView: "SafeAreaView" };
+      if (request === "@expo/vector-icons") return { Ionicons: "Ionicons" };
+      if (request === "@/store/audioSettingsStore") return audio;
       if (request === "@/store/learningStore") return learning;
       if (request === "@/store/languageStore") return language;
-      if (request === "@/store/playStore") return { usePlayStore: { persist: { rehydrate: () => model.reads.push("play") } } };
+      if (request === "@/store/playStore") return {
+        usePlayStore: { persist: { rehydrate: () => model.reads.push("play") } },
+        usePlayHydrationStatus: (selector) => selector({ reason: model.playReason }),
+      };
       return original.call(this, request, parent, isMain);
     };
     return {
@@ -49,6 +65,7 @@ function loadComponents() {
       LearningSaveMessage: require("../components/LearningSaveMessage.tsx").LearningSaveMessage,
       PendingSaveBanner: require("../components/PendingSaveBanner.tsx").PendingSaveBanner,
       LearningHydrationScreen: require("../components/LearningHydrationScreen.tsx").LearningHydrationScreen,
+      SoundEffectsControl: require("../components/SoundEffectsControl.tsx").SoundEffectsControl,
     };
   } finally {
     Module._load = original;
@@ -131,5 +148,29 @@ test("read screens explain newer, damaged and failed-migration data without a re
   tree = LearningHydrationScreen({ status: "error", storage: "course" });
   assert.ok(text(tree).includes("newer app version"));
   byId(tree, "retry-language-hydration").props.onPress();
-  assert.deepEqual(model.reads, ["progress", "course"]);
+  model.playReason = "newer";
+  tree = LearningHydrationScreen({ status: "error", storage: "play" });
+  assert.ok(text(tree).includes("newer app version"));
+  byId(tree, "retry-play-hydration").props.onPress();
+  assert.deepEqual(model.reads, ["progress", "course", "play"]);
+});
+
+test("sound settings explain invalid and newer data and offer a read retry", () => {
+  const { model, SoundEffectsControl } = loadComponents();
+  model.soundHydration = "error";
+  model.soundReason = "newer";
+  let tree = SoundEffectsControl({});
+  assert.ok(text(tree).includes("newer app version"));
+  assert.ok(text(tree).includes("do not uninstall"));
+  byId(tree, "sound-effects-toggle").props.onPress();
+  assert.deepEqual(model.reads, ["sound"]);
+  model.soundReason = "corrupt";
+  tree = SoundEffectsControl({});
+  assert.ok(text(tree).includes("unexpected format"));
+  assert.ok(text(tree).includes("not reset"));
+  model.soundHydration = "ready";
+  model.soundSave = "error";
+  tree = SoundEffectsControl({});
+  byId(tree, "retry-sound-settings-save").props.onPress();
+  assert.deepEqual(model.reads, ["sound", "sound-save"]);
 });

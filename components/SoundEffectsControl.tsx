@@ -14,6 +14,7 @@ export function SoundEffectsControl({ compact = false }: { compact?: boolean }) 
   const enabled = useAudioSettingsStore((state) => state.effectsEnabled);
   const setEnabled = useAudioSettingsStore((state) => state.setEffectsEnabled);
   const hydration = useAudioSettingsHydration((state) => state.status);
+  const reason = useAudioSettingsHydration((state) => state.reason);
   const save = useAudioSettingsSaveStatus((state) => state.status);
   const loading = hydration === "loading";
   const failed = hydration === "error";
@@ -62,7 +63,13 @@ export function SoundEffectsControl({ compact = false }: { compact?: boolean }) 
         </View>
         {control}
       </View>
-      {failed && <Text className="body-sm text-text-secondary mt-3" accessibilityLiveRegion="polite">Sound settings could not be read. Retry to restore your preference; lessons still work.</Text>}
+      {failed && (
+        <Text className="body-sm text-text-secondary mt-3" accessibilityLiveRegion="polite">
+          {reason === "newer" ? "Sound settings were saved by a newer app version. Reopen that version; do not uninstall."
+            : reason === "corrupt" ? "Sound settings have an unexpected format and were not reset. Keep the app installed and seek help."
+              : "Sound settings could not be read. Retry to restore your preference; lessons still work."}
+        </Text>
+      )}
       {save === "error" && !failed && (
         <View className="mt-3" accessibilityLiveRegion="polite">
           <Text className="body-sm text-text-secondary">Your choice works for now but could not be saved.</Text>

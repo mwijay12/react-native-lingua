@@ -115,6 +115,7 @@ test("play storage failures are retryable and never overwrite existing rewards",
   let writes = 0;
   const storage = {
     async getItem() { if (failRead) throw new Error("Storage unavailable"); return stored; },
+    async multiGet(keys) { return Promise.all(keys.map(async (key) => [key, await this.getItem(key)])); },
     async setItem(_key, value) {
       activeWrites += 1;
       maxConcurrentWrites = Math.max(maxConcurrentWrites, activeWrites);

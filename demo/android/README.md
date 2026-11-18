@@ -44,8 +44,10 @@ a retry for the current snapshot. Keep the app open until saving succeeds;
 changes still only in memory can be lost when it closes. Course selection waits
 for an acknowledged write before continuing. If saved data cannot be read, is
 unexpected or comes from a newer version, the app blocks overwriting it and
-provides a retry or guidance to reopen the newer version. Do not uninstall as a
-recovery step: local app data can be removed. Older version-0 sample XP is
+provides a retry or guidance to reopen the newer version. The same read and
+write guards cover play reward counters and the sound-effects preference; unknown
+older play/audio formats are kept for recovery rather than guessed. Do not
+uninstall as a recovery step: local app data can be removed. Older version-0 sample XP is
 recomputed from recognized completed lessons; old IDs are retained even if a
 lesson is no longer known, without inventing its XP. Version-1 earned XP is kept.
 

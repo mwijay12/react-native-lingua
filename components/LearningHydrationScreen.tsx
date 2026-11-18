@@ -3,7 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useLanguageHydrationStatus, useLanguageStore, type LanguageHydrationStatus } from "@/store/languageStore";
 import { useLearningHydrationStatus, useLearningStore, type LearningHydrationStatus } from "@/store/learningStore";
-import { usePlayStore, type PlayHydrationStatus } from "@/store/playStore";
+import { usePlayHydrationStatus, usePlayStore, type PlayHydrationStatus } from "@/store/playStore";
 
 // A failed read is not a new empty profile. Keep actions blocked and let the
 // learner retry without deleting or overwriting the saved value.
@@ -14,7 +14,8 @@ export function LearningHydrationScreen({ status, storage = "progress", onBack }
 }) {
   const learningReason = useLearningHydrationStatus((state) => state.reason);
   const languageReason = useLanguageHydrationStatus((state) => state.reason);
-  const reason = storage === "course" ? languageReason : storage === "progress" ? learningReason : "read";
+  const playReason = usePlayHydrationStatus((state) => state.reason);
+  const reason = storage === "course" ? languageReason : storage === "progress" ? learningReason : playReason;
   const label = storage === "course" ? "course" : storage === "play" ? "play rewards" : "progress";
   const title = storage === "course" ? "Course" : storage === "play" ? "Play rewards" : "Progress";
   const message = reason === "newer"

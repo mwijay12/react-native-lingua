@@ -33,6 +33,19 @@ export function isSavedLanguage(value: unknown, version: number): boolean {
     && (value.selectedLanguage === null || isKnownLanguageCode(value.selectedLanguage));
 }
 
+// These stores have only a known v1 format. Unknown earlier formats are
+// preserved for recovery rather than guessed or sanitized into defaults.
+export function isSavedPlay(value: unknown, version: number): boolean {
+  return version === 1 && isRecord(value) && hasOnlyKeys(value, ["roundsCompleted", "perfectRounds"])
+    && isCount(value.roundsCompleted) && value.roundsCompleted <= 1_000_000
+    && isCount(value.perfectRounds) && value.perfectRounds <= value.roundsCompleted;
+}
+
+export function isSavedAudioSettings(value: unknown, version: number): boolean {
+  return version === 1 && isRecord(value) && hasOnlyKeys(value, ["effectsEnabled"])
+    && typeof value.effectsEnabled === "boolean";
+}
+
 export function isSavedLearning(value: unknown, version: number): boolean {
   if (!isRecord(value) || !isIdList(value.completedLessonIds)) return false;
 

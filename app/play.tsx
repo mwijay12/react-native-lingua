@@ -202,7 +202,8 @@ export default function PlayScreen() {
               <Text className="body-sm text-text-secondary text-center mt-2">Each correct answer earns a star for this round. Every try is practice.</Text>
               {saveStatus !== "error" && (
                 <Text className="caption text-center mt-2" accessibilityLiveRegion="polite" testID="play-save-status">
-                  {saveStatus === "saving" ? "Saving your stickers…" : "Play rewards saved on this device."}
+                  {saveStatus === "saving" ? "Saving your stickers…" : saveStatus === "saved"
+                    ? "Play rewards saved on this device." : "Play rewards stay on this device."}
                 </Text>
               )}
               {newBadges.length > 0 && (

@@ -482,3 +482,118 @@ test("malformed multiGet results fail closed rather than creating a new profile"
     assert.deepEqual(storage.started, []);
   }
 });
+
+const PLAY = "play-storage";
+const AUDIO = "audio-settings";
+const auxiliaryInitial = () => ({
+  ...initial(),
+  [PLAY]: envelope({ roundsCompleted: 4, perfectRounds: 2 }, 1),
+  [AUDIO]: envelope({ effectsEnabled: false }, 1),
+});
+
+function loadAuxiliaryStores(storage) {
+  const playPath = require.resolve("../store/playStore.ts");
+  const audioPath = require.resolve("../store/audioSettingsStore.ts");
+  delete require.cache[playPath];
+  delete require.cache[audioPath];
+  const originalLoad = Module._load;
+  try {
+    Module._load = function (request, parent, isMain) {
+      if (request === "@react-native-async-storage/async-storage") return { default: storage };
+      if (request.startsWith("@/")) request = path.join(__dirname, "..", request.slice(2));
+      return originalLoad.call(this, request, parent, isMain);
+    };
+    return { play: require(playPath), audio: require(audioPath) };
+  } finally {
+    Module._load = originalLoad;
+  }
+}
+const auxiliaryHydrated = ({ play, audio }) =>
+  play.usePlayHydrationStatus.getState().status !== "loading"
+  && audio.useAudioSettingsHydration.getState().status !== "loading";
+
+test("play rewards and sound settings preserve empty, malformed and newer records", async () => {
+  const examples = [
+    [PLAY, "", "corrupt"],
+    [PLAY, "not JSON", "corrupt"],
+    [PLAY, envelope({ roundsCompleted: 3 }, 1), "corrupt"],
+    [PLAY, envelope({ roundsCompleted: 3, perfectRounds: 4 }, 1), "corrupt"],
+    [PLAY, envelope({ roundsCompleted: 3, perfectRounds: 1, future: "keep" }, 1), "corrupt"],
+    [PLAY, envelope({ roundsCompleted: 3, perfectRounds: 1 }, 0), "corrupt"],
+    [PLAY, envelope({ future: "keep" }, 2), "newer"],
+    [AUDIO, "", "corrupt"],
+    [AUDIO, envelope({ effectsEnabled: "false" }, 1), "corrupt"],
+    [AUDIO, envelope({ effectsEnabled: false, future: "keep" }, 1), "corrupt"],
+    [AUDIO, envelope({ effectsEnabled: false }, 0), "corrupt"],
+    [AUDIO, envelope({ future: "keep" }, 2), "newer"],
+  ];
+  for (const [key, raw, reason] of examples) {
+    const storage = new MemoryStorage({ ...auxiliaryInitial(), [key]: raw });
+    const read = storage.getItem.bind(storage);
+    storage.getItem = async (name) => (await read(name)) || null; // Native getItem loses empty strings.
+    storage.multiGet = async (keys) => Promise.all(keys.map(async (name) => [name, await read(name)]));
+    const stores = loadAuxiliaryStores(storage);
+    await waitFor(() => auxiliaryHydrated(stores));
+    const hydration = key === PLAY ? stores.play.usePlayHydrationStatus : stores.audio.useAudioSettingsHydration;
+    const store = key === PLAY ? stores.play.usePlayStore : stores.audio.useAudioSettingsStore;
+    assert.deepEqual(hydration.getState(), { status: "error", reason }, `${key}: ${raw}`);
+    if (key === PLAY) {
+      store.getState().completeMix(3, 3);
+      store.setState({ roundsCompleted: 999 });
+    } else {
+      store.getState().setEffectsEnabled(true);
+      store.setState({ effectsEnabled: true });
+    }
+    await store.persist.rehydrate();
+    assert.equal(storage.values[key], raw);
+    assert.deepEqual(storage.started, []);
+    assert.equal(storage.values[PROGRESS], initial()[PROGRESS]);
+    assert.equal(storage.values[COURSE], initial()[COURSE]);
+  }
+});
+
+test("play and sound retries save the latest snapshot without replaying a round or reverting memory", async () => {
+  const storage = new MemoryStorage(auxiliaryInitial());
+  const before = { ...storage.values };
+  const { play, audio } = loadAuxiliaryStores(storage);
+  await waitFor(() => auxiliaryHydrated({ play, audio }));
+  assert.equal(play.usePlaySaveStatus.getState().status, "saved");
+  assert.equal(audio.useAudioSettingsSaveStatus.getState().status, "saved");
+  assert.deepEqual(storage.started, []);
+  storage.failedWrites.add(PLAY);
+  storage.failedWrites.add(AUDIO);
+  play.usePlayStore.getState().completeMix(0, 3); // A zero-correct round still counts.
+  audio.useAudioSettingsStore.getState().setEffectsEnabled(true);
+  await waitFor(() => play.usePlaySaveStatus.getState().status === "error"
+    && audio.useAudioSettingsSaveStatus.getState().status === "error");
+  assert.equal(play.usePlayStore.getState().roundsCompleted, 5);
+  assert.equal(play.usePlayStore.getState().perfectRounds, 2);
+  assert.equal(audio.useAudioSettingsStore.getState().effectsEnabled, true);
+  assert.deepEqual(storage.values, before);
+  await Promise.all([play.usePlayStore.persist.rehydrate(), audio.useAudioSettingsStore.persist.rehydrate()]);
+  assert.equal(play.usePlayStore.getState().roundsCompleted, 5);
+  assert.equal(audio.useAudioSettingsStore.getState().effectsEnabled, true);
+  storage.failedWrites.clear();
+  play.retryPlaySave();
+  audio.retryAudioSettingsSave();
+  await waitFor(() => play.usePlaySaveStatus.getState().status === "saved"
+    && audio.useAudioSettingsSaveStatus.getState().status === "saved");
+  assert.deepEqual(JSON.parse(storage.values[PLAY]).state, { roundsCompleted: 5, perfectRounds: 2 });
+  assert.deepEqual(JSON.parse(storage.values[AUDIO]).state, { effectsEnabled: true });
+  assert.equal(storage.values[PROGRESS], before[PROGRESS]);
+  assert.equal(storage.values[COURSE], before[COURSE]);
+  const reopened = loadAuxiliaryStores(storage);
+  await waitFor(() => auxiliaryHydrated(reopened));
+  assert.equal(reopened.play.usePlayStore.getState().roundsCompleted, 5);
+  assert.equal(reopened.play.usePlayStore.getState().perfectRounds, 2);
+  assert.equal(reopened.audio.useAudioSettingsStore.getState().effectsEnabled, true);
+});
+
+test("fresh play and sound stores do not claim a snapshot was saved", async () => {
+  const storage = new MemoryStorage();
+  const stores = loadAuxiliaryStores(storage);
+  await waitFor(() => auxiliaryHydrated(stores));
+  assert.equal(stores.play.usePlaySaveStatus.getState().status, "idle");
+  assert.equal(stores.audio.useAudioSettingsSaveStatus.getState().status, "idle");
+  assert.deepEqual(storage.started, []);
+});

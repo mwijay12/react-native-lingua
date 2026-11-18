@@ -76,12 +76,22 @@ def read_snapshot(destination):
         return version, tables, rows
 
 
-def assert_blocked(title, message, screenshot):
+def assert_blocked(title, message, screenshot, location=None):
     launch()
-    smoke.wait_for(title)
+    if location == "play":
+        smoke.wait_for("TODAY’S STUDY")
+        smoke.scroll_to("Play Quick Mix and collect stickers", direction="up")
+        smoke.tap("Play Quick Mix and collect stickers")
+    elif location == "audio":
+        smoke.wait_for("TODAY’S STUDY")
+        smoke.tap("Profile")
+        smoke.scroll_to("Sound effects", exact=True)
+    if title:
+        smoke.wait_for(title)
     smoke.wait_for(message)
-    smoke.tap("Try again", exact=True)
-    smoke.wait_for(title)
+    smoke.tap("Retry sound settings" if location == "audio" else "Try again", exact=True)
+    if title:
+        smoke.wait_for(title)
     smoke.wait_for(message)
     smoke.screenshot(screenshot)
     force_stop()
@@ -122,15 +132,23 @@ def main(apk):
         with sqlite3.connect(pulled) as source, sqlite3.connect(baseline) as target:
             source.backup(target)
         with sqlite3.connect(baseline) as db:
+            # Add synthetic, valid v1 records so failures can be tested without
+            # playing a round or changing a real preference.
+            db.executemany("INSERT OR REPLACE INTO catalystLocalStorage VALUES (?, ?)", [
+                ("play-storage", json.dumps({"state": {"roundsCompleted": 4, "perfectRounds": 2}, "version": 1})),
+                ("audio-settings", json.dumps({"state": {"effectsEnabled": False}, "version": 1})),
+            ])
             original = dict(db.execute("SELECT key, value FROM catalystLocalStorage"))
         assert json.loads(original["learning-storage"])["state"]["dailyGoal"] == 2
         assert json.loads(original["language-storage"])["state"]["selectedLanguage"] == "sw"
 
-        for name, key, value, title, message in [
-            ("empty-progress", "learning-storage", "", "Progress could not be loaded", "unexpected or damaged format"),
-            ("empty-course", "language-storage", "", "Course could not be loaded", "unexpected or damaged format"),
+        for name, key, value, title, message, location in [
+            ("empty-progress", "learning-storage", "", "Progress could not be loaded", "unexpected or damaged format", None),
+            ("empty-course", "language-storage", "", "Course could not be loaded", "unexpected or damaged format", None),
             ("newer-progress", "learning-storage", json.dumps({"state": {"future": "keep"}, "version": 99}),
-             "Progress could not be loaded", "newer app version"),
+             "Progress could not be loaded", "newer app version", None),
+            ("empty-play", "play-storage", "", "Play rewards could not be loaded", "unexpected or damaged format", "play"),
+            ("empty-audio", "audio-settings", "", None, "Sound settings have an unexpected format", "audio"),
         ]:
             fixture = temp / f"{name}.sqlite"
             shutil.copyfile(baseline, fixture)
@@ -138,7 +156,7 @@ def main(apk):
                 db.execute("UPDATE catalystLocalStorage SET value=? WHERE key=?", (value, key))
             expected = dict(original, **{key: value})
             replace_test_files(fixture, REMOTE, owner)
-            assert_blocked(title, message, f"p0-{name}")
+            assert_blocked(title, message, f"p0-{name}", location)
             version, tables, actual = read_snapshot(temp / f"after-{name}.sqlite")
             assert version == 1 and "catalystLocalStorage" in tables and actual == expected, name
             print(f"Preserved synthetic {name} record after retry", flush=True)
