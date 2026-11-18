@@ -15,7 +15,7 @@ function loadComponents() {
   const model = {
     progress: "idle", course: "idle", progressHydration: "ready", courseHydration: "ready",
     progressReason: null, courseReason: null, playReason: null, soundReason: null,
-    soundHydration: "ready", soundSave: "idle", soundEnabled: true,
+    playHydration: "ready", playSave: "idle", soundHydration: "ready", soundSave: "idle", soundEnabled: true,
     progressRetries: 0, courseRetries: 0, reads: [],
   };
   const learning = {
@@ -56,7 +56,9 @@ function loadComponents() {
       if (request === "@/store/languageStore") return language;
       if (request === "@/store/playStore") return {
         usePlayStore: { persist: { rehydrate: () => model.reads.push("play") } },
-        usePlayHydrationStatus: (selector) => selector({ reason: model.playReason }),
+        usePlayHydrationStatus: (selector) => selector({ status: model.playHydration, reason: model.playReason }),
+        usePlaySaveStatus: (selector) => selector({ status: model.playSave }),
+        retryPlaySave: () => model.reads.push("play-save"),
       };
       return original.call(this, request, parent, isMain);
     };
@@ -128,6 +130,27 @@ test("global notices show pending work and separate retries without claiming suc
   tree = PendingSaveBanner();
   assert.equal(byId(tree, "progress-save-notice"), undefined);
   assert.ok(byId(tree, "course-save-notice"));
+});
+
+test("play and sound save problems remain visible and retryable outside their screens", () => {
+  const { model, PendingSaveBanner } = loadComponents();
+  model.playSave = "saving";
+  model.soundSave = "error";
+  let tree = PendingSaveBanner();
+  assert.ok(text(tree).includes("Saving play rewards"));
+  assert.ok(text(tree).includes("Sound settings are not saved yet"));
+  assert.equal(byId(tree, "retry-play-save-global"), undefined);
+  byId(tree, "retry-sound-save-global").props.onPress();
+  model.playSave = "error";
+  model.soundSave = "saving";
+  tree = PendingSaveBanner();
+  assert.ok(text(tree).includes("Play rewards are not saved yet"));
+  assert.ok(text(tree).includes("Saving sound settings"));
+  byId(tree, "retry-play-save-global").props.onPress();
+  assert.deepEqual(model.reads, ["sound-save", "play-save"]);
+  model.playHydration = "error";
+  model.soundHydration = "error";
+  assert.equal(PendingSaveBanner(), null);
 });
 
 test("read screens explain newer, damaged and failed-migration data without a reset", () => {
