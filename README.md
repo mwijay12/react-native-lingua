@@ -83,16 +83,42 @@ from this playback-only build, and the demo build checks the final APK.
 The study dashboard has a configurable daily session goal, a rolling seven-day
 activity view and per-course completion. A finished lesson or review set counts
 as a session, including lesson replays; only a first lesson completion awards
-XP. Missed lesson questions are saved to an on-device review list for the
+XP. Missed lesson questions are added to an on-device review list for the
 selected course. A correct answer in review clears a question, while a missed
-answer stays for another set. Review awards no XP. Existing lesson progress is
-preserved on upgrade, but old completions are not assigned fictional study
+answer stays for another set. Review awards no XP. Supported older progress is
+retained on upgrade, but old completions are not assigned fictional study
 dates. The additional lessons change the course-completion denominator, so a
-previously complete course may show a lower percentage; earned XP, completed
-lessons and existing sticker milestones remain intact. Goals and history use
-the device's local calendar and do not sync. If saved progress or the selected
-course cannot be read, Lingua offers a retry instead of treating it as an empty
-profile or overwriting it.
+previously complete course may show a lower percentage. Goals and history use
+the device's local calendar and do not sync.
+
+Learning and course changes are saved locally after storage acknowledges the
+write. While a save is pending or has failed, Lingua displays its status; if
+it fails, keep the app open and retry the current snapshot. Closing the app
+before a successful save can lose recent changes. A course selection waits for
+its save before continuing. If progress or a course cannot be read, has an
+unexpected format, or belongs to a newer version, Lingua does not replace it
+with defaults. The same safeguards cover Quick Mix reward counters and the
+sound-effects preference without changing their rules. Pending or failed saves
+remain visible when leaving those screens, with a retry after failure. Retry or
+reopen the newer version as appropriate; uninstalling can remove local data.
+Supported older migrations keep earned XP and lesson IDs without inventing study
+dates. Progress is not synced or backed up to an account.
+
+AsyncStorage 2.2.0 has a version-checked local native safety patch in
+`patches/async-storage-2.2.0.patch`. It avoids destructive Android database
+recovery and iOS manifest replacement, and blocks ambiguous legacy storage
+rather than guessing or deleting it. This is not a backup or a guarantee against
+all corruption, device failure or uninstall. Android Expo scoped databases and
+ambiguous iOS legacy locations are preserved but require a future, verified
+recovery path. Do not clear app data as a workaround.
+
+`npm install` applies the patch via `postinstall`; Expo prebuild also verifies
+and applies it. If install scripts are disabled, run `npm run harden-storage`
+after `npm ci` and before any direct native build. The patch requires Git and
+fails on an unknown or modified AsyncStorage version rather than silently
+building an unreviewed backend. Rebuild the native app after applying it; Expo Go
+or an already-built binary still uses its original native storage implementation.
+The iOS patch has not yet been validated on a real iOS device.
 
 The dashboard's **Quick Mix** offers an untimed round of up to three shuffled
 multiple-choice questions from completed lessons in the current course. New

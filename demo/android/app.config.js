@@ -21,6 +21,7 @@ module.exports = {
       edgeToEdgeEnabled: true,
     },
     plugins: [
+      "./plugins/with-safe-storage.cjs",
       "expo-router",
       [
         "expo-splash-screen",

@@ -125,6 +125,7 @@ test("sound preferences survive rapid toggles and storage failures without touch
   const keys = [];
   const storage = {
     async getItem(key) { keys.push(key); if (failRead) throw new Error("read failed"); return stored; },
+    async multiGet(names) { return Promise.all(names.map(async (name) => [name, await this.getItem(name)])); },
     async setItem(key, value) {
       keys.push(key);
       activeWrites += 1;

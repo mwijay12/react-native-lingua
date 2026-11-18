@@ -29,6 +29,7 @@ export default {
       favicon: "./assets/images/favicon.png",
     },
     plugins: [
+      "./plugins/with-safe-storage.cjs",
       "expo-router",
       [
         "expo-splash-screen",

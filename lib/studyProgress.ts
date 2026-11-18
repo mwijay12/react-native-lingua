@@ -104,13 +104,19 @@ export function migrateLearningState(
   version: number,
   lessons: readonly Pick<Lesson, "id" | "xpReward">[],
 ): SavedLearning {
+  if (version !== 0 && version !== 1) {
+    // A future schema needs its own migration; never reset its study fields.
+    throw new Error(`Unsupported learning migration from version ${version}.`);
+  }
   const previous = value && typeof value === "object" ? value as Record<string, unknown> : {};
   const legacy = migrateLegacyProgress(previous, lessons);
-  if (version < 1) return { ...legacy, ...EMPTY_STUDY_PROGRESS };
-
   const completedLessonIds = Array.isArray(previous.completedLessonIds)
     ? [...new Set(previous.completedLessonIds.filter((id): id is string => typeof id === "string" && id.length > 0))]
     : [];
+  // Even an ID not present in today's content may belong to an old course.
+  // Keep it, but do not invent an XP reward for an unrecognized lesson.
+  if (version === 0) return { ...legacy, completedLessonIds, ...EMPTY_STUDY_PROGRESS };
+
   const totalXp = typeof previous.totalXp === "number" && Number.isFinite(previous.totalXp) && previous.totalXp >= 0
     ? previous.totalXp
     : legacy.totalXp;

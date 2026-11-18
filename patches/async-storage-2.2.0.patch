@@ -1,0 +1,945 @@
+diff --git a/android/build.gradle b/android/build.gradle
+index 4560dc7..8400ced 100644
+--- a/android/build.gradle
++++ b/android/build.gradle
+@@ -24,6 +24,12 @@ apply from: 'config.gradle'
+ boolean isNewArchitectureEnabled = ext.AsyncStorageConfig.isNewArchitectureEnabled
+ boolean useNextStorage = ext.AsyncStorageConfig.useNextStorage
+ 
++// The reviewed non-destructive patch is for the legacy SQLite implementation.
++// Do not silently switch to an unreviewed persistence backend.
++if (useNextStorage) {
++    throw new GradleException("AsyncStorage next storage is not covered by Lingua's data protection")
++}
++
+ logger.info("[AsyncStorage] Config used: {}", ext.AsyncStorageConfig)
+ 
+ if (useNextStorage) {
+diff --git a/android/src/main/java/com/reactnativecommunity/asyncstorage/AsyncStorageExpoMigration.java b/android/src/main/java/com/reactnativecommunity/asyncstorage/AsyncStorageExpoMigration.java
+index cd79cc0..08dfff9 100644
+--- a/android/src/main/java/com/reactnativecommunity/asyncstorage/AsyncStorageExpoMigration.java
++++ b/android/src/main/java/com/reactnativecommunity/asyncstorage/AsyncStorageExpoMigration.java
+@@ -1,154 +1,38 @@
+ package com.reactnativecommunity.asyncstorage;
+ 
+ import android.content.Context;
+-import android.os.Build;
+ import android.util.Log;
+-
+-import androidx.annotation.RequiresApi;
+-
+ import java.io.File;
+-import java.io.FileInputStream;
+-import java.io.FileOutputStream;
+-import java.io.IOException;
+-import java.nio.channels.FileChannel;
+-import java.nio.file.Files;
+-import java.nio.file.attribute.BasicFileAttributes;
+-import java.util.ArrayList;
+ 
+-// A utility class that migrates a scoped AsyncStorage database to RKStorage.
+-// This utility only runs if the RKStorage file has not been created yet.
++// Older Expo scoped databases can contain the only copy of learner data. The
++// upstream migration copies and then deletes them, and can create a partial
++// RKStorage on failure. Until a verified migration is available, preserve both
++// locations and report a storage error instead of guessing which one is newest.
+ public class AsyncStorageExpoMigration {
+     static final String LOG_TAG = "AsyncStorageExpoMigration";
+ 
+-    public static void migrate(Context context) {
+-        // Only migrate if the default async storage file does not exist.
+-        if (isAsyncStorageDatabaseCreated(context)) {
+-            return;
+-        }
+-
+-        ArrayList<File> expoDatabases = getExpoDatabases(context);
+-
+-        File expoDatabase = getLastModifiedFile(expoDatabases);
+-
+-        if (expoDatabase == null) {
+-            Log.v(LOG_TAG, "No scoped database found");
+-            return;
+-        }
+-
+-        try {
+-            // Create the storage file
+-            ReactDatabaseSupplier.getInstance(context).get();
+-            copyFile(new FileInputStream(expoDatabase), new FileOutputStream(context.getDatabasePath(ReactDatabaseSupplier.DATABASE_NAME)));
+-            Log.v(LOG_TAG, "Migrated most recently modified database " + expoDatabase.getName() + " to RKStorage");
+-        } catch (Exception e) {
+-            Log.v(LOG_TAG, "Failed to migrate scoped database " + expoDatabase.getName());
+-            e.printStackTrace();
+-            return;
+-        }
+-
++    public static boolean migrate(Context context) {
+         try {
+-            for (File file : expoDatabases) {
+-                if (file.delete()) {
+-                    Log.v(LOG_TAG, "Deleted scoped database " + file.getName());
+-                } else {
+-                    Log.v(LOG_TAG, "Failed to delete scoped database " + file.getName());
+-                }
+-            }
+-        } catch (Exception e) {
+-            e.printStackTrace();
+-        }
+-
+-        Log.v(LOG_TAG, "Completed the scoped AsyncStorage migration");
+-    }
+-
+-    private static boolean isAsyncStorageDatabaseCreated(Context context) {
+-        return context.getDatabasePath(ReactDatabaseSupplier.DATABASE_NAME).exists();
+-    }
+-
+-    // Find all database files that the user may have created while using Expo.
+-    private static ArrayList<File> getExpoDatabases(Context context) {
+-        ArrayList<File> scopedDatabases = new ArrayList<>();
+-        try {
+-            File databaseDirectory = context.getDatabasePath("noop").getParentFile();
+-            File[] directoryListing = databaseDirectory.listFiles();
+-            if (directoryListing != null) {
+-                for (File child : directoryListing) {
+-                    // Find all databases matching the Expo scoped key, and skip any database journals.
+-                    if (child.getName().startsWith("RKStorage-scoped-experience-") && !child.getName().endsWith("-journal")) {
+-                        scopedDatabases.add(child);
+-                    }
+-                }
+-            }
+-        } catch (Exception e) {
+-            // Just in case anything happens catch and print, file system rules can tend to be different across vendors.
+-            e.printStackTrace();
+-        }
+-        return scopedDatabases;
+-    }
+-
+-    // Returns the most recently modified file.
+-    // If a user publishes an app with Expo, then changes the slug 
+-    // and publishes again, a new database will be created. 
+-    // We want to select the most recent database and migrate it to RKStorage.
+-    private static File getLastModifiedFile(ArrayList<File> files) {
+-        if (files.size() == 0) {
+-            return null;
+-        }
+-        long lastMod = -1;
+-        File lastModFile = null;
+-        for (File child : files) {
+-            long modTime = getLastModifiedTimeInMillis(child);
+-            if (modTime > lastMod) {
+-                lastMod = modTime;
+-                lastModFile = child;
+-            }
+-        }
+-        if (lastModFile != null) {
+-            return lastModFile;
+-        }
+-
+-        return files.get(0);
+-    }
+-
+-    private static long getLastModifiedTimeInMillis(File file) {
+-        try {
+-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+-                return getLastModifiedTimeFromBasicFileAttrs(file);
+-            } else {
+-                return file.lastModified();
+-            }
+-        } catch (Exception e) {
+-            e.printStackTrace();
+-            return -1;
+-        }
+-    }
+-
+-    @RequiresApi(Build.VERSION_CODES.O)
+-    private static long getLastModifiedTimeFromBasicFileAttrs(File file) {
+-        try {
+-            return Files.readAttributes(file.toPath(), BasicFileAttributes.class).creationTime().toMillis();
+-        } catch (Exception e) {
+-            return -1;
+-        }
+-    }
+-
+-    private static void copyFile(FileInputStream fromFile, FileOutputStream toFile) throws IOException {
+-        FileChannel fromChannel = null;
+-        FileChannel toChannel = null;
+-        try {
+-            fromChannel = fromFile.getChannel();
+-            toChannel = toFile.getChannel();
+-            fromChannel.transferTo(0, fromChannel.size(), toChannel);
+-        } finally {
+-            try {
+-                if (fromChannel != null) {
+-                    fromChannel.close();
+-                }
+-            } finally {
+-                if (toChannel != null) {
+-                    toChannel.close();
++            File database = context.getDatabasePath(ReactDatabaseSupplier.DATABASE_NAME);
++            File directory = database.getParentFile();
++            if (directory == null) return false;
++            if (!directory.exists()) return true;
++            File[] files = directory.listFiles();
++            if (files == null) return false;
++            for (File file : files) {
++                String name = file.getName();
++                if (name.startsWith("RKStorage-scoped-experience-") ||
++                    (!database.exists() && (name.equals("RKStorage-wal") ||
++                                            name.equals("RKStorage-shm") ||
++                                            name.equals("RKStorage-journal")))) {
++                    Log.w(LOG_TAG, "Legacy or incomplete storage needs recovery; files retained");
++                    return false;
+                 }
+             }
++            return true;
++        } catch (Exception error) {
++            Log.w(LOG_TAG, "Could not inspect existing storage; files retained", error);
++            return false;
+         }
+     }
+ }
+diff --git a/android/src/main/java/com/reactnativecommunity/asyncstorage/AsyncStorageModule.java b/android/src/main/java/com/reactnativecommunity/asyncstorage/AsyncStorageModule.java
+index a66e802..ec41b66 100644
+--- a/android/src/main/java/com/reactnativecommunity/asyncstorage/AsyncStorageModule.java
++++ b/android/src/main/java/com/reactnativecommunity/asyncstorage/AsyncStorageModule.java
+@@ -8,6 +8,7 @@
+ package com.reactnativecommunity.asyncstorage;
+ 
+ import android.database.Cursor;
++import android.database.sqlite.SQLiteDatabase;
+ import android.database.sqlite.SQLiteStatement;
+ import android.os.AsyncTask;
+ 
+@@ -41,6 +42,7 @@ public final class AsyncStorageModule extends NativeAsyncStorageModuleSpec {
+   private static final int MAX_SQL_KEYS = 999;
+ 
+   private ReactDatabaseSupplier mReactDatabaseSupplier;
++  private boolean mLegacyStorageReady;
+   private boolean mShuttingDown = false;
+ 
+   private final SerialExecutor executor;
+@@ -58,8 +60,8 @@ public final class AsyncStorageModule extends NativeAsyncStorageModuleSpec {
+   AsyncStorageModule(ReactApplicationContext reactContext, Executor executor) {
+     super(reactContext);
+ 
+-    // The migration MUST run before the AsyncStorage database is created for the first time.
+-    AsyncStorageExpoMigration.migrate(reactContext);
++    // An ambiguous legacy database must block opening and creating RKStorage.
++    mLegacyStorageReady = AsyncStorageExpoMigration.migrate(reactContext);
+ 
+     this.executor = new SerialExecutor(executor);
+ 
+@@ -110,16 +112,17 @@ public final class AsyncStorageModule extends NativeAsyncStorageModuleSpec {
+         WritableArray data = Arguments.createArray();
+         for (int keyStart = 0; keyStart < keys.size(); keyStart += MAX_SQL_KEYS) {
+           int keyCount = Math.min(keys.size() - keyStart, MAX_SQL_KEYS);
+-          Cursor cursor = mReactDatabaseSupplier.get().query(
+-              ReactDatabaseSupplier.TABLE_CATALYST,
+-              columns,
+-              AsyncLocalStorageUtil.buildKeySelection(keyCount),
+-              AsyncLocalStorageUtil.buildKeySelectionArgs(keys, keyStart, keyCount),
+-              null,
+-              null,
+-              null);
+-          keysRemaining.clear();
++          Cursor cursor = null;
+           try {
++            cursor = mReactDatabaseSupplier.get().query(
++                ReactDatabaseSupplier.TABLE_CATALYST,
++                columns,
++                AsyncLocalStorageUtil.buildKeySelection(keyCount),
++                AsyncLocalStorageUtil.buildKeySelectionArgs(keys, keyStart, keyCount),
++                null,
++                null,
++                null);
++            keysRemaining.clear();
+             if (cursor.getCount() != keys.size()) {
+               // some keys have not been found - insert them with null into the final array
+               for (int keyIndex = keyStart; keyIndex < keyStart + keyCount; keyIndex++) {
+@@ -141,7 +144,9 @@ public final class AsyncStorageModule extends NativeAsyncStorageModuleSpec {
+             callback.invoke(AsyncStorageErrorUtil.getError(null, e.getMessage()), null);
+             return;
+           } finally {
+-            cursor.close();
++            if (cursor != null) {
++              try { cursor.close(); } catch (Exception e) { FLog.w(ReactConstants.TAG, "Cursor close failed", e); }
++            }
+           }
+ 
+           for (String key : keysRemaining) {
+@@ -180,22 +185,24 @@ public final class AsyncStorageModule extends NativeAsyncStorageModuleSpec {
+         }
+ 
+         String sql = "INSERT OR REPLACE INTO " + ReactDatabaseSupplier.TABLE_CATALYST + " VALUES (?, ?);";
+-        SQLiteStatement statement = mReactDatabaseSupplier.get().compileStatement(sql);
++        SQLiteStatement statement = null;
++        SQLiteDatabase db = null;
++        boolean transactionStarted = false;
+         WritableMap error = null;
+         try {
+-          mReactDatabaseSupplier.get().beginTransaction();
++          db = mReactDatabaseSupplier.get();
++          statement = db.compileStatement(sql);
++          db.beginTransaction();
++          transactionStarted = true;
+           for (int idx=0; idx < keyValueArray.size(); idx++) {
+             if (keyValueArray.getArray(idx).size() != 2) {
+-              error = AsyncStorageErrorUtil.getInvalidValueError(null);
+-              return;
++              throw new IllegalArgumentException("Invalid value");
+             }
+             if (keyValueArray.getArray(idx).getString(0) == null) {
+-              error = AsyncStorageErrorUtil.getInvalidKeyError(null);
+-              return;
++              throw new IllegalArgumentException("Invalid key");
+             }
+             if (keyValueArray.getArray(idx).getString(1) == null) {
+-              error = AsyncStorageErrorUtil.getInvalidValueError(null);
+-              return;
++              throw new IllegalArgumentException("Invalid value");
+             }
+ 
+             statement.clearBindings();
+@@ -203,17 +210,23 @@ public final class AsyncStorageModule extends NativeAsyncStorageModuleSpec {
+             statement.bindString(2, keyValueArray.getArray(idx).getString(1));
+             statement.execute();
+           }
+-          mReactDatabaseSupplier.get().setTransactionSuccessful();
++          db.setTransactionSuccessful();
+         } catch (Exception e) {
+           FLog.w(ReactConstants.TAG, e.getMessage(), e);
+           error = AsyncStorageErrorUtil.getError(null, e.getMessage());
+         } finally {
+-          try {
+-            mReactDatabaseSupplier.get().endTransaction();
+-          } catch (Exception e) {
+-            FLog.w(ReactConstants.TAG, e.getMessage(), e);
+-            if (error == null) {
+-              error = AsyncStorageErrorUtil.getError(null, e.getMessage());
++          if (transactionStarted) {
++            try {
++              db.endTransaction();
++            } catch (Exception e) {
++              FLog.w(ReactConstants.TAG, e.getMessage(), e);
++              if (error == null) error = AsyncStorageErrorUtil.getError(null, e.getMessage());
++            }
++          }
++          if (statement != null) {
++            try { statement.close(); } catch (Exception e) {
++              FLog.w(ReactConstants.TAG, "Statement close failed", e);
++              if (error == null) error = AsyncStorageErrorUtil.getError(null, e.getMessage());
+             }
+           }
+         }
+@@ -351,7 +364,7 @@ public final class AsyncStorageModule extends NativeAsyncStorageModuleSpec {
+     new GuardedAsyncTask<Void, Void>(getReactApplicationContext()) {
+       @Override
+       protected void doInBackgroundGuarded(Void... params) {
+-        if (!mReactDatabaseSupplier.ensureDatabase()) {
++        if (!ensureDatabase()) {
+           callback.invoke(AsyncStorageErrorUtil.getDBError(null));
+           return;
+         }
+@@ -381,9 +394,10 @@ public final class AsyncStorageModule extends NativeAsyncStorageModuleSpec {
+         }
+         WritableArray data = Arguments.createArray();
+         String[] columns = {ReactDatabaseSupplier.KEY_COLUMN};
+-        Cursor cursor = mReactDatabaseSupplier.get()
+-            .query(ReactDatabaseSupplier.TABLE_CATALYST, columns, null, null, null, null, null);
++        Cursor cursor = null;
+         try {
++          cursor = mReactDatabaseSupplier.get()
++              .query(ReactDatabaseSupplier.TABLE_CATALYST, columns, null, null, null, null, null);
+           if (cursor.moveToFirst()) {
+             do {
+               data.pushString(cursor.getString(0));
+@@ -394,7 +408,9 @@ public final class AsyncStorageModule extends NativeAsyncStorageModuleSpec {
+           callback.invoke(AsyncStorageErrorUtil.getError(null, e.getMessage()), null);
+           return;
+         } finally {
+-          cursor.close();
++          if (cursor != null) {
++            try { cursor.close(); } catch (Exception e) { FLog.w(ReactConstants.TAG, "Cursor close failed", e); }
++          }
+         }
+         callback.invoke(null, data);
+       }
+@@ -405,6 +421,10 @@ public final class AsyncStorageModule extends NativeAsyncStorageModuleSpec {
+    * Verify the database is open for reads and writes.
+    */
+   private boolean ensureDatabase() {
+-    return !mShuttingDown && mReactDatabaseSupplier.ensureDatabase();
++    if (mShuttingDown) return false;
++    if (!mLegacyStorageReady) {
++      mLegacyStorageReady = AsyncStorageExpoMigration.migrate(getReactApplicationContext());
++    }
++    return mLegacyStorageReady && mReactDatabaseSupplier.ensureDatabase();
+   }
+ }
+diff --git a/android/src/main/java/com/reactnativecommunity/asyncstorage/ReactDatabaseSupplier.java b/android/src/main/java/com/reactnativecommunity/asyncstorage/ReactDatabaseSupplier.java
+index c7c59b0..202e2b8 100644
+--- a/android/src/main/java/com/reactnativecommunity/asyncstorage/ReactDatabaseSupplier.java
++++ b/android/src/main/java/com/reactnativecommunity/asyncstorage/ReactDatabaseSupplier.java
+@@ -8,6 +8,7 @@
+ package com.reactnativecommunity.asyncstorage;
+ 
+ import android.content.Context;
++import android.database.DatabaseErrorHandler;
+ import android.database.sqlite.SQLiteDatabase;
+ import android.database.sqlite.SQLiteException;
+ import android.database.sqlite.SQLiteOpenHelper;
+@@ -16,8 +17,8 @@ import com.facebook.react.common.ReactConstants;
+ import javax.annotation.Nullable;
+ 
+ /**
+- * Database supplier of the database used by react native. This creates, opens and deletes the
+- * database as necessary.
++ * Database supplier of the database used by react native. Failed opens and
++ * unexpected schema versions must not delete existing learner data.
+  */
+ public class ReactDatabaseSupplier extends SQLiteOpenHelper {
+ 
+@@ -25,7 +26,6 @@ public class ReactDatabaseSupplier extends SQLiteOpenHelper {
+   public static final String DATABASE_NAME = "RKStorage";
+ 
+   private static final int DATABASE_VERSION = 1;
+-  private static final int SLEEP_TIME_MS = 30;
+ 
+   static final String TABLE_CATALYST = "catalystLocalStorage";
+   static final String KEY_COLUMN = "key";
+@@ -39,13 +39,22 @@ public class ReactDatabaseSupplier extends SQLiteOpenHelper {
+ 
+   private static @Nullable ReactDatabaseSupplier sReactDatabaseSupplierInstance;
+ 
+-  private Context mContext;
++  // SQLite's default corruption handler deletes database files. Never use it
++  // for this app: retain the file and reject operations until process restart.
++  private static volatile boolean sCorruptionReported = false;
++  private static final DatabaseErrorHandler PRESERVE_CORRUPT_DATABASE = database -> {
++    sCorruptionReported = true;
++    throw new SQLiteException("AsyncStorage database corruption; data retained");
++  };
++
++  private final boolean mExistedBeforeOpening;
++  private boolean mHasOpened = false;
+   private @Nullable SQLiteDatabase mDb;
+   private long mMaximumDatabaseSize =  BuildConfig.AsyncStorage_db_size * 1024L * 1024L;
+ 
+   private ReactDatabaseSupplier(Context context) {
+-    super(context, DATABASE_NAME, null, DATABASE_VERSION);
+-    mContext = context;
++    super(context, DATABASE_NAME, null, DATABASE_VERSION, PRESERVE_CORRUPT_DATABASE);
++    mExistedBeforeOpening = context.getDatabasePath(DATABASE_NAME).exists();
+   }
+ 
+   public static ReactDatabaseSupplier getInstance(Context context) {
+@@ -57,59 +66,48 @@ public class ReactDatabaseSupplier extends SQLiteOpenHelper {
+ 
+   @Override
+   public void onCreate(SQLiteDatabase db) {
++    // An existing version-zero file is not proof that this is a new profile.
++    if (mExistedBeforeOpening || mHasOpened) {
++      throw new SQLiteException("Existing AsyncStorage database has an unknown schema");
++    }
+     db.execSQL(VERSION_TABLE_CREATE);
+   }
+ 
+   @Override
+   public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+-    if (oldVersion != newVersion) {
+-      deleteDatabase();
+-      onCreate(db);
+-    }
++    throw new SQLiteException("Unexpected AsyncStorage database version; data retained");
+   }
+ 
+   /**
+    * Verify the database exists and is open.
+    */
+   /* package */ synchronized boolean ensureDatabase() {
+-    if (mDb != null && mDb.isOpen()) {
++    if (sCorruptionReported) return false;
++    if (mDb != null && mDb.isOpen()) return true;
++
++    try {
++      // Do not delete or recreate a database after a failed open.
++      mDb = getWritableDatabase();
++      mDb.setMaximumSize(mMaximumDatabaseSize);
++      mHasOpened = true;
+       return true;
+-    }
+-    // Sometimes retrieving the database fails. We do 2 retries: first without database deletion
+-    // and then with deletion.
+-    SQLiteException lastSQLiteException = null;
+-    for (int tries = 0; tries < 2; tries++) {
+-      try {
+-        if (tries > 0) {
+-          deleteDatabase();
+-        }
+-        mDb = getWritableDatabase();
+-        break;
+-      } catch (SQLiteException e) {
+-        lastSQLiteException = e;
+-      }
+-      // Wait before retrying.
++    } catch (Exception e) {
++      FLog.w(ReactConstants.TAG, "AsyncStorage could not open its database; data retained", e);
+       try {
+-        Thread.sleep(SLEEP_TIME_MS);
+-      } catch (InterruptedException ie) {
+-        Thread.currentThread().interrupt();
++        closeDatabase();
++      } catch (Exception closeError) {
++        FLog.w(ReactConstants.TAG, "AsyncStorage could not close its database", closeError);
++        mDb = null;
+       }
++      return false;
+     }
+-    if (mDb == null) {
+-      throw lastSQLiteException;
+-    }
+-    // This is a sane limit to protect the user from the app storing too much data in the database.
+-    // This also protects the database from filling up the disk cache and becoming malformed
+-    // (endTransaction() calls will throw an exception, not rollback, and leave the db malformed).
+-    mDb.setMaximumSize(mMaximumDatabaseSize);
+-    return true;
+   }
+ 
+   /**
+    * Create and/or open the database.
+    */
+   public synchronized SQLiteDatabase get() {
+-    ensureDatabase();
++    if (!ensureDatabase()) throw new SQLiteException("AsyncStorage database unavailable");
+     return mDb;
+   }
+ 
+@@ -119,13 +117,8 @@ public class ReactDatabaseSupplier extends SQLiteOpenHelper {
+       closeDatabase();
+       FLog.d(ReactConstants.TAG, "Cleaned " + DATABASE_NAME);
+     } catch (Exception e) {
+-      // Clearing the database has failed, delete it instead.
+-      if (deleteDatabase()) {
+-        FLog.d(ReactConstants.TAG, "Deleted Local Database " + DATABASE_NAME);
+-        return;
+-      }
+-      // Everything failed, throw
+-      throw new RuntimeException("Clearing and deleting database " + DATABASE_NAME + " failed");
++      // A failed explicit clear must not fall back to deleting the database file.
++      throw new RuntimeException("Clearing database " + DATABASE_NAME + " failed; data retained", e);
+     }
+   }
+ 
+@@ -144,14 +137,9 @@ public class ReactDatabaseSupplier extends SQLiteOpenHelper {
+     }
+   }
+ 
+-  private synchronized boolean deleteDatabase() {
+-    closeDatabase();
+-    return mContext.deleteDatabase(DATABASE_NAME);
+-  }
+-
+   public synchronized void closeDatabase() {
+-    if (mDb != null && mDb.isOpen()) {
+-      mDb.close();
++    if (mDb != null) {
++      if (mDb.isOpen()) mDb.close();
+       mDb = null;
+     }
+   }
+@@ -159,5 +147,6 @@ public class ReactDatabaseSupplier extends SQLiteOpenHelper {
+   // For testing purposes only!
+   public static void deleteInstance() {
+     sReactDatabaseSupplierInstance = null;
++    sCorruptionReported = false;
+   }
+ }
+diff --git a/ios/RNCAsyncStorage.mm b/ios/RNCAsyncStorage.mm
+index fa3bb04..75a3183 100644
+--- a/ios/RNCAsyncStorage.mm
++++ b/ios/RNCAsyncStorage.mm
+@@ -79,9 +79,23 @@ static NSArray<NSDictionary *> *RCTMakeErrors(NSArray<id<NSObject>> *results)
+     return errors;
+ }
+ 
++static BOOL RCTStorageFileIsMissing(NSError *error)
++{
++    return [error.domain isEqualToString:NSCocoaErrorDomain] &&
++        (error.code == NSFileNoSuchFileError || error.code == NSFileReadNoSuchFileError);
++}
++
+ static NSString *RCTReadFile(NSString *filePath, NSString *key, NSDictionary **errorOut)
+ {
+-    if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
++    NSError *statError = nil;
++    NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath
++                                                                                error:&statError];
++    if (!attributes && !RCTStorageFileIsMissing(statError)) {
++        if (errorOut) *errorOut = RCTMakeError(@"Failed to inspect storage file.", statError,
++                                               @{@"key": RCTNullIfNil(key)});
++        return nil;
++    }
++    if (attributes) {
+         NSError *error;
+         NSStringEncoding encoding;
+         NSString *entryString = [NSString stringWithContentsOfFile:filePath
+@@ -256,30 +270,6 @@ static NSDictionary *RCTDeleteStorageDirectory()
+     return nil;
+ }
+ 
+-static NSDate *RCTManifestModificationDate(NSString *manifestFilePath)
+-{
+-    NSDictionary *attributes =
+-        [[NSFileManager defaultManager] attributesOfItemAtPath:manifestFilePath error:nil];
+-    return [attributes fileModificationDate];
+-}
+-
+-/**
+- * Creates an NSException used during Storage Directory Migration.
+- */
+-static void RCTStorageDirectoryMigrationLogError(NSString *reason, NSError *error)
+-{
+-    RCTLogWarn(@"%@: %@", reason, error ? error.description : @"");
+-}
+-
+-static void RCTStorageDirectoryCleanupOld(NSString *oldDirectoryPath)
+-{
+-    NSError *error;
+-    if (![[NSFileManager defaultManager] removeItemAtPath:oldDirectoryPath error:&error]) {
+-        RCTStorageDirectoryMigrationLogError(
+-            @"Failed to remove old storage directory during migration", error);
+-    }
+-}
+-
+ static void _createStorageDirectory(NSString *storageDirectory, NSError **error)
+ {
+     [[NSFileManager defaultManager] createDirectoryAtPath:storageDirectory
+@@ -288,127 +278,73 @@ static void _createStorageDirectory(NSString *storageDirectory, NSError **error)
+                                                     error:error];
+ }
+ 
+-static void RCTStorageDirectoryMigrate(NSString *oldDirectoryPath,
+-                                       NSString *newDirectoryPath,
+-                                       BOOL shouldCleanupOldDirectory)
+-{
+-    NSError *error;
+-    // Migrate data by copying old storage directory to new storage directory location
+-    if (![[NSFileManager defaultManager] copyItemAtPath:oldDirectoryPath
+-                                                 toPath:newDirectoryPath
+-                                                  error:&error]) {
+-        // the new storage directory "Application Support/[bundleID]/RCTAsyncLocalStorage_V1" seems
+-        // unable to migrate because folder "Application Support/[bundleID]" doesn't exist.. create
+-        // this folder and attempt folder copying again
+-        if (error != nil && error.code == 4 &&
+-            [newDirectoryPath isEqualToString:RCTGetStorageDirectory()]) {
+-            error = nil;
+-            _createStorageDirectory(RCTCreateStorageDirectoryPath(@""), &error);
+-            if (error == nil) {
+-                RCTStorageDirectoryMigrate(
+-                    oldDirectoryPath, newDirectoryPath, shouldCleanupOldDirectory);
+-            } else {
+-                RCTStorageDirectoryMigrationLogError(
+-                    @"Failed to create storage directory during migration.", error);
+-            }
+-        } else {
+-            RCTStorageDirectoryMigrationLogError(
+-                @"Failed to copy old storage directory to new storage directory location during "
+-                @"migration",
+-                error);
++// Copy one unambiguous legacy directory into the current location. Never
++// delete a source or replace an existing destination. Ambiguous, unreadable or
++// incomplete data blocks storage rather than being mistaken for a new profile.
++static NSDictionary *RCTPrepareSafeStorageDirectory(void)
++{
++    NSFileManager *files = [NSFileManager defaultManager];
++    NSString *target = RCTGetStorageDirectory();
++    NSArray<NSString *> *oldPaths = @[
++        RCTCreateStorageDirectoryPath_deprecated(RCTOldStorageDirectory),
++        RCTCreateStorageDirectoryPath_deprecated(RCTExpoStorageDirectory),
++        RCTCreateStorageDirectoryPath_deprecated(RCTStorageDirectory)
++    ];
++    NSMutableArray<NSString *> *existing = [NSMutableArray new];
++    for (NSString *path in oldPaths) {
++        NSError *error = nil;
++        NSDictionary *attributes = [files attributesOfItemAtPath:path error:&error];
++        if (!attributes) {
++            if (RCTStorageFileIsMissing(error)) continue;
++            return RCTMakeError(@"Could not inspect old storage; data retained.", error, nil);
+         }
+-    } else if (shouldCleanupOldDirectory) {
+-        // If copying succeeds, remove old storage directory
+-        RCTStorageDirectoryCleanupOld(oldDirectoryPath);
++        if (![attributes.fileType isEqualToString:NSFileTypeDirectory]) {
++            return RCTMakeError(@"Unexpected old storage location; data retained.", nil, nil);
++        }
++        [existing addObject:path];
+     }
+-}
+ 
+-/**
+- * Determine which of RCTOldStorageDirectory or RCTExpoStorageDirectory needs to migrated.
+- * If both exist, we remove the least recently modified and return the most recently modified.
+- * Otherwise, this will return the path to whichever directory exists.
+- * If no directory exists, then return nil.
+- */
+-static NSString *RCTGetStoragePathForMigration()
+-{
+-    BOOL isDir;
+-    NSString *oldStoragePath = RCTCreateStorageDirectoryPath_deprecated(RCTOldStorageDirectory);
+-    NSString *expoStoragePath = RCTCreateStorageDirectoryPath_deprecated(RCTExpoStorageDirectory);
+-    NSFileManager *fileManager = [NSFileManager defaultManager];
+-    BOOL oldStorageDirectoryExists =
+-        [fileManager fileExistsAtPath:oldStoragePath isDirectory:&isDir] && isDir;
+-    BOOL expoStorageDirectoryExists =
+-        [fileManager fileExistsAtPath:expoStoragePath isDirectory:&isDir] && isDir;
+-
+-    // Check if both the old storage directory and Expo storage directory exist
+-    if (oldStorageDirectoryExists && expoStorageDirectoryExists) {
+-        // If the old storage has been modified more recently than Expo storage, then clear Expo
+-        // storage. Otherwise, clear the old storage.
+-        if ([RCTManifestModificationDate(RCTCreateManifestFilePath(oldStoragePath))
+-                compare:RCTManifestModificationDate(RCTCreateManifestFilePath(expoStoragePath))] ==
+-            NSOrderedDescending) {
+-            RCTStorageDirectoryCleanupOld(expoStoragePath);
+-            return oldStoragePath;
+-        } else {
+-            RCTStorageDirectoryCleanupOld(oldStoragePath);
+-            return expoStoragePath;
++    NSError *error = nil;
++    NSDictionary *targetAttributes = [files attributesOfItemAtPath:target error:&error];
++    if (targetAttributes) {
++        if (![targetAttributes.fileType isEqualToString:NSFileTypeDirectory]) {
++            return RCTMakeError(@"Unexpected storage location; data retained.", nil, nil);
++        }
++        error = nil;
++        NSArray<NSString *> *entries = [files contentsOfDirectoryAtPath:target error:&error];
++        if (!entries) return RCTMakeError(@"Could not inspect storage; data retained.", error, nil);
++        if (![entries containsObject:RCTManifestFileName] && (entries.count > 0 || existing.count > 0)) {
++            return RCTMakeError(@"Incomplete storage location; data retained.", nil, nil);
+         }
+-    } else if (oldStorageDirectoryExists) {
+-        return oldStoragePath;
+-    } else if (expoStorageDirectoryExists) {
+-        return expoStoragePath;
+-    } else {
+         return nil;
+     }
+-}
+-
+-/**
+- * This check is added to make sure that anyone coming from pre-1.2.2 does not lose cached data.
+- * Check that data is migrated from the old location to the new location
+- * fromStorageDirectory: the directory where the older data lives
+- * toStorageDirectory: the directory where the new data should live
+- * shouldCleanupOldDirectoryAndOverwriteNewDirectory: YES if we should delete the old directory's
+- * contents and overwrite the new directory's contents during the migration to the new directory
+- */
+-static void
+-RCTStorageDirectoryMigrationCheck(NSString *fromStorageDirectory,
+-                                  NSString *toStorageDirectory,
+-                                  BOOL shouldCleanupOldDirectoryAndOverwriteNewDirectory)
+-{
+-    NSError *error;
+-    BOOL isDir;
+-    NSFileManager *fileManager = [NSFileManager defaultManager];
+-    // If the old directory exists, it means we may need to migrate old data to the new directory
+-    if ([fileManager fileExistsAtPath:fromStorageDirectory isDirectory:&isDir] && isDir) {
+-        // Check if the new storage directory location already exists
+-        if ([fileManager fileExistsAtPath:toStorageDirectory]) {
+-            // If new storage location exists, check if the new storage has been modified sooner in
+-            // which case we may want to cleanup the old location
+-            if ([RCTManifestModificationDate(RCTCreateManifestFilePath(toStorageDirectory))
+-                    compare:RCTManifestModificationDate(
+-                                RCTCreateManifestFilePath(fromStorageDirectory))] == 1) {
+-                // If new location has been modified more recently, simply clean out old data
+-                if (shouldCleanupOldDirectoryAndOverwriteNewDirectory) {
+-                    RCTStorageDirectoryCleanupOld(fromStorageDirectory);
+-                }
+-            } else if (shouldCleanupOldDirectoryAndOverwriteNewDirectory) {
+-                // If old location has been modified more recently, remove new storage and migrate
+-                if (![fileManager removeItemAtPath:toStorageDirectory error:&error]) {
+-                    RCTStorageDirectoryMigrationLogError(
+-                        @"Failed to remove new storage directory during migration", error);
+-                } else {
+-                    RCTStorageDirectoryMigrate(fromStorageDirectory,
+-                                               toStorageDirectory,
+-                                               shouldCleanupOldDirectoryAndOverwriteNewDirectory);
+-                }
+-            }
+-        } else {
+-            // If new storage location doesn't exist, migrate data
+-            RCTStorageDirectoryMigrate(fromStorageDirectory,
+-                                       toStorageDirectory,
+-                                       shouldCleanupOldDirectoryAndOverwriteNewDirectory);
+-        }
++    if (!RCTStorageFileIsMissing(error)) {
++        return RCTMakeError(@"Could not inspect storage location; data retained.", error, nil);
++    }
++    if (existing.count == 0) return nil;
++    if (existing.count != 1) {
++        return RCTMakeError(@"Multiple old storage locations need recovery; data retained.", nil, nil);
++    }
++    NSString *source = existing.firstObject;
++    NSString *oldManifest = [source stringByAppendingPathComponent:RCTManifestFileName];
++    error = nil;
++    if (![files attributesOfItemAtPath:oldManifest error:&error]) {
++        return RCTMakeError(@"Old storage is incomplete; data retained.", error, nil);
++    }
++    NSString *parent = [target stringByDeletingLastPathComponent];
++    error = nil;
++    if (![files createDirectoryAtPath:parent withIntermediateDirectories:YES attributes:nil error:&error]) {
++        return RCTMakeError(@"Could not prepare storage migration; data retained.", error, nil);
++    }
++    NSString *temporary = [parent stringByAppendingPathComponent:
++        [@".lingua-async-migration-" stringByAppendingString:[NSUUID UUID].UUIDString]];
++    if (![files copyItemAtPath:source toPath:temporary error:&error]) {
++        return RCTMakeError(@"Could not copy old storage; data retained.", error, nil);
++    }
++    if (![files moveItemAtPath:temporary toPath:target error:&error]) {
++        return RCTMakeError(@"Could not complete storage migration; data retained.", error, nil);
+     }
++    return nil;
+ }
+ 
+ #pragma mark - RNCAsyncStorage
+@@ -432,22 +368,8 @@ RCTStorageDirectoryMigrationCheck(NSString *fromStorageDirectory,
+         return nil;
+     }
+ 
+-    // Get the path to any old storage directory that needs to be migrated. If multiple exist,
+-    // the oldest are removed and the most recently modified is returned.
+-    NSString *oldStoragePath = RCTGetStoragePathForMigration();
+-    if (oldStoragePath != nil) {
+-        // Migrate our deprecated path "Documents/.../RNCAsyncLocalStorage_V1" or
+-        // "Documents/.../RCTAsyncLocalStorage" to "Documents/.../RCTAsyncLocalStorage_V1"
+-        RCTStorageDirectoryMigrationCheck(
+-            oldStoragePath, RCTCreateStorageDirectoryPath_deprecated(RCTStorageDirectory), YES);
+-    }
+-
+-    // Migrate what's in "Documents/.../RCTAsyncLocalStorage_V1" to
+-    // "Application Support/[bundleID]/RCTAsyncLocalStorage_V1"
+-    RCTStorageDirectoryMigrationCheck(RCTCreateStorageDirectoryPath_deprecated(RCTStorageDirectory),
+-                                      RCTCreateStorageDirectoryPath(RCTStorageDirectory),
+-                                      NO);
+-
++    // Migration is performed on the storage queue by _ensureSetup, where a
++    // failure can be returned to JavaScript without deleting either copy.
+     return self;
+ }
+ 
+@@ -506,6 +428,10 @@ RCT_EXPORT_MODULE()
+ {
+     RCTAssertThread(RCTGetMethodQueue(), @"Must be executed on storage thread");
+ 
++    if (!_haveSetup) {
++        NSDictionary *migrationError = RCTPrepareSafeStorageDirectory();
++        if (migrationError) return migrationError;
++    }
+     NSError *error = nil;
+     if (!RCTHasCreatedStorageDirectory) {
+         _createStorageDirectory(RCTGetStorageDirectory(), &error);
+@@ -547,11 +473,18 @@ RCT_EXPORT_MODULE()
+                 _manifest = [NSMutableDictionary new];
+             }
+         } else {
+-            _manifest = RCTJSONParseMutable(serialized, &error);
+-            if (!_manifest) {
+-                RCTLogError(@"Failed to parse manifest - creating a new one.\n\n%@", error);
+-                _manifest = [NSMutableDictionary new];
++            id parsed = RCTJSONParseMutable(serialized, &error);
++            if (![parsed isKindOfClass:[NSMutableDictionary class]]) {
++                return RCTMakeError(@"Invalid storage manifest; data retained.", error, nil);
++            }
++            for (id key in (NSDictionary *)parsed) {
++                id value = parsed[key];
++                if (![key isKindOfClass:[NSString class]] ||
++                    !([value isKindOfClass:[NSString class]] || value == (id)kCFNull)) {
++                    return RCTMakeError(@"Unexpected storage manifest; data retained.", nil, nil);
++                }
+             }
++            _manifest = parsed;
+         }
+         _haveSetup = YES;
+     }
+@@ -561,16 +494,20 @@ RCT_EXPORT_MODULE()
+ 
+ - (NSDictionary *)_writeManifest:(NSMutableArray<NSDictionary *> *__autoreleasing *)errors
+ {
+-    NSError *error;
++    NSError *error = nil;
+     NSString *serialized = RCTJSONStringify(_manifest, &error);
+-    [serialized writeToFile:RCTCreateStorageDirectoryPath(RCTGetManifestFilePath())
+-                 atomically:YES
+-                   encoding:NSUTF8StringEncoding
+-                      error:&error];
+-    NSDictionary *errorOut;
+-    if (error) {
++    BOOL written = serialized && [serialized writeToFile:RCTCreateStorageDirectoryPath(RCTGetManifestFilePath())
++                                              atomically:YES
++                                                encoding:NSUTF8StringEncoding
++                                                   error:&error];
++    NSDictionary *errorOut = nil;
++    if (!written || error) {
+         errorOut = RCTMakeError(@"Failed to write manifest file.", error, nil);
+         RCTAppendError(errorOut, errors);
++        // A failed write must not make an in-memory manifest look committed.
++        _haveSetup = NO;
++        _manifest = nil;
++        [RCTGetCache() removeAllObjects];
+     }
+     return errorOut;
+ }
+@@ -589,6 +526,7 @@ RCT_EXPORT_MODULE()
+ 
+ - (NSString *)_getValueForKey:(NSString *)key errorOut:(NSDictionary *__autoreleasing *)errorOut
+ {
++    if (errorOut) *errorOut = nil;
+     NSString *value =
+         _manifest[key];  // nil means missing, null means there may be a data file, else: NSString
+     if (value == (id)kCFNull) {
+@@ -598,10 +536,10 @@ RCT_EXPORT_MODULE()
+             value = RCTReadFile(filePath, key, errorOut);
+             if (value) {
+                 [RCTGetCache() setObject:value forKey:key cost:value.length];
+-            } else {
+-                // file does not exist after all, so remove from manifest (no need to save
+-                // manifest immediately though, as cost of checking again next time is negligible)
+-                [_manifest removeObjectForKey:key];
++            } else if (errorOut && !*errorOut) {
++                // A missing external value is damage, not an absent key. Keep
++                // the manifest reference so another write cannot erase it.
++                *errorOut = RCTMakeError(@"Missing storage value; data retained.", nil, @{@"key": key});
+             }
+         }
+     }
+@@ -624,21 +562,23 @@ RCT_EXPORT_MODULE()
+     NSError *error;
+     if (value.length <= RCTInlineValueThreshold) {
+         if (_manifest[key] == (id)kCFNull) {
+-            // If the value already existed but wasn't inlined, remove the old file.
+-            [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
++            // Keep the old external file until the new manifest is committed.
++            // Retaining this one per-key file also protects a failed write.
+             [RCTGetCache() removeObjectForKey:key];
+         }
+         *changedManifest = YES;
+         _manifest[key] = value;
+         return nil;
+     }
+-    [value writeToFile:filePath atomically:YES encoding:NSUTF8StringEncoding error:&error];
+-    [RCTGetCache() setObject:value forKey:key cost:value.length];
+-    if (error) {
++    BOOL written = [value writeToFile:filePath atomically:YES encoding:NSUTF8StringEncoding error:&error];
++    if (!written || error) {
+         errorOut = RCTMakeError(@"Failed to write value.", error, @{@"key": key});
+-    } else if (_manifest[key] != (id)kCFNull) {
+-        *changedManifest = YES;
+-        _manifest[key] = (id)kCFNull;
++    } else {
++        [RCTGetCache() setObject:value forKey:key cost:value.length];
++        if (_manifest[key] != (id)kCFNull) {
++            *changedManifest = YES;
++            _manifest[key] = (id)kCFNull;
++        }
+     }
+     return errorOut;
+ }

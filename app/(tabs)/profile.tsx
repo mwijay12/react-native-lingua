@@ -5,6 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AccountControls } from "@/components/AccountControls";
 import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
+import { LearningSaveMessage } from "@/components/LearningSaveMessage";
 import { MotionSticker } from "@/components/MotionSticker";
 import { SoundEffectsControl } from "@/components/SoundEffectsControl";
 import { CREATOR_CREDIT } from "@/constants/branding";
@@ -60,7 +61,8 @@ export default function ProfileScreen() {
             <Text className="body-sm text-text-secondary">Lessons completed</Text>
           </View>
         </View>
-        <Text className="caption mt-3">Progress is saved on this device and is not synced to an account. XP is awarded once per lesson.</Text>
+        <LearningSaveMessage className="mt-3" testID="profile-save-status" />
+        <Text className="caption mt-1">Progress is not synced to an account. XP is awarded once per lesson.</Text>
 
         <Text className="font-poppins-semibold text-base text-text-primary mt-6 mb-3">Course progress</Text>
         <View className="rounded-2xl border border-border bg-white p-4">

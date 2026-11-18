@@ -1,0 +1,37 @@
+name: iOS storage native logic
+
+on:
+  push:
+    branches:
+      - "arena/**"
+    paths:
+      - ".github/workflows/ios-storage.yml"
+      - "patches/**"
+      - "plugins/**"
+      - "scripts/harden-async-storage.cjs"
+      - "scripts/test-ios-storage-native.py"
+      - "tests/ios-native/**"
+      - "package*.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CI: "1"
+
+jobs:
+  native-storage:
+    name: Foundation storage logic and iOS SDK syntax
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install the locked dependencies without lifecycle scripts
+        run: npm ci --legacy-peer-deps --ignore-scripts --no-audit --no-fund
+      - name: Test patched native storage with isolated temporary files
+        run: python3 scripts/test-ios-storage-native.py

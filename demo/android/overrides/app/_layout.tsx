@@ -1,6 +1,7 @@
 import "../global.css";
 
 import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
+import { PendingSaveBanner } from "@/components/PendingSaveBanner";
 import { useLanguageHydrationStatus } from "@/store/languageStore";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
@@ -42,15 +43,18 @@ export default function DemoRootLayout() {
         {languageHydration !== "ready" ? (
           <LearningHydrationScreen status={languageHydration} storage="course" />
         ) : (
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="onboarding" />
-            <Stack.Screen name="language-select" />
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="lesson/[id]" />
-            <Stack.Screen name="review" />
-            <Stack.Screen name="play" />
-          </Stack>
+          <>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="onboarding" />
+              <Stack.Screen name="language-select" />
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="lesson/[id]" />
+              <Stack.Screen name="review" />
+              <Stack.Screen name="play" />
+            </Stack>
+            <PendingSaveBanner />
+          </>
         )}
       </View>
     </SafeAreaProvider>

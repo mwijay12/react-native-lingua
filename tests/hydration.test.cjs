@@ -26,6 +26,7 @@ const storage = {
     if (failRead) throw new Error("Storage unavailable");
     return stored;
   },
+  async multiGet(keys) { return Promise.all(keys.map(async (key) => [key, await this.getItem(key)])); },
   async setItem(_key, value) { writes += 1; stored = value; },
   async removeItem() { stored = null; },
 };

@@ -15,6 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FeedbackPanel } from "@/components/FeedbackPanel";
 import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
+import { LearningSaveMessage } from "@/components/LearningSaveMessage";
 import { LessonIcon } from "@/components/LessonIcon";
 import { MotionSticker } from "@/components/MotionSticker";
 import { PronunciationSample } from "@/components/PronunciationSample";
@@ -234,7 +235,7 @@ export default function LessonScreen() {
                     {feedback === "correct" ? "Correct!" : "Not quite. Try again."}
                   </Text>
                   {feedback === "incorrect" && (
-                    <Text className="body-sm text-text-secondary mt-1">Saved for a separate review, even after you retry.</Text>
+                    <Text className="body-sm text-text-secondary mt-1">Added for a separate review, even after you retry.</Text>
                   )}
                   {feedback === "incorrect" && attempts >= 2 && (
                     <Text className="body-sm text-text-secondary mt-1">Answer: {activity.correctAnswer}</Text>
@@ -275,7 +276,7 @@ export default function LessonScreen() {
               <Text className="body-sm text-text-secondary text-center mt-2" testID="lesson-first-try">
                 {firstTryCorrect} of {lesson.activities.length} correct on the first try.
               </Text>
-              <Text className="body-sm text-text-secondary text-center mt-2">Your progress is saved on this device.</Text>
+              <LearningSaveMessage className="text-center mt-2" testID="lesson-save-status" />
               {reviewItems.some((item) => item.lessonId === lesson.id) && (
                 <TouchableOpacity
                   onPress={() => isAvailableLanguage(lessonCourse)
