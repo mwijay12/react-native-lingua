@@ -21,7 +21,7 @@ smoke = load("android_smoke", "smoke-android-demo.py")
 planning = load("planning_smoke", "smoke-android-planning.py")
 
 
-def main(old_apk, new_apk):
+def main(old_apk, new_apk, old_english_total=10):
     smoke.adb("install", "-r", str(old_apk))
     smoke.adb("shell", "pm", "clear", smoke.PACKAGE)
     smoke.adb("shell", "svc", "wifi", "disable", check=False)
