@@ -1,4 +1,4 @@
-name: Temporary Android motion trial
+name: Temporary Android input trial
 
 on:
   push:
@@ -10,70 +10,8 @@ permissions:
   contents: read
 
 jobs:
-  build:
-    name: Prepare disposable trial APK
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: npm
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
-      - uses: actions/download-artifact@v4
-        with:
-          name: Lingua-Demo-APK
-          path: original
-          run-id: 44443156598
-          github-token: ${{ github.token }}
-      - name: Apply trial source and install existing dependencies
-        run: |
-          echo 'ZGlmZiAtLWdpdCBhL1JFQURNRS5tZCBiL1JFQURNRS5tZAppbmRleCA2NDU1ZmJjLi40ODM3MWU0IDEwMDY0NAotLS0gYS9SRUFETUUubWQKKysrIGIvUkVBRE1FLm1kCkBAIC01MywxMSArNTMsMTIgQEAgdGhlIGxlYXJuaW5nIHBhdGggbW9yZSBwbGF5ZnVsLiBUaGUgc3RhbmRhbG9uZSBbQW5kcm9pZCBkZW1vXShkZW1vL2FuZHJvaWQvUkVBRE0KIGhhcyBubyBzaWduLWluIG9yIGFuYWx5dGljcy4KIAogTGluZ3VhJ3MgbmF0aXZlIHNwbGFzaCBoYW5kcyBvZmYgdG8gYSBzaG9ydCwgc2tpcHBhYmxlIGJyYW5kZWQgaW50cm9kdWN0aW9uCi1vbmNlIHRoZSBSZWFjdCB2aWV3IGlzIGxhaWQgb3V0LiBUaGUgYXBwIGFuZCBzdG9yYWdlIHJlY292ZXJ5IHNjcmVlbnMgbW91bnQKLXVuZGVybmVhdGg7IHRoZSBpbnRyb2R1Y3Rpb24gZG9lcyBub3Qgd2FpdCBmb3Igc3RvcmFnZSBvciBhIG5ldHdvcmsuIFJlZHVjZWQKLW1vdGlvbiBza2lwcyB0aGUgYW5pbWF0aW9uLCBhbmQgYSB0aW1lb3V0IHByZXZlbnRzIGl0IGZyb20gYmxvY2tpbmcgc3RhcnR1cCBpZgotYW4gYW5pbWF0aW9uIGNhbGxiYWNrIGRvZXMgbm90IGFycml2ZS4gVGhlIGxhdW5jaCBkZXNpZ24gc2hvdWxkIGJlIGNoZWNrZWQgaW4KLWEgcmVsZWFzZSBidWlsZCwgYmVjYXVzZSBFeHBvIEdvIGRvZXMgbm90IHJlcHJvZHVjZSB0aGUgbmF0aXZlIHNwbGFzaCBleGFjdGx5Lgorb25jZSB0aGUgUmVhY3QgdmlldyBpcyBsYWlkIG91dC4gTmF2aWdhdGlvbiBtb3VudHMgYWZ0ZXIgdGhlIGludHJvZHVjdGlvbiBoYXMKK2dvbmUsIHdoaWxlIHN0b3JhZ2UgaHlkcmF0aW9uIGNvbnRpbnVlcyBpbmRlcGVuZGVudGx5OyB0aGUgaW50cm9kdWN0aW9uIGRvZXMKK25vdCB3YWl0IGZvciBzdG9yYWdlIG9yIGEgbmV0d29yay4gUmVkdWNlZCBtb3Rpb24gc2tpcHMgdGhlIGFuaW1hdGlvbiwgYW5kIGEKK3RpbWVvdXQgcHJldmVudHMgaXQgZnJvbSBibG9ja2luZyBzdGFydHVwIGlmIGFuIGFuaW1hdGlvbiBjYWxsYmFjayBkb2VzIG5vdAorYXJyaXZlLiBUaGUgbGF1bmNoIGRlc2lnbiBzaG91bGQgYmUgY2hlY2tlZCBpbiBhIHJlbGVhc2UgYnVpbGQsIGJlY2F1c2UgRXhwbyBHbworZG9lcyBub3QgcmVwcm9kdWNlIHRoZSBuYXRpdmUgc3BsYXNoIGV4YWN0bHkuCiAKIFRoZSB3ZWxjb21lIGNvbXBhbmlvbnMgbWFrZSBhIHNtYWxsLCBvbmUtdGltZSBncmVldGluZyBhZnRlciB0aGUgc3BsYXNoLiBCdXR0b24KIHByZXNzZXMsIGFuc3dlciBzZWxlY3Rpb25zIGFuZCBjaGFuZ2VzIGluIHRoZSBkYWlseS1nb2FsIGFuZCBRdWljayBNaXggcHJvZ3Jlc3MKZGlmZiAtLWdpdCBhL2NvbXBvbmVudHMvTGF1bmNoU3BsYXNoLnRzeCBiL2NvbXBvbmVudHMvTGF1bmNoU3BsYXNoLnRzeAppbmRleCAyM2UyNDE3Li42MGNiN2I4IDEwMDY0NAotLS0gYS9jb21wb25lbnRzL0xhdW5jaFNwbGFzaC50c3gKKysrIGIvY29tcG9uZW50cy9MYXVuY2hTcGxhc2gudHN4CkBAIC0xMSwyNiArMTEsMjggQEAgaW1wb3J0IHsgaW1hZ2VzIH0gZnJvbSAiQC9jb25zdGFudHMvaW1hZ2VzIjsKIGltcG9ydCB7IHVzZVJlc29sdmVkUmVkdWNlZE1vdGlvblByZWZlcmVuY2UgfSBmcm9tICJAL2hvb2tzL3VzZVJlZHVjZWRNb3Rpb25QcmVmZXJlbmNlIjsKIGltcG9ydCB7IExhdW5jaFZpc2liaWxpdHlDb250ZXh0IH0gZnJvbSAiQC9saWIvbGF1bmNoVmlzaWJpbGl0eSI7CiAKLS8vIFRoZSBuYXRpdmUgc3BsYXNoIHN0YXlzIHVwIHVudGlsIHRoaXMgbWF0Y2hpbmcgdGVhbCB2aWV3IGhhcyBhY3R1YWxseSBsYWlkCi0vLyBvdXQuIFRoZSBhcHAgaXMgbW91bnRlZCB1bmRlcm5lYXRoLCBzbyBzbG93IGh5ZHJhdGlvbi9lcnJvcnMgYXJlIG5vdCBoaWRkZW4KLS8vIGJlaGluZCBhbiBpbmRlZmluaXRlIGFuaW1hdGlvbi4gVGFwcGluZyBhbHNvIHNraXBzIHRoZSBzaG9ydCBpbnRyb2R1Y3Rpb24uCisvLyBUaGUgbmF0aXZlIHNwbGFzaCBzdGF5cyB1cCB1bnRpbCB0aGlzIG1hdGNoaW5nIHRlYWwgdmlldyBoYXMgbGFpZCBvdXQuCisvLyBNb3VudCBuYXZpZ2F0aW9uIGFmdGVyIHRoZSBvdmVybGF5IGlzIGdvbmUsIGluIGEgc2VwYXJhdGUgdHVybjogb24gQW5kcm9pZCwKKy8vIHJlbW92aW5nIHRoZSBzcGxhc2ggd2hpbGUgYSBuYXRpdmUgc3RhY2sgYXR0YWNoZXMgY2FuIHJlLWVudGVyIGEgZnJhZ21lbnQKKy8vIHRyYW5zYWN0aW9uLiBIeWRyYXRpb24gY29udGludWVzIGluZGVwZW5kZW50bHksIGFuZCB0YXBwaW5nIHNraXBzIHRoZSBpbnRyby4KIGV4cG9ydCBmdW5jdGlvbiBMYXVuY2hHYXRlKHsgY2hpbGRyZW4gfTogeyBjaGlsZHJlbjogUmVhY3ROb2RlIH0pIHsKICAgY29uc3QgW2xhdW5jaGluZywgc2V0TGF1bmNoaW5nXSA9IHVzZVN0YXRlKHRydWUpOworICBjb25zdCBbY29udGVudFJlYWR5LCBzZXRDb250ZW50UmVhZHldID0gdXNlU3RhdGUoZmFsc2UpOwogICBjb25zdCBmaW5pc2ggPSB1c2VDYWxsYmFjaygoKSA9PiBzZXRMYXVuY2hpbmcoZmFsc2UpLCBbXSk7CiAKKyAgdXNlRWZmZWN0KCgpID0+IHsKKyAgICBpZiAobGF1bmNoaW5nKSByZXR1cm47CisgICAgY29uc3QgdGltZXIgPSBzZXRUaW1lb3V0KCgpID0+IHNldENvbnRlbnRSZWFkeSh0cnVlKSwgNTApOworICAgIHJldHVybiAoKSA9PiBjbGVhclRpbWVvdXQodGltZXIpOworICB9LCBbbGF1bmNoaW5nXSk7CisKICAgcmV0dXJuICgKICAgICA8VmlldyBzdHlsZT17c3R5bGVzLnJvb3R9PgotICAgICAgPExhdW5jaFZpc2liaWxpdHlDb250ZXh0LlByb3ZpZGVyIHZhbHVlPXshbGF1bmNoaW5nfT4KLSAgICAgICAgPFZpZXcKLSAgICAgICAgICBzdHlsZT17c3R5bGVzLmNvbnRlbnR9Ci0gICAgICAgICAgcG9pbnRlckV2ZW50cz17bGF1bmNoaW5nID8gIm5vbmUiIDogImF1dG8ifQotICAgICAgICAgIGFjY2Vzc2liaWxpdHlFbGVtZW50c0hpZGRlbj17bGF1bmNoaW5nfQotICAgICAgICAgIGltcG9ydGFudEZvckFjY2Vzc2liaWxpdHk9e2xhdW5jaGluZyA/ICJuby1oaWRlLWRlc2NlbmRhbnRzIiA6ICJhdXRvIn0KLSAgICAgICAgICBhcmlhLWhpZGRlbj17bGF1bmNoaW5nfQotICAgICAgICA+Ci0gICAgICAgICAge2NoaWxkcmVufQotICAgICAgICA8L1ZpZXc+Ci0gICAgICA8L0xhdW5jaFZpc2liaWxpdHlDb250ZXh0LlByb3ZpZGVyPgorICAgICAge2NvbnRlbnRSZWFkeSAmJiAoCisgICAgICAgIDxMYXVuY2hWaXNpYmlsaXR5Q29udGV4dC5Qcm92aWRlciB2YWx1ZT4KKyAgICAgICAgICA8VmlldyBzdHlsZT17c3R5bGVzLmNvbnRlbnR9PntjaGlsZHJlbn08L1ZpZXc+CisgICAgICAgIDwvTGF1bmNoVmlzaWJpbGl0eUNvbnRleHQuUHJvdmlkZXI+CisgICAgICApfQogICAgICAge2xhdW5jaGluZyAmJiA8TGF1bmNoU3BsYXNoIG9uQ29tcGxldGU9e2ZpbmlzaH0gLz59CiAgICAgPC9WaWV3PgogICApOwpkaWZmIC0tZ2l0IGEvY29tcG9uZW50cy9Nb3Rpb25QcmVzc2FibGUudHN4IGIvY29tcG9uZW50cy9Nb3Rpb25QcmVzc2FibGUudHN4CmluZGV4IDliOThkMDkuLjEyYTU0MTMgMTAwNjQ0Ci0tLSBhL2NvbXBvbmVudHMvTW90aW9uUHJlc3NhYmxlLnRzeAorKysgYi9jb21wb25lbnRzL01vdGlvblByZXNzYWJsZS50c3gKQEAgLTEsMTMgKzEsMTMgQEAKIGltcG9ydCB7IHVzZUVmZmVjdCwgdHlwZSBDb21wb25lbnRQcm9wcyB9IGZyb20gInJlYWN0IjsKLWltcG9ydCB7IFRvdWNoYWJsZU9wYWNpdHkgfSBmcm9tICJyZWFjdC1uYXRpdmUiOworaW1wb3J0IHsgU3R5bGVTaGVldCwgVG91Y2hhYmxlT3BhY2l0eSB9IGZyb20gInJlYWN0LW5hdGl2ZSI7CiBpbXBvcnQgQW5pbWF0ZWQsIHsgY2FuY2VsQW5pbWF0aW9uLCBFYXNpbmcsIHVzZUFuaW1hdGVkU3R5bGUsIHVzZVNoYXJlZFZhbHVlLCB3aXRoVGltaW5nIH0gZnJvbSAicmVhY3QtbmF0aXZlLXJlYW5pbWF0ZWQiOwogCiBpbXBvcnQgeyB1c2VSZWR1Y2VkTW90aW9uUHJlZmVyZW5jZSB9IGZyb20gIkAvaG9va3MvdXNlUmVkdWNlZE1vdGlvblByZWZlcmVuY2UiOwogCiB0eXBlIFByb3BzID0gQ29tcG9uZW50UHJvcHM8dHlwZW9mIFRvdWNoYWJsZU9wYWNpdHk+OwogCi0vLyBLZWVwIHRoZSByZWFsIG5hdGl2ZSBidXR0b24gYW5kIGl0cyBhY2Nlc3NpYmlsaXR5IHNlbWFudGljcy4gT25seSB0aGUgb3V0ZXIKLS8vIHZpc3VhbCBsYXllciBzY2FsZXMsIGFuZCBtb3Rpb24gbmV2ZXIgZGVsYXlzIG9yIHN1YnN0aXR1dGVzIGZvciBvblByZXNzLgorLy8gS2VlcCB0aGUgcmVhbCBuYXRpdmUgYnV0dG9uIGFuZCBpdHMgaGl0IGFyZWEgc3RpbGwuIE9ubHkgaXRzIGNvbnRlbnRzIHNjYWxlLAorLy8gc28gdGhlIGZlZWRiYWNrIGNhbm5vdCBtb3ZlIHRoZSB0YXJnZXQgdW5kZXJuZWF0aCBhIGZpbmdlciBkdXJpbmcgYSBwcmVzcy4KIGV4cG9ydCBmdW5jdGlvbiBNb3Rpb25QcmVzc2FibGUoeyBvblByZXNzSW4sIG9uUHJlc3NPdXQsIGRpc2FibGVkLCBjaGlsZHJlbiwgLi4ucHJvcHMgfTogUHJvcHMpIHsKICAgY29uc3QgcmVkdWNlZE1vdGlvbiA9IHVzZVJlZHVjZWRNb3Rpb25QcmVmZXJlbmNlKCk7CiAgIGNvbnN0IHNjYWxlID0gdXNlU2hhcmVkVmFsdWUoMSk7CkBAIC0yMywyMSArMjMsMjUgQEAgZXhwb3J0IGZ1bmN0aW9uIE1vdGlvblByZXNzYWJsZSh7IG9uUHJlc3NJbiwgb25QcmVzc091dCwgZGlzYWJsZWQsIGNoaWxkcmVuLCAuLi4KICAgY29uc3QgYW5pbWF0ZWRTdHlsZSA9IHVzZUFuaW1hdGVkU3R5bGUoKCkgPT4gKHsgdHJhbnNmb3JtOiBbeyBzY2FsZTogc2NhbGUudmFsdWUgfV0gfSkpOwogCiAgIHJldHVybiAoCi0gICAgPEFuaW1hdGVkLlZpZXcgc3R5bGU9e2FuaW1hdGVkU3R5bGV9PgotICAgICAgPFRvdWNoYWJsZU9wYWNpdHkKLSAgICAgICAgey4uLnByb3BzfQotICAgICAgICBkaXNhYmxlZD17ZGlzYWJsZWR9Ci0gICAgICAgIG9uUHJlc3NJbj17KGV2ZW50KSA9PiB7Ci0gICAgICAgICAgaWYgKCFkaXNhYmxlZCAmJiAhcmVkdWNlZE1vdGlvbikgc2NhbGUudmFsdWUgPSB3aXRoVGltaW5nKDAuOTg1LCB7IGR1cmF0aW9uOiA5MCwgZWFzaW5nOiBFYXNpbmcub3V0KEVhc2luZy5xdWFkKSB9KTsKLSAgICAgICAgICBvblByZXNzSW4/LihldmVudCk7Ci0gICAgICAgIH19Ci0gICAgICAgIG9uUHJlc3NPdXQ9eyhldmVudCkgPT4gewotICAgICAgICAgIHNjYWxlLnZhbHVlID0gcmVkdWNlZE1vdGlvbiA/IDEgOiB3aXRoVGltaW5nKDEsIHsgZHVyYXRpb246IDEyMCwgZWFzaW5nOiBFYXNpbmcub3V0KEVhc2luZy5xdWFkKSB9KTsKLSAgICAgICAgICBvblByZXNzT3V0Py4oZXZlbnQpOwotICAgICAgICB9fQotICAgICAgPgorICAgIDxUb3VjaGFibGVPcGFjaXR5CisgICAgICB7Li4ucHJvcHN9CisgICAgICBkaXNhYmxlZD17ZGlzYWJsZWR9CisgICAgICBvblByZXNzSW49eyhldmVudCkgPT4geworICAgICAgICBpZiAoIWRpc2FibGVkICYmICFyZWR1Y2VkTW90aW9uKSBzY2FsZS52YWx1ZSA9IHdpdGhUaW1pbmcoMC45ODUsIHsgZHVyYXRpb246IDkwLCBlYXNpbmc6IEVhc2luZy5vdXQoRWFzaW5nLnF1YWQpIH0pOworICAgICAgICBvblByZXNzSW4/LihldmVudCk7CisgICAgICB9fQorICAgICAgb25QcmVzc091dD17KGV2ZW50KSA9PiB7CisgICAgICAgIHNjYWxlLnZhbHVlID0gcmVkdWNlZE1vdGlvbiB8fCBkaXNhYmxlZCA/IDEgOiB3aXRoVGltaW5nKDEsIHsgZHVyYXRpb246IDEyMCwgZWFzaW5nOiBFYXNpbmcub3V0KEVhc2luZy5xdWFkKSB9KTsKKyAgICAgICAgb25QcmVzc091dD8uKGV2ZW50KTsKKyAgICAgIH19CisgICAgPgorICAgICAgPEFuaW1hdGVkLlZpZXcgc3R5bGU9e1tzdHlsZXMuY29udGVudCwgYW5pbWF0ZWRTdHlsZV19IHBvaW50ZXJFdmVudHM9Im5vbmUiPgogICAgICAgICB7Y2hpbGRyZW59Ci0gICAgICA8L1RvdWNoYWJsZU9wYWNpdHk+Ci0gICAgPC9BbmltYXRlZC5WaWV3PgorICAgICAgPC9BbmltYXRlZC5WaWV3PgorICAgIDwvVG91Y2hhYmxlT3BhY2l0eT4KICAgKTsKIH0KKworY29uc3Qgc3R5bGVzID0gU3R5bGVTaGVldC5jcmVhdGUoeworICBjb250ZW50OiB7IGZsZXhEaXJlY3Rpb246ICJyb3ciLCBhbGlnbkl0ZW1zOiAiY2VudGVyIiwganVzdGlmeUNvbnRlbnQ6ICJjZW50ZXIiIH0sCit9KTsKZGlmZiAtLWdpdCBhL3Rlc3RzL21vdGlvbi50ZXN0LmNqcyBiL3Rlc3RzL21vdGlvbi50ZXN0LmNqcwppbmRleCAxNzRiNTQyLi4zZTI3MTFkIDEwMDY0NAotLS0gYS90ZXN0cy9tb3Rpb24udGVzdC5janMKKysrIGIvdGVzdHMvbW90aW9uLnRlc3QuY2pzCkBAIC0yMjksMjEgKzIyOSwyMCBAQCB0ZXN0KCJsYXVuY2ggaGFzIGEgbWF4aW11bSBmYWxsYmFjayBhbmQgc3RvcHMgaWYgdGhlIGFwcCBiYWNrZ3JvdW5kcyBvciBtb3Rpb24gaQogICB0aHJlZS5oYXJuZXNzLmNsZWFudXAoKTsKIH0pOwogCi10ZXN0KCJsYXVuY2ggZ2F0ZSBleHBvc2VzIHVuZGVybHlpbmcgYXBwIG9ubHkgYWZ0ZXIgdGhlIHNwbGFzaCBpcyBkaXNtaXNzZWQiLCAoKSA9PiB7Cit0ZXN0KCJsYXVuY2ggZ2F0ZSBtb3VudHMgbmF2aWdhdGlvbiBhZnRlciB0aGUgc3BsYXNoIGhhcyBsZWZ0IiwgKHQpID0+IHsKKyAgdC5tb2NrLnRpbWVycy5lbmFibGUoeyBhcGlzOiBbInNldFRpbWVvdXQiXSB9KTsKICAgY29uc3QgeyBoYXJuZXNzLCBtb2R1bGUgfSA9IGxhdW5jaEZpeHR1cmUodHJ1ZSk7CiAgIGxldCB0cmVlID0gaGFybmVzcy5yZW5kZXIobW9kdWxlLkxhdW5jaEdhdGUsIHsgY2hpbGRyZW46ICJhcHAiIH0pOwotICBsZXQgY29udGVudCA9IGZpbmQodHJlZSwgKGVsZW1lbnQpID0+IGVsZW1lbnQucHJvcHM/LmNoaWxkcmVuID09PSAiYXBwIik7Ci0gIGFzc2VydC5lcXVhbChjb250ZW50LnByb3BzLnBvaW50ZXJFdmVudHMsICJub25lIik7Ci0gIGFzc2VydC5lcXVhbChjb250ZW50LnByb3BzLmFjY2Vzc2liaWxpdHlFbGVtZW50c0hpZGRlbiwgdHJ1ZSk7Ci0gIGFzc2VydC5lcXVhbChmaW5kKHRyZWUsIChlbGVtZW50KSA9PiBlbGVtZW50LnR5cGUgPT09ICJMYXVuY2hWaXNpYmlsaXR5UHJvdmlkZXIiKS5wcm9wcy52YWx1ZSwgZmFsc2UpOworICBhc3NlcnQuZXF1YWwoZmluZCh0cmVlLCAoZWxlbWVudCkgPT4gZWxlbWVudC5wcm9wcz8uY2hpbGRyZW4gPT09ICJhcHAiKSwgdW5kZWZpbmVkKTsKICAgY29uc3Qgc3BsYXNoID0gZmluZCh0cmVlLCAoZWxlbWVudCkgPT4gZWxlbWVudC50eXBlID09PSBtb2R1bGUuTGF1bmNoU3BsYXNoKTsKICAgc3BsYXNoLnByb3BzLm9uQ29tcGxldGUoKTsKICAgdHJlZSA9IGhhcm5lc3MucmVuZGVyKG1vZHVsZS5MYXVuY2hHYXRlLCB7IGNoaWxkcmVuOiAiYXBwIiB9KTsKLSAgY29udGVudCA9IGZpbmQodHJlZSwgKGVsZW1lbnQpID0+IGVsZW1lbnQucHJvcHM/LmNoaWxkcmVuID09PSAiYXBwIik7Ci0gIGFzc2VydC5lcXVhbChjb250ZW50LnByb3BzLnBvaW50ZXJFdmVudHMsICJhdXRvIik7Ci0gIGFzc2VydC5lcXVhbChjb250ZW50LnByb3BzLmFjY2Vzc2liaWxpdHlFbGVtZW50c0hpZGRlbiwgZmFsc2UpOwotICBhc3NlcnQuZXF1YWwoZmluZCh0cmVlLCAoZWxlbWVudCkgPT4gZWxlbWVudC50eXBlID09PSAiTGF1bmNoVmlzaWJpbGl0eVByb3ZpZGVyIikucHJvcHMudmFsdWUsIHRydWUpOwogICBhc3NlcnQuZXF1YWwoZmluZCh0cmVlLCAoZWxlbWVudCkgPT4gZWxlbWVudC50eXBlID09PSBtb2R1bGUuTGF1bmNoU3BsYXNoKSwgdW5kZWZpbmVkKTsKKyAgYXNzZXJ0LmVxdWFsKGZpbmQodHJlZSwgKGVsZW1lbnQpID0+IGVsZW1lbnQucHJvcHM/LmNoaWxkcmVuID09PSAiYXBwIiksIHVuZGVmaW5lZCk7CisgIHQubW9jay50aW1lcnMudGljayg1MCk7CisgIHRyZWUgPSBoYXJuZXNzLnJlbmRlcihtb2R1bGUuTGF1bmNoR2F0ZSwgeyBjaGlsZHJlbjogImFwcCIgfSk7CisgIGFzc2VydC5vayhmaW5kKHRyZWUsIChlbGVtZW50KSA9PiBlbGVtZW50LnByb3BzPy5jaGlsZHJlbiA9PT0gImFwcCIpKTsKKyAgYXNzZXJ0LmVxdWFsKGZpbmQodHJlZSwgKGVsZW1lbnQpID0+IGVsZW1lbnQudHlwZSA9PT0gIkxhdW5jaFZpc2liaWxpdHlQcm92aWRlciIpLnByb3BzLnZhbHVlLCB0cnVlKTsKICAgaGFybmVzcy5jbGVhbnVwKCk7CiB9KTsKIApAQCAtMzY4LDYgKzM2Nyw5IEBAIHRlc3QoInByZXNzIGZlZWRiYWNrIGRvZXMgbm90IGNoYW5nZSBidXR0b24gYWN0aW9ucyBhbmQgaXMgc3RpbGwgd2l0aCByZWR1Y2VkIG1vCiAgIGNvbnN0IHByb3BzID0geyB0ZXN0SUQ6ICJidXR0b24iLCBhY2Nlc3NpYmlsaXR5Um9sZTogImJ1dHRvbiIsIG9uUHJlc3M6ICgpID0+IHsgcHJlc3NlZCArPSAxOyB9LCBvblByZXNzSW46ICgpID0+IHsgcHJlc3NlZEluICs9IDE7IH0gfTsKICAgbGV0IHRyZWUgPSBoYXJuZXNzLnJlbmRlcihNb3Rpb25QcmVzc2FibGUsIHByb3BzKTsKICAgbGV0IGJ1dHRvbiA9IGJ5SWQodHJlZSwgImJ1dHRvbiIpOworICBhc3NlcnQuZXF1YWwodHJlZS50eXBlLCAiVG91Y2hhYmxlT3BhY2l0eSIsICJ0aGUgaGl0IHRhcmdldCBtdXN0IG5vdCBiZSB0cmFuc2Zvcm1lZCIpOworICBhc3NlcnQuZXF1YWwoYnV0dG9uLnByb3BzLmNoaWxkcmVuLnR5cGUsICJBbmltYXRlZFZpZXciKTsKKyAgYXNzZXJ0LmVxdWFsKGJ1dHRvbi5wcm9wcy5jaGlsZHJlbi5wcm9wcy5wb2ludGVyRXZlbnRzLCAibm9uZSIpOwogICBidXR0b24ucHJvcHMub25QcmVzc0luKHt9KTsKICAgYnV0dG9uLnByb3BzLm9uUHJlc3MoKTsKICAgYnV0dG9uLnByb3BzLm9uUHJlc3NPdXQoe30pOwo=' | base64 --decode | git apply
-          npm ci --legacy-peer-deps --ignore-scripts --no-audit --no-fund
-          npm run harden-storage
-          node scripts/prepare-android-demo.mjs
-      - name: Bundle trial JavaScript and re-sign disposable APK
-        env:
-          EXPO_OFFLINE: "1"
-          NODE_ENV: production
-        run: |
-          set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/trial-assets" trial
-          cd .expo/android-demo
-          ./node_modules/.bin/expo export:embed --platform android --entry-file node_modules/expo-router/entry.js --dev false --bundle-output "$RUNNER_TEMP/index.android.bundle" --assets-dest "$RUNNER_TEMP/trial-assets" --bytecode --max-workers 2
-          cd ../..
-          python3 - <<'PY'
-          import os
-          import zipfile
-          from pathlib import Path
-          tmp = Path(os.environ['RUNNER_TEMP'])
-          with zipfile.ZipFile('original/Lingua-Demo.apk') as source, zipfile.ZipFile(tmp / 'unsigned.apk', 'w') as target:
-              assert 'assets/index.android.bundle' in source.namelist()
-              for info in source.infolist():
-                  upper = info.filename.upper()
-                  if upper.startswith('META-INF/') and (upper.endswith(('.RSA', '.DSA', '.EC', '.SF')) or upper == 'META-INF/MANIFEST.MF'):
-                      continue
-                  content = (tmp / 'index.android.bundle').read_bytes() if info.filename == 'assets/index.android.bundle' else source.read(info)
-                  target.writestr(info, content)
-          PY
-          tools="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
-          "$tools/zipalign" -f -p 4 "$RUNNER_TEMP/unsigned.apk" "$RUNNER_TEMP/aligned.apk"
-          keytool -genkeypair -keystore "$RUNNER_TEMP/trial.jks" -alias trial -keyalg RSA -keysize 2048 -validity 2 -storepass android -keypass android -dname 'CN=Disposable emulator test' > /dev/null 2>&1
-          "$tools/apksigner" sign --ks "$RUNNER_TEMP/trial.jks" --ks-key-alias trial --ks-pass pass:android --key-pass pass:android --out trial/Lingua-Trial.apk "$RUNNER_TEMP/aligned.apk"
-          "$tools/apksigner" verify trial/Lingua-Trial.apk
-      - uses: actions/upload-artifact@v4
-        with:
-          name: internal-disposable-motion-trial
-          path: trial/Lingua-Trial.apk
-          retention-days: 1
-
-  motion:
-    name: Trial normal and reduced motion
-    needs: build
+  probe:
+    name: Probe normal-motion input
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -82,12 +20,42 @@ jobs:
         with:
           name: internal-disposable-motion-trial
           path: trial
+          run-id: 44447786898
+          github-token: ${{ github.token }}
       - name: Enable isolated emulator
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-      - name: Run motion smoke
+      - name: Prepare careful input probe
+        run: |
+          cat > "$RUNNER_TEMP/probe.py" <<'PY'
+          import importlib.util
+          import os
+          import time
+          from pathlib import Path
+          spec = importlib.util.spec_from_file_location('motion', Path('scripts/smoke-android-motion.py'))
+          motion = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(motion)
+          os.environ['LINGUA_SYNTHETIC_EMULATOR'] = '1'
+          smoke = motion.smoke
+          def steady_tap(text, exact=False):
+              smoke.wait_for(text, exact=exact)
+              # Native transitions need time to settle before coordinates are
+              # measured. Hold like a real tap rather than an instantaneous adb tap.
+              time.sleep(0.7)
+              _, _, x, y = smoke.wait_for(text, exact=exact)
+              smoke.adb('shell', 'input', 'swipe', str(x), str(y), str(x), str(y), '120')
+              print(f'Steady tap: {text} at {x},{y}', flush=True)
+          smoke.tap = steady_tap
+          try:
+              motion.main(Path('trial/Lingua-Trial.apk'))
+          finally:
+              logs = smoke.adb('logcat', '-d', '-v', 'time', 'ReactNativeJS:V', 'AndroidRuntime:E', '*:S', check=False)
+              (smoke.OUT / 'probe-logcat.txt').write_bytes(logs.stdout)
+              smoke.screenshot('probe-last-screen')
+          PY
+      - name: Exercise motion modes on a fresh emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
@@ -96,108 +64,33 @@ jobs:
           profile: pixel_2
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
-          script: >-
-            bash -o pipefail -c 'LINGUA_SYNTHETIC_EMULATOR=1 python3 scripts/smoke-android-motion.py trial/Lingua-Trial.apk 2>&1 | tee motion-trial.log; result=${PIPESTATUS[0]}; adb logcat -d -v time ReactNativeJS:V AndroidRuntime:E "*:S" > android-smoke/trial-logcat.txt; exit "$result"'
-      - name: Report trial details
+          script: bash -o pipefail -c 'python3 "$RUNNER_TEMP/probe.py" 2>&1 | tee probe.log'
+      - name: Report probe details
         if: always()
         run: |
           python3 - <<'PY'
           import xml.etree.ElementTree as ET
           from pathlib import Path
-          def notice(title, message):
-              message = message[-3800:].replace('%','%25').replace('\r','%0D').replace('\n','%0A')
-              print(f'::notice title={title}::{message}')
-          for path in (Path('motion-trial.log'), Path('android-smoke/trial-logcat.txt')):
+          def notice(title, text):
+              text = text[-3800:].replace('%','%25').replace('\r','%0D').replace('\n','%0A')
+              print(f'::notice title={title}::{text}')
+          for path in (Path('probe.log'), Path('android-smoke/probe-logcat.txt')):
               if path.exists():
                   lines = path.read_text(errors='replace').splitlines()
                   fatal = next((i for i,line in enumerate(lines) if 'FATAL EXCEPTION' in line), None)
-                  notice(path.name, '\n'.join(lines[fatal:fatal+25] if fatal is not None else lines[-24:]))
+                  notice(path.name, '\n'.join(lines[fatal:fatal+25] if fatal is not None else lines[-30:]))
           path = Path('android-smoke/last-window.xml')
           if path.exists():
               try:
                   labels = [f"{n.get('text', '')} | {n.get('content-desc', '')}" for n in ET.parse(path).iter('node') if n.get('text') or n.get('content-desc')]
-                  notice('Trial last screen', '\n'.join(labels[-50:]))
+                  notice('Last screen', '\n'.join(labels[-50:]))
               except ET.ParseError:
                   pass
           PY
-
-  storage:
-    name: Trial synthetic storage fault safety
-    needs: build
-    runs-on: ubuntu-24.04
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          name: internal-disposable-motion-trial
-          path: trial
-      - name: Enable isolated emulator
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-      - name: Run synthetic storage checks
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 35
-          arch: x86_64
-          target: google_apis
-          profile: pixel_2
-          disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
-          script: bash -o pipefail -c 'python3 scripts/smoke-android-storage-failures.py trial/Lingua-Trial.apk 2>&1 | tee storage-trial.log'
-      - name: Report storage details
+      - uses: actions/upload-artifact@v4
         if: always()
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          for path in (Path('storage-trial.log'), Path('android-smoke/p0-storage-logcat.txt')):
-              if path.exists():
-                  lines = path.read_text(errors='replace').splitlines()
-                  fatal = next((i for i,line in enumerate(lines) if 'FATAL EXCEPTION' in line), None)
-                  message = '\n'.join(lines[fatal:fatal+25] if fatal is not None else lines[-24:])[-3800:]
-                  message = message.replace('%','%25').replace('\r','%0D').replace('\n','%0A')
-                  print(f'::notice title=Trial {path.name}::{message}')
-          PY
-
-  baseline:
-    name: Compare prior synthetic storage behavior
-    runs-on: ubuntu-24.04
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
         with:
-          name: Lingua-Demo-APK
-          path: baseline
-          run-id: 44231838779
-          github-token: ${{ github.token }}
-      - name: Enable isolated emulator
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-      - name: Run prior APK synthetic storage check
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 35
-          arch: x86_64
-          target: google_apis
-          profile: pixel_2
-          disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
-          script: bash -o pipefail -c 'python3 scripts/smoke-android-storage-failures.py baseline/Lingua-Demo.apk 2>&1 | tee baseline-storage.log'
-      - name: Report baseline details
-        if: always()
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          for path in (Path('baseline-storage.log'), Path('android-smoke/p0-storage-logcat.txt')):
-              if path.exists():
-                  lines = path.read_text(errors='replace').splitlines()
-                  fatal = next((i for i,line in enumerate(lines) if 'FATAL EXCEPTION' in line), None)
-                  message = '\n'.join(lines[fatal:fatal+25] if fatal is not None else lines[-24:])[-3800:]
-                  message = message.replace('%','%25').replace('\r','%0D').replace('\n','%0A')
-                  print(f'::notice title=Baseline {path.name}::{message}')
-          PY
+          name: internal-motion-probe
+          path: android-smoke/
+          if-no-files-found: warn
+          retention-days: 1
