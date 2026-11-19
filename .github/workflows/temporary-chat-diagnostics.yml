@@ -21,12 +21,16 @@ jobs:
           path: diagnostics
           run-id: 44498479753
           github-token: ${{ github.token }}
-      - name: Summarize failure without personal data
+      - name: Summarize synthetic test failure
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          gh api repos/mwijay12/react-native-lingua/actions/jobs/135480017194/logs > job.log || true
+          if gh api repos/mwijay12/react-native-lingua/actions/jobs/135480017194/logs > job.log 2>/dev/null; then
+            echo '::notice title=Job log access::Download succeeded'
+          else
+            echo '::notice title=Job log access::Download unavailable'
+          fi
           python3 - <<'PY'
           import re
           from pathlib import Path
@@ -37,22 +41,74 @@ jobs:
               print(f'::notice title={title}::{text[:12000]}')
 
           root = Path('diagnostics')
-          notice('Synthetic diagnostic files', ', '.join(str(p.relative_to(root)) for p in root.rglob('*') if p.is_file()))
           log = Path('job.log').read_text(errors='replace').splitlines()
-          wanted = [line for line in log if re.search(r'Found:|Tapped:|RuntimeError:|AssertionError:|Traceback|FATAL EXCEPTION|Error: The process', line)]
-          notice('Recent test output', '\n'.join(wanted[-35:]) or 'No matching lines in job log')
-          for name in ('last-window.xml', 'motion-logcat.txt', 'logcat.txt'):
-              for file in root.rglob(name):
-                  if name.endswith('.xml'):
-                      try:
-                          tree = ET.fromstring(file.read_text(errors='replace'))
-                          labels = [f"{node.get('text', '')} | {node.get('content-desc', '')}" for node in tree.iter('node') if node.get('text') or node.get('content-desc')]
-                          notice('Last synthetic UI labels', '\n'.join(labels[-40:]))
-                      except ET.ParseError:
-                          notice('Last synthetic UI labels', 'Could not parse UI dump')
-                  else:
-                      lines = file.read_text(errors='replace').splitlines()
-                      fatal = [i for i, line in enumerate(lines) if 'FATAL EXCEPTION' in line]
-                      if fatal:
-                          notice(name, '\n'.join(lines[fatal[-1]:fatal[-1] + 24]))
+          wanted = [line for line in log if re.search(r'Found:|Tapped:|RuntimeError:|AssertionError:|Traceback|FATAL EXCEPTION|Error: The process|Did not find|Could not scroll', line)]
+          notice('Recent test output', '\n'.join(wanted[-45:]) or f'No matching lines in job log ({len(log)} lines)')
+          for file in root.rglob('last-window.xml'):
+              try:
+                  tree = ET.fromstring(file.read_text(errors='replace'))
+                  labels = [f"{node.get('text', '')} | {node.get('content-desc', '')} | {node.get('class', '')} | bounds={node.get('bounds', '')} | enabled={node.get('enabled', '')} | clickable={node.get('clickable', '')} | package={node.get('package', '')}" for node in tree.iter('node') if node.get('text') or node.get('content-desc')]
+                  notice('Last synthetic UI bounds', '\n'.join(labels[-40:]))
+              except ET.ParseError:
+                  notice('Last synthetic UI bounds', 'Could not parse UI dump')
+          for file in root.rglob('*logcat.txt'):
+              lines = file.read_text(errors='replace').splitlines()
+              fatal = [i for i, line in enumerate(lines) if 'FATAL EXCEPTION' in line]
+              if fatal:
+                  notice(file.name, '\n'.join(lines[fatal[-1]:fatal[-1] + 24]))
+          PY
+      - name: Encode small synthetic screenshots
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/Resize.java" <<'JAVA'
+          import java.awt.image.BufferedImage;
+          import java.awt.Graphics2D;
+          import java.io.File;
+          import javax.imageio.ImageIO;
+          import javax.imageio.ImageWriter;
+          import javax.imageio.ImageWriteParam;
+          import javax.imageio.IIOImage;
+          import javax.imageio.stream.ImageOutputStream;
+          public class Resize {
+              public static void main(String[] args) throws Exception {
+                  BufferedImage input = ImageIO.read(new File(args[0]));
+                  int width = 320;
+                  int height = input.getHeight() * width / input.getWidth();
+                  BufferedImage output = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+                  Graphics2D g = output.createGraphics();
+                  g.drawImage(input, 0, 0, width, height, null);
+                  g.dispose();
+                  ImageWriter writer = ImageIO.getImageWritersByFormatName("jpeg").next();
+                  try (ImageOutputStream stream = ImageIO.createImageOutputStream(new File(args[1]))) {
+                      writer.setOutput(stream);
+                      ImageWriteParam p = writer.getDefaultWriteParam();
+                      p.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                      p.setCompressionQuality(0.35f);
+                      writer.write(null, new IIOImage(output, null, null), p);
+                  }
+                  writer.dispose();
+              }
+          }
+          JAVA
+          for name in 05-chat-keyboard last-screen; do
+            picture="$(find diagnostics -name "$name.png" -print -quit)"
+            if [ -n "$picture" ]; then
+              java "$RUNNER_TEMP/Resize.java" "$picture" "$RUNNER_TEMP/$name.jpg"
+            fi
+          done
+          python3 - <<'PY'
+          import base64
+          import os
+          from pathlib import Path
+          for name in ('05-chat-keyboard', 'last-screen'):
+              path = Path(os.environ['RUNNER_TEMP']) / f'{name}.jpg'
+              if not path.exists():
+                  continue
+              payload = base64.b64encode(path.read_bytes()).decode()
+              chunks = [payload[index:index+3000] for index in range(0, len(payload), 3000)]
+              if len(chunks) > 20:
+                  raise SystemExit(f'{name} has too many chunks')
+              for index, part in enumerate(chunks):
+                  print(f'::notice title={name} {index:02d}::{part}')
           PY
