@@ -69,3 +69,20 @@ jobs:
                           for start in range(0, min(len(stack), 12000), 3500):
                               notice(f'{name} fatal stack {start}', stack[start:start + 3500])
           PY
+      - name: Inspect synthetic welcome screenshot
+        run: |
+          set -euo pipefail
+          gh run download 44443156598 --repo "$GITHUB_REPOSITORY" --name Lingua-Demo-Android-Smoke --dir "$RUNNER_TEMP/motion-picture"
+          picture="$(find "$RUNNER_TEMP/motion-picture" -name 'motion-on-welcome.png' -print -quit)"
+          convert "$picture" -resize 300x -strip -quality 42 "$RUNNER_TEMP/welcome.jpg"
+          python3 - <<'PY'
+          import base64
+          import os
+          from pathlib import Path
+          payload = base64.b64encode((Path(os.environ['RUNNER_TEMP']) / 'welcome.jpg').read_bytes()).decode()
+          chunks = [payload[index:index+3000] for index in range(0, len(payload), 3000)]
+          if len(chunks) > 9:
+              raise RuntimeError(f'Screenshot has too many parts: {len(chunks)}')
+          for index, part in enumerate(chunks):
+              print(f'::notice title=welcome image {index:02d}::{part}')
+          PY
