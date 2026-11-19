@@ -54,9 +54,15 @@ jobs:
                       tree = ET.parse(path)
                       labels = [f"{n.get('text', '')} | {n.get('content-desc', '')}" for n in tree.iter('node') if n.get('text') or n.get('content-desc')]
                       notice(f'{name} last screen {path.name}', '\n'.join(labels[-60:]) or '(no labels)')
+                      if name == 'motion':
+                          notice('motion raw screen', path.read_text(errors='replace')[:30000])
                   except ET.ParseError:
                       pass
               for path in directory.rglob('*logcat*'):
-                  matching = [line for line in path.read_text(errors='replace').splitlines() if re.search(r'exception|fatal|error|warning', line, re.I)]
+                  log_lines = path.read_text(errors='replace').splitlines()
+                  matching = [line for line in log_lines if re.search(r'exception|fatal|error|warning', line, re.I)]
                   notice(f'{name} logcat errors {path.name}', '\n'.join(matching[-25:]) or '(none)')
+                  for index, line in enumerate(log_lines):
+                      if 'FATAL EXCEPTION' in line:
+                          notice(f'{name} fatal stack {path.name}', '\n'.join(log_lines[index:index + 80]))
           PY
