@@ -22,8 +22,8 @@ jobs:
       - name: Summarize failed job logs
         run: |
           set -euo pipefail
-          gh api "repos/$GITHUB_REPOSITORY/actions/jobs/135295001791/logs" > "$RUNNER_TEMP/motion.log" 2> "$RUNNER_TEMP/motion.error" || true
-          gh api "repos/$GITHUB_REPOSITORY/actions/jobs/135295001958/logs" > "$RUNNER_TEMP/storage.log" 2> "$RUNNER_TEMP/storage.error" || true
+          gh api --allow-escape-sequences "repos/$GITHUB_REPOSITORY/actions/jobs/135295001791/logs" > "$RUNNER_TEMP/motion.log" 2> "$RUNNER_TEMP/motion.error" || true
+          gh api --allow-escape-sequences "repos/$GITHUB_REPOSITORY/actions/jobs/135295001958/logs" > "$RUNNER_TEMP/storage.log" 2> "$RUNNER_TEMP/storage.error" || true
           gh run download 44443156598 --repo "$GITHUB_REPOSITORY" --name Lingua-Demo-Android-Smoke --dir "$RUNNER_TEMP/motion-artifact" 2> "$RUNNER_TEMP/motion-download.error" || true
           gh run download 44443156598 --repo "$GITHUB_REPOSITORY" --name Lingua-Demo-Storage-Smoke --dir "$RUNNER_TEMP/storage-artifact" 2> "$RUNNER_TEMP/storage-download.error" || true
           python3 - <<'PY'
@@ -43,6 +43,7 @@ jobs:
                   if error:
                       notice(f'{name} diagnostic error', error[:3000])
               text = (tmp / f'{name}.log').read_text(errors='replace')
+              text = re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', text)
               lines = text.splitlines()
               for offset in range(0, min(150, len(lines)), 30):
                   end = len(lines) - offset
