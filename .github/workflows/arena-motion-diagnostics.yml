@@ -45,9 +45,9 @@ jobs:
               text = (tmp / f'{name}.log').read_text(errors='replace')
               text = re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', text)
               lines = text.splitlines()
-              for offset in range(0, min(150, len(lines)), 30):
-                  end = len(lines) - offset
-                  notice(f'{name} log tail {offset + 1}', '\n'.join(lines[max(0, end - 30):end]))
+              for index, line in enumerate(lines):
+                  if 'Traceback (most recent call last)' in line:
+                      notice(f'{name} traceback', '\n'.join(lines[index:index + 14])[:4000])
               directory = tmp / f'{name}-artifact'
               for path in directory.rglob('*.xml'):
                   try:
@@ -55,7 +55,8 @@ jobs:
                       labels = [f"{n.get('text', '')} | {n.get('content-desc', '')}" for n in tree.iter('node') if n.get('text') or n.get('content-desc')]
                       notice(f'{name} last screen {path.name}', '\n'.join(labels[-60:]) or '(no labels)')
                       if name == 'motion':
-                          notice('motion raw screen', path.read_text(errors='replace')[:30000])
+                          buttons = [str(n.attrib) for n in tree.iter('node') if 'Try the demo' in n.get('text', '') or 'Try the demo' in n.get('content-desc', '')]
+                          notice('motion button details', '\n'.join(buttons)[:4000])
                   except ET.ParseError:
                       pass
               for path in directory.rglob('*logcat*'):
@@ -64,5 +65,7 @@ jobs:
                   notice(f'{name} logcat errors {path.name}', '\n'.join(matching[-25:]) or '(none)')
                   for index, line in enumerate(log_lines):
                       if 'FATAL EXCEPTION' in line:
-                          notice(f'{name} fatal stack {path.name}', '\n'.join(log_lines[index:index + 80]))
+                          stack = '\n'.join(log_lines[index:index + 80])
+                          for start in range(0, min(len(stack), 12000), 3500):
+                              notice(f'{name} fatal stack {start}', stack[start:start + 3500])
           PY
