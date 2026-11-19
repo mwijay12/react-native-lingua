@@ -1,0 +1,57 @@
+name: Temporary motion diagnostics
+
+on:
+  push:
+    branches:
+      - "arena/**"
+    paths:
+      - ".github/workflows/arena-motion-diagnostics.yml"
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  diagnose:
+    name: Inspect synthetic emulator diagnostics
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Summarize failed job logs
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/actions/jobs/135295001791/logs" > "$RUNNER_TEMP/motion.log"
+          gh api "repos/$GITHUB_REPOSITORY/actions/jobs/135295001958/logs" > "$RUNNER_TEMP/storage.log"
+          gh run download 44443156598 --repo "$GITHUB_REPOSITORY" --name Lingua-Demo-Android-Smoke --dir "$RUNNER_TEMP/motion-artifact" || true
+          gh run download 44443156598 --repo "$GITHUB_REPOSITORY" --name Lingua-Demo-Storage-Smoke --dir "$RUNNER_TEMP/storage-artifact" || true
+          python3 - <<'PY'
+          import os
+          import re
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+
+          tmp = Path(os.environ['RUNNER_TEMP'])
+          def notice(title, text):
+              text = text.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+              print(f'::notice title={title}::{text}', flush=True)
+
+          for name in ('motion', 'storage'):
+              text = (tmp / f'{name}.log').read_text(errors='replace')
+              lines = text.splitlines()
+              for offset in range(0, min(150, len(lines)), 30):
+                  end = len(lines) - offset
+                  notice(f'{name} log tail {offset + 1}', '\n'.join(lines[max(0, end - 30):end]))
+              directory = tmp / f'{name}-artifact'
+              for path in directory.rglob('*.xml'):
+                  try:
+                      tree = ET.parse(path)
+                      labels = [f"{n.get('text', '')} | {n.get('content-desc', '')}" for n in tree.iter('node') if n.get('text') or n.get('content-desc')]
+                      notice(f'{name} last screen {path.name}', '\n'.join(labels[-60:]) or '(no labels)')
+                  except ET.ParseError:
+                      pass
+              for path in directory.rglob('*logcat*'):
+                  matching = [line for line in path.read_text(errors='replace').splitlines() if re.search(r'exception|fatal|error|warning', line, re.I)]
+                  notice(f'{name} logcat errors {path.name}', '\n'.join(matching[-25:]) or '(none)')
+          PY
