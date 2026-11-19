@@ -52,6 +52,15 @@ with tempfile.TemporaryDirectory(prefix="lingua-upgrade-unit-") as temporary:
     spec = importlib.util.spec_from_file_location("planning_upgrade", ROOT / "scripts/smoke-android-planning-upgrade.py")
     upgrade = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(upgrade)
+    # Both the old test APK and the current preview must remain usable as
+    # synthetic baselines after the onboarding label changes.
+    helpers = upgrade.smoke
+    captured = []
+    for label in ("Try the demo", "Continue without an account"):
+        helpers.wait_for_one_of = lambda options, label=label: label if label in options else None
+        helpers.tap = lambda text, exact=False: captured.append((text, exact))
+        helpers.tap_onboarding()
+    assert captured == [("Try the demo", True), ("Continue without an account", True)]
     check_scenario(upgrade, 10)
     check_scenario(upgrade, 12)
 print("Upgrade orchestration passed with the historical and P0 baseline lesson counts.")

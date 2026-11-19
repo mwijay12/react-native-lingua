@@ -72,7 +72,8 @@ export default function RootLayout() {
       debug={__DEV__}
       autocapture={{
         captureScreens: true,
-        captureTouches: true,
+        // Do not collect touch events while the private chat screen is active.
+        captureTouches: !/^\/chat(?:\/|$)/.test(pathname),
         propsToCapture: ["testID"],
         maxElementsCaptured: 20,
       }}

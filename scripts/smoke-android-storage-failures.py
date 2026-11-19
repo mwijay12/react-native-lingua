@@ -111,7 +111,7 @@ def main(apk):
     shell("svc", "data", "disable", check=False)
     smoke.adb("logcat", "-c")
     launch()
-    smoke.tap("Try the demo")
+    smoke.tap_onboarding()
     smoke.wait_for("Choose a language")
     smoke.tap("Continue")
     smoke.wait_for("TODAY’S STUDY")

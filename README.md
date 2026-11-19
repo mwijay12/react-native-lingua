@@ -145,12 +145,46 @@ course, review and mix milestones across courses. Mix rewards use separate
 on-device storage; if rewards cannot be read or saved, the app offers a retry
 without resetting existing study progress.
 
-**AI voice and live chat are not enabled.** The AI screens show labelled local
-practice instead, and the agent-session and Stream-token API routes in this
-source return 503. They must not be re-enabled until authentication, call
-ownership, rate limiting, token validation and the agent deployment have been
-secured and reviewed. Any previously deployed backend is unaffected by these
-source changes and must be disabled or secured separately.
+**AI voice and live chat are not enabled yet.** Chat now has a message composer,
+course-specific starter prompts and clear connection/error states; it never
+pretends that a local example is an AI reply. A draft stays on screen if a send
+fails. Conversations are kept only in memory and clear when the account or
+course changes, or the app closes. Avoid sharing sensitive information.
+
+The chat client accepts an optional `EXPO_PUBLIC_CHAT_API_URL` for **your own**
+HTTPS backend (or `/api/chat` on a same-origin web host). It sends a Clerk
+session token and a bounded recent conversation, never a provider key. The chat
+view is marked for PostHog exclusion, touch autocapture is disabled while chat
+is active, and native session replay is explicitly disabled. Verify privacy on
+each deployed platform before using real conversations. The bundled chat route
+intentionally returns 503, even if a provider key exists; setting a URL or key
+alone does not enable AI. Never put provider or Clerk secret keys in the app,
+an `EXPO_PUBLIC_` variable, Git, or a chat message.
+
+A future backend should implement this small, provider-neutral contract:
+
+- Accept `POST` JSON with `language` (`sw`, `en`, or `fr`) and `messages` (up
+  to 11 alternating `{ "role": "user" | "assistant", "content": "..." }`
+  entries, ending with a user message). User messages are at most 1,200
+  characters; assistant messages are at most 4,000.
+- Verify the `Authorization: Bearer <Clerk session token>` on the server,
+  independently validate all input and limits, and return a successful reply
+  as `{ "reply": "..." }` (at most 4,000 characters). Select tutor instructions
+  on the server and treat all client-supplied history as untrusted. Responses
+  should use `Cache-Control: no-store`; the client requests the final HTTPS
+  endpoint without cookies or redirects.
+- Enforce per-user rate and spending limits; handle privacy and provider
+  retention; and keep provider credentials in server-side secrets. If a web
+  client uses a different origin, configure CORS for the trusted app origin and
+  its `Authorization`, `Content-Type`, and `Cache-Control` request headers.
+  Return 401/403 for authentication, 429 for rate limiting and 503 when the
+  service is unavailable; the client displays safe, generic error messages.
+
+The agent-session and Stream-token routes also return 503. Voice must not be
+enabled until authentication, call ownership, rate limiting, token validation
+and agent deployment have been secured and reviewed. Any previously deployed
+backend is unaffected by these source changes and must be disabled or secured
+separately.
 
 ## <a name="introduction">✨ Introduction</a>
 
@@ -192,7 +226,7 @@ If you're getting started and need assistance or face any bugs, join our active 
 
 👉 **Accounts**: The tutorial source includes Clerk integration; sign-in is deliberately disabled in the standalone Android demo.
 
-👉 **AI Teacher (planned)**: Live voice and chat are currently disabled. The app offers labelled offline practice while secure services are developed.
+👉 **AI Teacher and Chat (planned)**: Live voice and AI replies are currently disabled. Chat has a composer and starter prompts ready for a secure backend; lessons remain available offline.
 
 👉 **Lesson Interface**: A core learning engine built with **React Native**, **Expo**, and **TypeScript**, using **NativeWind** to maintain a polished UI that survives contact with serious features.
 
@@ -279,22 +313,18 @@ Create a new file named `.env` in the root of your project and add the following
 
 ```env
 EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=
-
+# Optional public URL of your own HTTPS backend; do not use a provider URL.
+EXPO_PUBLIC_CHAT_API_URL=
 POSTHOG_PROJECT_TOKEN=
 POSTHOG_HOST=
-
 STREAM_API_KEY=
-STREAM_API_SECRET=
-
-# Vision Agent
-# Run `uv run main.py serve` inside vision-agent/
-VISION_AGENT_URL=http://localhost:8000
-
-# OpenAI API key (required for the vision-agent)
-OPENAI_API_KEY=
 ```
 
-Replace the placeholder values with your real credentials. You can get these by signing up at: [**Stream**](https://jsm.dev/lingua-stream), [**PostHog**](https://jsm.dev/lingua-posthog), [**Clerk**](https://jsm.dev/lingua-clerk).
+These are client-visible settings; never place a secret in them. Configure any
+AI provider key, Clerk secret key, or Stream secret only in the deployed
+backend's secret manager, not in an app bundle or repository. The chat and voice
+routes remain disabled until their server-side security and provider integration
+are implemented and reviewed.
 
 **Running the Project**
 

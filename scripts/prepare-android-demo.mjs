@@ -55,7 +55,7 @@ replaceOnce(
   '            posthog.capture("onboarding_get_started_tapped");\n            router.push("/(auth)/sign-up");',
   '            router.push("/language-select");',
 );
-replaceOnce("app/onboarding.tsx", "            Get Started\n", "            Try the demo\n");
+replaceOnce("app/onboarding.tsx", "            Get Started\n", "            Continue without an account\n");
 replaceOnce("app/(tabs)/index.tsx", 'import { useUser } from "@clerk/expo";\n', "");
 replaceOnce("app/(tabs)/index.tsx", '  const { user } = useUser();\n', "");
 replaceOnce('app/(tabs)/index.tsx', '  const firstName = user?.firstName ?? "Learner";', '  const firstName = "Learner";');

@@ -8,8 +8,8 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { Text, View } from "react-native";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { View } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -28,14 +28,7 @@ export default function DemoRootLayout() {
   return (
     <SafeAreaProvider>
       <LaunchGate>
-        <StatusBar style="light" />
-        <SafeAreaView edges={["top"]} style={{ backgroundColor: "#104F49" }}>
-          <View className="items-center px-3 py-2">
-            <Text className="text-center text-xs text-white font-poppins-semibold">
-              DEMO · Sign-in and AI voice are disabled
-            </Text>
-          </View>
-        </SafeAreaView>
+        <StatusBar style="dark" />
         <View style={{ flex: 1, backgroundColor: "#FBF8F1" }}>
           {languageHydration !== "ready" ? (
             <LearningHydrationScreen status={languageHydration} storage="course" />

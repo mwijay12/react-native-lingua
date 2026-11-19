@@ -102,6 +102,12 @@ def wait_for_one_of(texts, timeout=90):
     raise RuntimeError(f"Did not find any of {texts!r} on screen")
 
 
+def tap_onboarding():
+    # Upgrade baselines use the old label; current test builds use the new one.
+    label = wait_for_one_of(("Continue without an account", "Try the demo"))
+    tap(label, exact=True)
+
+
 def screen_size():
     text = adb("shell", "wm", "size").stdout.decode("utf-8", "replace")
     sizes = re.findall(r"(\d+)x(\d+)", text)
@@ -256,10 +262,10 @@ def main(apk):
     adb("shell", "svc", "data", "disable", check=False)
     adb("logcat", "-c")
     adb("shell", "am", "start", "-n", f"{PACKAGE}/.MainActivity")
-    wait_for("Try the demo")
+    wait_for("Continue without an account")
     wait_for("Created by Mwijay")
     screenshot("01-onboarding")
-    tap("Try the demo")
+    tap("Continue without an account")
     wait_for("Choose a language")
     wait_for("Kiswahili")
     screenshot("02-language")
@@ -297,9 +303,28 @@ def main(apk):
     wait_for("AI voice is not available yet")
     screenshot("04-ai-teacher")
     tap("Chat")
-    wait_for("Live AI chat is not available yet")
-    wait_for("This is a written example, not a conversation with an AI.")
+    wait_for("Chat with Lingua")
+    wait_for("AI connection needed")
+    wait_for("Your AI tutor will be here once the secure chat service is connected.")
     screenshot("05-chat")
+    # The preview has no backend: a starter becomes a draft, changing course
+    # warns before discarding it, and an attempted send never invents a reply.
+    tap("Use prompt: Teach me a Kiswahili greeting", exact=True)
+    wait_for("Teach me a Kiswahili greeting")
+    tap("Change course, currently Kiswahili", exact=True)
+    wait_for("Choosing a different course clears this conversation and draft.")
+    tap("Keep", exact=True)
+    tap("Message for the AI tutor", exact=True)
+    wait_for("Send message", exact=True)
+    screenshot("05-chat-keyboard")
+    tap("Send message", exact=True)
+    wait_for("AI chat isn't connected yet. Your draft is still here.")
+    wait_for("Teach me a Kiswahili greeting")
+    adb("shell", "input", "keyevent", "KEYCODE_BACK")
+    tap("Clear conversation", exact=True)
+    wait_for("Clear this conversation and draft?")
+    tap("Clear", exact=True)
+    wait_for("Use prompt: Teach me a Kiswahili greeting", exact=True)
     tap("Profile")
     scroll_to("Created by Mwijay")
     wait_for("About Lingua")

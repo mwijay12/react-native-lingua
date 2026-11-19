@@ -1,7 +1,7 @@
 // Standalone, non-production variant. No Clerk, Stream or analytics keys.
 module.exports = {
   expo: {
-    name: "Lingua Demo",
+    name: "Lingua Preview",
     slug: "lingua-android-demo",
     version: "1.0.0",
     orientation: "portrait",
