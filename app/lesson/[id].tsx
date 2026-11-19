@@ -201,8 +201,8 @@ export default function LessonScreen() {
                 </>
               )}
               {lesson.activities.length > 0 ? (
-                <MotionPressable onPress={() => setPhase("practice")} className="bg-lingua-teal rounded-2xl items-center py-4 mt-6" accessibilityRole="button" testID="start-practice-button">
-                  <Text className="font-poppins-semibold text-base text-white">Start practice</Text>
+                <MotionPressable onPress={() => setPhase("practice")} className="bg-lingua-teal rounded-2xl items-center px-4 py-4 mt-6" accessibilityRole="button" testID="start-practice-button">
+                  <Text className="font-poppins-semibold text-base text-white text-center shrink">Start practice</Text>
                 </MotionPressable>
               ) : (
                 <Text className="body-sm text-text-secondary mt-6">Practice questions are not available for this lesson yet.</Text>

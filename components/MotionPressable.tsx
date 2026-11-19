@@ -43,5 +43,5 @@ export function MotionPressable({ onPressIn, onPressOut, disabled, children, ...
 }
 
 const styles = StyleSheet.create({
-  content: { flexDirection: "row", alignItems: "center", justifyContent: "center" },
+  content: { flexDirection: "row", alignItems: "center", justifyContent: "center", flexShrink: 1, maxWidth: "100%" },
 });

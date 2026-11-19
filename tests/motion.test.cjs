@@ -379,8 +379,10 @@ test("progress remains bounded, accessible immediately, and animates only when a
   });
   let props = { value: 1, max: 4, label: "Practice progress", valueText: "One of four" };
   let tree = harness.render(MotionProgress, props);
+  assert.equal(tree.props.accessible, true);
   assert.equal(tree.props.accessibilityRole, "progressbar");
   assert.deepEqual(tree.props.accessibilityValue, { min: 0, max: 4, now: 1, text: "One of four" });
+  assert.equal(tree.props.children.props.accessible, false);
   tree.props.onLayout({ nativeEvent: { layout: { width: 200 } } });
   tree = harness.render(MotionProgress, props);
   let fill = find(tree, (element) => element.type === "AnimatedView");
@@ -415,6 +417,8 @@ test("press feedback does not change button actions and is still with reduced mo
   assert.equal(tree.type, "TouchableOpacity", "the hit target must not be transformed");
   assert.equal(button.props.children.type, "AnimatedView");
   assert.equal(button.props.children.props.pointerEvents, "none");
+  assert.equal(button.props.children.props.style[0].maxWidth, "100%");
+  assert.equal(button.props.children.props.style[0].flexShrink, 1);
   button.props.onPressIn({});
   button.props.onPress();
   button.props.onPressOut({});

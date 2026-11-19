@@ -46,6 +46,7 @@ export function MotionProgress({
       className={className}
       style={[styles.track, { backgroundColor: trackColor }]}
       onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
+      accessible
       accessibilityRole="progressbar"
       accessibilityLabel={label}
       accessibilityValue={{ min: 0, max: progress.max, now: progress.value, text: valueText }}

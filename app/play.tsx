@@ -147,8 +147,8 @@ export default function PlayScreen() {
               <Text className="caption mt-2">Round stars are just for fun: no extra XP, daily sessions or changes to your review list.</Text>
               <Text className="caption mt-2">Use the speaker above to turn feedback sounds on or off.</Text>
               {questionCount > 0 && language ? (
-                <MotionPressable onPress={start} className="bg-lingua-teal rounded-2xl items-center py-4 mt-4" accessibilityRole="button" testID="start-mix-button">
-                  <Text className="font-poppins-semibold text-base text-white">Play {questionCount}-question mix</Text>
+                <MotionPressable onPress={start} className="bg-lingua-teal rounded-2xl items-center px-4 py-4 mt-4" accessibilityRole="button" testID="start-mix-button">
+                  <Text className="font-poppins-semibold text-base text-white text-center shrink">Play {questionCount}-question mix</Text>
                 </MotionPressable>
               ) : (
                 <TouchableOpacity onPress={() => router.push("/language-select")} className="bg-lingua-teal rounded-2xl items-center py-4 mt-4" accessibilityRole="button" testID="mix-choose-course">

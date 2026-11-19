@@ -42,7 +42,7 @@ export default function OnboardingScreen() {
 
         <View className="flex-1" />
         <MotionPressable
-          className="bg-lingua-teal rounded-2xl flex-row items-center justify-center mt-4 py-4"
+          className="bg-lingua-teal rounded-2xl flex-row items-center justify-center mt-4 px-4 py-4"
           activeOpacity={0.85}
           accessibilityRole="button"
           testID="get-started-button"
@@ -51,7 +51,7 @@ export default function OnboardingScreen() {
             router.push("/(auth)/sign-up");
           }}
         >
-          <Text className="font-poppins-semibold text-base text-white">
+          <Text className="font-poppins-semibold text-base text-white text-center shrink">
             Get Started
           </Text>
           <Ionicons name="arrow-forward" size={20} color="#fff" style={{ marginLeft: 9 }} />
