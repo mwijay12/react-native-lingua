@@ -74,7 +74,25 @@ jobs:
           set -euo pipefail
           gh run download 44443156598 --repo "$GITHUB_REPOSITORY" --name Lingua-Demo-Android-Smoke --dir "$RUNNER_TEMP/motion-picture"
           picture="$(find "$RUNNER_TEMP/motion-picture" -name 'motion-on-welcome.png' -print -quit)"
-          convert "$picture" -resize 300x -strip -quality 42 "$RUNNER_TEMP/welcome.jpg"
+          cat > "$RUNNER_TEMP/Resize.java" <<'JAVA'
+          import java.awt.image.BufferedImage;
+          import java.awt.Graphics2D;
+          import java.io.File;
+          import javax.imageio.ImageIO;
+          public class Resize {
+              public static void main(String[] args) throws Exception {
+                  BufferedImage input = ImageIO.read(new File(args[0]));
+                  int width = 270;
+                  int height = input.getHeight() * width / input.getWidth();
+                  BufferedImage output = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+                  Graphics2D graphics = output.createGraphics();
+                  graphics.drawImage(input, 0, 0, width, height, null);
+                  graphics.dispose();
+                  ImageIO.write(output, "jpg", new File(args[1]));
+              }
+          }
+          JAVA
+          java "$RUNNER_TEMP/Resize.java" "$picture" "$RUNNER_TEMP/welcome.jpg"
           python3 - <<'PY'
           import base64
           import os
@@ -85,4 +103,138 @@ jobs:
               raise RuntimeError(f'Screenshot has too many parts: {len(chunks)}')
           for index, part in enumerate(chunks):
               print(f'::notice title=welcome image {index:02d}::{part}')
+          PY
+
+  probe-motion:
+    name: Reproduce normal-motion input
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: Lingua-Demo-APK
+          path: artifacts
+          run-id: 44443156598
+          github-token: ${{ github.token }}
+      - name: Enable isolated emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Prepare input probe
+        run: |
+          cat > "$RUNNER_TEMP/probe.py" <<'PY'
+          import importlib.util
+          import os
+          import sys
+          import time
+          import traceback
+          from pathlib import Path
+
+          spec = importlib.util.spec_from_file_location('motion', Path('scripts/smoke-android-motion.py'))
+          motion = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(motion)
+          os.environ['LINGUA_SYNTHETIC_EMULATOR'] = '1'
+          smoke = motion.smoke
+          report = []
+          try:
+              motion.main(Path('artifacts/Lingua-Demo.apk'))
+              report.append('Original motion smoke passed.')
+          except Exception as failure:
+              report.append('Original failure: ' + repr(failure))
+              logs = smoke.adb('logcat', '-d', '-v', 'time', 'ReactNativeJS:V', 'AndroidRuntime:E', '*:S', check=False).stdout.decode('utf-8', 'replace')
+              report.extend(logs.splitlines()[-20:])
+              # The original smoke has restored the emulator's settings. Only
+              # probe the checked emulator, and restore its original values again.
+              motion.safety.require_isolated_emulator()
+              original = {name: smoke.adb('shell', 'settings', 'get', 'global', name).stdout.decode().strip() for name in motion.SCALES}
+              try:
+                  node = smoke.wait_for('Try the demo', timeout=5)
+                  _, _, x, y = node
+                  for label, value, duration in [('second tap, motion on', '1', 0), ('long press, motion on', '1', 200), ('tap, reduced motion', '0', 0)]:
+                      motion.set_scales(value)
+                      if duration:
+                          smoke.adb('shell', 'input', 'swipe', str(x), str(y), str(x), str(y), str(duration))
+                      else:
+                          smoke.adb('shell', 'input', 'tap', str(x), str(y))
+                      try:
+                          smoke.wait_for('Choose a language', timeout=12)
+                          report.append(label + ': navigated')
+                          break
+                      except RuntimeError:
+                          report.append(label + ': did not navigate')
+              except Exception as probe_error:
+                  report.append('Probe failed: ' + repr(probe_error))
+              finally:
+                  for name, value in original.items():
+                      if value == 'null':
+                          smoke.adb('shell', 'settings', 'delete', 'global', name, check=False)
+                      else:
+                          smoke.adb('shell', 'settings', 'put', 'global', name, value, check=False)
+          finally:
+              Path('motion-probe.txt').write_text('\n'.join(report))
+              print('\n'.join(report), flush=True)
+          PY
+      - name: Run probe on a fresh emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: python3 "$RUNNER_TEMP/probe.py"
+      - name: Report probe
+        if: always()
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          report = Path('motion-probe.txt')
+          if report.exists():
+              message = report.read_text()[-3800:].replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+              print(f'::notice title=Motion probe::{message}')
+          PY
+
+  repeat-storage:
+    name: Repeat synthetic storage fault smoke
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: Lingua-Demo-APK
+          path: artifacts
+          run-id: 44443156598
+          github-token: ${{ github.token }}
+      - name: Enable isolated emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Run synthetic storage smoke
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: bash -o pipefail -c 'python3 scripts/smoke-android-storage-failures.py artifacts/Lingua-Demo.apk 2>&1 | tee storage-retry.log'
+      - name: Report synthetic failure
+        if: always()
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for filename in ('storage-retry.log', 'android-smoke/p0-storage-logcat.txt'):
+              path = Path(filename)
+              if path.exists():
+                  lines = path.read_text(errors='replace').splitlines()
+                  fatal = next((i for i, line in enumerate(lines) if 'FATAL EXCEPTION' in line), None)
+                  selected = lines[fatal:fatal + 25] if fatal is not None else lines[-20:]
+                  message = '\n'.join(selected)[-3800:].replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+                  print(f'::notice title=Storage retry {path.name}::{message}')
           PY
