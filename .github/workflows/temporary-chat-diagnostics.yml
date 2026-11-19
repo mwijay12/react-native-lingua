@@ -1,0 +1,56 @@
+name: Temporary Android failure diagnostics
+
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Download synthetic emulator diagnostics
+        uses: actions/download-artifact@v4
+        with:
+          name: Lingua-Demo-Android-Smoke
+          path: diagnostics
+          run-id: 44498479753
+          github-token: ${{ github.token }}
+      - name: Summarize failure without personal data
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          gh api repos/mwijay12/react-native-lingua/actions/jobs/135480017194/logs > job.log || true
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          def notice(title, text):
+              text = str(text).replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+              print(f'::notice title={title}::{text[:12000]}')
+
+          root = Path('diagnostics')
+          notice('Synthetic diagnostic files', ', '.join(str(p.relative_to(root)) for p in root.rglob('*') if p.is_file()))
+          log = Path('job.log').read_text(errors='replace').splitlines()
+          wanted = [line for line in log if re.search(r'Found:|Tapped:|RuntimeError:|AssertionError:|Traceback|FATAL EXCEPTION|Error: The process', line)]
+          notice('Recent test output', '\n'.join(wanted[-35:]) or 'No matching lines in job log')
+          for name in ('last-window.xml', 'motion-logcat.txt', 'logcat.txt'):
+              for file in root.rglob(name):
+                  if name.endswith('.xml'):
+                      try:
+                          tree = ET.fromstring(file.read_text(errors='replace'))
+                          labels = [f"{node.get('text', '')} | {node.get('content-desc', '')}" for node in tree.iter('node') if node.get('text') or node.get('content-desc')]
+                          notice('Last synthetic UI labels', '\n'.join(labels[-40:]))
+                      except ET.ParseError:
+                          notice('Last synthetic UI labels', 'Could not parse UI dump')
+                  else:
+                      lines = file.read_text(errors='replace').splitlines()
+                      fatal = [i for i, line in enumerate(lines) if 'FATAL EXCEPTION' in line]
+                      if fatal:
+                          notice(name, '\n'.join(lines[fatal[-1]:fatal[-1] + 24]))
+          PY
