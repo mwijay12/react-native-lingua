@@ -6,6 +6,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FeedbackPanel } from "@/components/FeedbackPanel";
 import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
+import { MotionPressable } from "@/components/MotionPressable";
+import { MotionProgress } from "@/components/MotionProgress";
 import { MotionSticker } from "@/components/MotionSticker";
 import { QuestionInput } from "@/components/QuestionInput";
 import { RewardAlbum } from "@/components/RewardAlbum";
@@ -145,9 +147,9 @@ export default function PlayScreen() {
               <Text className="caption mt-2">Round stars are just for fun: no extra XP, daily sessions or changes to your review list.</Text>
               <Text className="caption mt-2">Use the speaker above to turn feedback sounds on or off.</Text>
               {questionCount > 0 && language ? (
-                <TouchableOpacity onPress={start} className="bg-lingua-teal rounded-2xl items-center py-4 mt-4" accessibilityRole="button" testID="start-mix-button">
+                <MotionPressable onPress={start} className="bg-lingua-teal rounded-2xl items-center py-4 mt-4" accessibilityRole="button" testID="start-mix-button">
                   <Text className="font-poppins-semibold text-base text-white">Play {questionCount}-question mix</Text>
-                </TouchableOpacity>
+                </MotionPressable>
               ) : (
                 <TouchableOpacity onPress={() => router.push("/language-select")} className="bg-lingua-teal rounded-2xl items-center py-4 mt-4" accessibilityRole="button" testID="mix-choose-course">
                   <Text className="font-poppins-semibold text-base text-white">Choose a course</Text>
@@ -167,9 +169,7 @@ export default function PlayScreen() {
                 <Text className="font-poppins-semibold text-sm text-text-primary ml-1">{correctCount} / {questions.length}</Text>
               </View>
             </View>
-            <View className="h-2 bg-surface rounded-full overflow-hidden mb-5" accessibilityRole="progressbar" accessibilityLabel="Quick Mix progress" accessibilityValue={{ min: 0, max: questions.length, now: completedQuestions }} aria-valuemin={0} aria-valuemax={questions.length} aria-valuenow={completedQuestions}>
-              <View className="h-2 bg-lingua-teal rounded-full" style={{ width: `${Math.round((completedQuestions / questions.length) * 100)}%` }} />
-            </View>
+            <MotionProgress className="mb-5" value={completedQuestions} max={questions.length} label="Quick Mix progress" />
             <Text className="caption mb-2">{roundCourse} · {question.lessonTitle}</Text>
             <Text className="font-poppins-semibold text-xl text-text-primary mb-2" testID="mix-question">{question.activity.question}</Text>
             <Text className="body-sm text-text-secondary mb-5">Choose one answer. Take your time.</Text>

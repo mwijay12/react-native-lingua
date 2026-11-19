@@ -7,6 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
 import { LearningSticker } from "@/components/LearningSticker";
 import { LessonIcon } from "@/components/LessonIcon";
+import { MotionProgress } from "@/components/MotionProgress";
 import { MotionSticker } from "@/components/MotionSticker";
 import { images } from "@/constants/images";
 import { getCourseUnits } from "@/data/courses";
@@ -36,7 +37,6 @@ export default function HomeScreen() {
   const nextLesson = lessons.find((lesson) => !completedLessonIds.includes(lesson.id));
   const courseProgress = lessons.length ? Math.round((completedCount / lessons.length) * 100) : 0;
   const todaySessions = sessionCount(activityByDate[localDateKey(now)]);
-  const goalProgress = Math.min(100, Math.round((todaySessions / dailyGoal) * 100));
   const week = lastSevenDays(activityByDate, now);
   const activeDays = week.filter((day) => day.sessions > 0).length;
   const reviewCount = getReviewQuestions(reviewItems, lessons).length;
@@ -75,9 +75,7 @@ export default function HomeScreen() {
             </View>
           </View>
           {lessons.length > 0 && (
-            <View className="h-2 bg-white/25 rounded-full overflow-hidden mt-4" accessibilityRole="progressbar" accessibilityLabel="Course progress" accessibilityValue={{ min: 0, max: 100, now: courseProgress }}>
-              <View className="h-2 bg-[#D7EBDC] rounded-full" style={{ width: `${courseProgress}%` }} />
-            </View>
+            <MotionProgress className="mt-4" value={courseProgress} max={100} label="Course progress" trackColor="rgba(255, 255, 255, 0.25)" fillColor="#D7EBDC" />
           )}
           <TouchableOpacity
             className="bg-[#FFFDF8] rounded-xl py-3 px-4 self-start mt-4"
@@ -120,9 +118,7 @@ export default function HomeScreen() {
               </Text>
             </View>
           </View>
-          <View className="h-2 bg-[#EDF2EE] rounded-full overflow-hidden mt-3" accessibilityRole="progressbar" accessibilityLabel="Daily study goal" accessibilityValue={{ min: 0, max: dailyGoal, now: Math.min(todaySessions, dailyGoal), text: `${todaySessions} of ${dailyGoal} sessions` }}>
-            <View className="h-2 bg-lingua-teal rounded-full" style={{ width: `${goalProgress}%` }} />
-          </View>
+          <MotionProgress className="mt-3" value={todaySessions} max={dailyGoal} label="Daily study goal" valueText={`${todaySessions} of ${dailyGoal} sessions`} trackColor="#EDF2EE" />
           <Text className="body-sm text-text-secondary mt-2">
             {todaySessions >= dailyGoal ? "Goal reached. Keep learning at your pace." : `${dailyGoal - todaySessions} more ${dailyGoal - todaySessions === 1 ? "session" : "sessions"} to reach your goal.`}
           </Text>

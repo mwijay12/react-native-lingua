@@ -1,7 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
-import type { KeyboardEvent } from "react";
+import { useEffect, useRef, type KeyboardEvent } from "react";
 import { Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import Animated, { cancelAnimation, Easing, useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 
+import { useScreenMotionAllowed } from "@/hooks/useScreenMotionAllowed";
 import type { Activity } from "@/types/learning";
 
 interface QuestionInputProps {
@@ -14,6 +16,7 @@ interface QuestionInputProps {
 
 // The same answer controls are used by lessons and the missed-question review.
 export function QuestionInput({ activity, answer, disabled, onChange, onSubmit }: QuestionInputProps) {
+  const motionAllowed = useScreenMotionAllowed();
   if (activity.type === "multiple-choice") {
     const options = activity.options ?? [];
     return (
@@ -51,9 +54,7 @@ export function QuestionInput({ activity, answer, disabled, onChange, onSubmit }
               testID={`activity-choice-${index}`}
               className={`flex-row items-center rounded-2xl border border-b-2 p-3.5 ${selected ? "border-lingua-teal bg-[#E5F3ED]" : "border-border bg-white"}`}
             >
-              <View className={`w-9 h-9 rounded-xl items-center justify-center mr-3 ${selected ? "bg-lingua-teal" : "bg-[#F5F3EC]"}`}>
-                <Text className={`font-poppins-semibold text-xs ${selected ? "text-white" : "text-text-secondary"}`}>{String.fromCharCode(65 + index)}</Text>
-              </View>
+              <ChoiceMarker selected={selected} index={index} motionAllowed={motionAllowed} />
               <Text className="font-poppins-medium text-sm text-text-primary flex-1">{option}</Text>
               {selected && <Ionicons name="radio-button-on" size={22} color="#14675D" />}
             </TouchableOpacity>
@@ -77,6 +78,36 @@ export function QuestionInput({ activity, answer, disabled, onChange, onSubmit }
       editable={!disabled}
       onSubmitEditing={onSubmit}
     />
+  );
+}
+
+// Selection is already indicated by text, color and radio state. This brief
+// accent is optional and never changes the answer or delays the next action.
+function ChoiceMarker({ selected, index, motionAllowed }: { selected: boolean; index: number; motionAllowed: boolean }) {
+  const scale = useSharedValue(1);
+  const wasSelected = useRef(selected);
+
+  useEffect(() => {
+    if (!motionAllowed || !selected) {
+      cancelAnimation(scale);
+      scale.value = 1;
+    } else if (!wasSelected.current) {
+      scale.value = withSequence(
+        withTiming(1.08, { duration: 80, easing: Easing.out(Easing.quad) }),
+        withTiming(1, { duration: 120, easing: Easing.out(Easing.quad) }),
+      );
+    }
+    wasSelected.current = selected;
+    return () => cancelAnimation(scale);
+  }, [motionAllowed, scale, selected]);
+
+  const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  return (
+    <Animated.View style={animatedStyle} pointerEvents="none" accessible={false} aria-hidden>
+      <View className={`w-9 h-9 rounded-xl items-center justify-center mr-3 ${selected ? "bg-lingua-teal" : "bg-[#F5F3EC]"}`}>
+        <Text className={`font-poppins-semibold text-xs ${selected ? "text-white" : "text-text-secondary"}`}>{String.fromCharCode(65 + index)}</Text>
+      </View>
+    </Animated.View>
   );
 }
 

@@ -1,4 +1,5 @@
 import brandLogo from "@/assets/images/icon.png";
+import splashLogo from "@/assets/images/splash-icon.png";
 import mascotCat from "@/assets/images/mascots/cat.png";
 import mascotParrot from "@/assets/images/mascots/parrot.png";
 import flagEnglish from "@/assets/images/flags/english.png";
@@ -13,6 +14,7 @@ import planningScene from "@/assets/images/scenes/days-and-plans.jpg";
 // The same original companions appear throughout the app.
 export const images = {
   brandLogo,
+  splashLogo,
   mascotCat,
   mascotParrot,
   flagEnglish,

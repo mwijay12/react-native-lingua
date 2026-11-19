@@ -52,15 +52,30 @@ parrot companions, original SVG doodles and five illustrated unit scenes make
 the learning path more playful. The standalone [Android demo](demo/android/README.md)
 has no sign-in or analytics.
 
-The doodles in `components/LearningSticker.tsx` are original, hand-drawn shapes
-in Lingua's palette. `MotionSticker` keeps decoration in reserved space, never
-intercepts touches, and moves it gently only while its screen is focused and the
-app is active. Device reduced-motion settings keep the drawings still (including
-the tab indicator); artwork and learning content are never hidden until an
-animation runs. Correct-answer panels have a small one-shot emphasis, also
-respecting reduced motion and screen focus. The selected cat and parrot remain
-the existing image assets. The approach is adapted for a native app from the
-[motion-lab prompt pack](https://github.com/mwijay12/motion-lab/blob/main/motion-lab/docs/agent-prompt-pack.md).
+Lingua's native splash hands off to a short, skippable branded introduction
+once the React view is laid out. The app and storage recovery screens mount
+underneath; the introduction does not wait for storage or a network. Reduced
+motion skips the animation, and a timeout prevents it from blocking startup if
+an animation callback does not arrive. The launch design should be checked in
+a release build, because Expo Go does not reproduce the native splash exactly.
+
+The welcome companions make a small, one-time greeting after the splash. Button
+presses, answer selections and changes in the daily-goal and Quick Mix progress
+have subtle feedback without changing learning or scoring. Progress is announced
+at its real value immediately. The doodles in `components/LearningSticker.tsx`
+are original, hand-drawn shapes in Lingua's palette. `MotionSticker` keeps
+decoration in reserved space, never intercepts touches, and moves gently only
+while its screen is focused and the app is active. Device reduced-motion
+settings keep the artwork still (including the tab indicator); artwork and
+learning content remain visible. Correct-answer panels have a small one-shot
+emphasis. The selected cat and parrot remain the existing image assets.
+
+The project-specific [motion-design skill](.agents/skills/lingua-motion-design/SKILL.md)
+combines the existing native UI guidance with research from
+[Expo](https://github.com/expo/skills/tree/main/plugins/expo/skills/expo-animation),
+[Apple](https://developer.apple.com/design/human-interface-guidelines/motion) and
+the [motion-lab prompt pack](https://github.com/mwijay12/motion-lab/blob/main/motion-lab/docs/agent-prompt-pack.md).
+It adds no app dependency or remote service.
 
 Fifteen short, generated pronunciation samples cover the greeting lesson, both
 travel lessons and both days-and-plans lessons in each language. Tap **Play

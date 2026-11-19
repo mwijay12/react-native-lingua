@@ -9,8 +9,12 @@ travel lessons and two days-and-plans lessons with explanations, examples and
 practice feedback. The six new lessons add 44 questions and 15 XP each.
 Earlier lessons also include context notes. The app retains Lingua's
 cat-and-parrot identity, with five illustrated scenes, original SVG doodles and
-gentle motion. Artwork remains visible and still when the device's
-reduced-motion setting is on.
+gentle motion. A short, skippable branded intro follows the native splash;
+the welcome scene, answer choices and real progress changes have small,
+purposeful animations. Artwork remains visible and still when the device's
+reduced-motion setting is on, and startup does not wait for the animation in
+that mode. The native splash appearance needs a release-build check on a real
+phone; Expo Go is not an exact preview.
 
 Fifteen generated pronunciation samples (greetings, both travel lessons and
 both days-and-plans lessons in each course) are bundled in the APK. Tap Play
@@ -100,10 +104,15 @@ EXPO_OFFLINE=1 ./gradlew :app:assembleRelease --no-daemon --max-workers=2
 The output is `app/build/outputs/apk/release/app-release.apk` relative to the
 last directory above. The release variant embeds the JavaScript bundle and does
 not require a Metro server. It is still **debug-key-signed** and for testing.
-The GitHub Actions workflow uploads the APK and then runs the general and
-six-lesson planning smoke tests on Android emulators without a network. The
-emulators have no speakers, so these checks cannot judge audible pronunciation.
-Artifacts expire after three days.
+The GitHub Actions workflow uploads the APK and runs the general and
+six-lesson planning smoke tests on Android emulators without a network. It also
+checks a normal launch, a live switch to reduced motion and a reduced-motion
+relaunch using a synthetic learner. The motion smoke requires the explicit
+`LINGUA_SYNTHETIC_EMULATOR=1` opt-in, verifies and pins the emulator serial,
+clears only the demo package, and restores the emulator's animation settings.
+Never run it on an installation with data to keep. The emulators have no
+speakers, so these checks cannot judge audible pronunciation. Artifacts expire
+after three days.
 
 `prepare-android-demo.mjs` creates an ignored, isolated copy under `.expo/`;
 it doesn't alter the production source. It copies no `.env` files and removes

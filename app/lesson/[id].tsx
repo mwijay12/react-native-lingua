@@ -17,6 +17,7 @@ import { FeedbackPanel } from "@/components/FeedbackPanel";
 import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
 import { LearningSaveMessage } from "@/components/LearningSaveMessage";
 import { LessonIcon } from "@/components/LessonIcon";
+import { MotionPressable } from "@/components/MotionPressable";
 import { MotionSticker } from "@/components/MotionSticker";
 import { PronunciationSample } from "@/components/PronunciationSample";
 import { QuestionInput } from "@/components/QuestionInput";
@@ -200,9 +201,9 @@ export default function LessonScreen() {
                 </>
               )}
               {lesson.activities.length > 0 ? (
-                <TouchableOpacity onPress={() => setPhase("practice")} className="bg-lingua-teal rounded-2xl items-center py-4 mt-6" accessibilityRole="button" testID="start-practice-button">
+                <MotionPressable onPress={() => setPhase("practice")} className="bg-lingua-teal rounded-2xl items-center py-4 mt-6" accessibilityRole="button" testID="start-practice-button">
                   <Text className="font-poppins-semibold text-base text-white">Start practice</Text>
-                </TouchableOpacity>
+                </MotionPressable>
               ) : (
                 <Text className="body-sm text-text-secondary mt-6">Practice questions are not available for this lesson yet.</Text>
               )}
