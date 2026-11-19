@@ -53,22 +53,23 @@ the learning path more playful. The standalone [Android demo](demo/android/READM
 has no sign-in or analytics.
 
 Lingua's native splash hands off to a short, skippable branded introduction
-once the React view is laid out. The app and storage recovery screens mount
-underneath; the introduction does not wait for storage or a network. Reduced
-motion skips the animation, and a timeout prevents it from blocking startup if
-an animation callback does not arrive. The launch design should be checked in
-a release build, because Expo Go does not reproduce the native splash exactly.
+once the React view is laid out. Navigation mounts after the introduction has
+gone, while storage hydration continues independently; the introduction does
+not wait for storage or a network. Reduced motion skips the animation, and a
+timeout prevents it from blocking startup if an animation callback does not
+arrive. The launch design should be checked in a release build, because Expo Go
+does not reproduce the native splash exactly.
 
 The welcome companions make a small, one-time greeting after the splash. Button
 presses, answer selections and changes in the daily-goal and Quick Mix progress
 have subtle feedback without changing learning or scoring. Progress is announced
 at its real value immediately. The doodles in `components/LearningSticker.tsx`
 are original, hand-drawn shapes in Lingua's palette. `MotionSticker` keeps
-decoration in reserved space, never intercepts touches, and moves gently only
-while its screen is focused and the app is active. Device reduced-motion
-settings keep the artwork still (including the tab indicator); artwork and
-learning content remain visible. Correct-answer panels have a small one-shot
-emphasis. The selected cat and parrot remain the existing image assets.
+decoration in reserved space, never intercepts touches, and makes one gentle
+drift only while its screen is focused and the app is active. Device
+reduced-motion settings keep the artwork still (including the tab indicator);
+artwork and learning content remain visible. Correct-answer panels have a small
+one-shot emphasis. The selected cat and parrot remain the existing image assets.
 
 The project-specific [motion-design skill](.agents/skills/lingua-motion-design/SKILL.md)
 combines the existing native UI guidance with research from

@@ -26,6 +26,10 @@ class FakeSmoke:
     def wait_for_one_of(self, _options):
         return next(self.questions)
 
+    def wait_for(self, *args, **kwargs):
+        self.calls.append(("wait_for", args, os.environ.get("ANDROID_SERIAL")))
+        return (0, 0, 100, 150)
+
     def __getattr__(self, name):
         def record(*args, **kwargs):
             self.calls.append((name, args, os.environ.get("ANDROID_SERIAL")))
@@ -39,6 +43,7 @@ with tempfile.TemporaryDirectory(prefix="lingua-motion-unit-") as temporary:
     spec.loader.exec_module(motion)
     fake = FakeSmoke(Path(temporary))
     motion.smoke = fake
+    motion.time.sleep = lambda _duration: None
     guard_calls = []
     motion.safety.require_isolated_emulator = lambda: guard_calls.append(os.environ.get("ANDROID_SERIAL"))
 
@@ -71,7 +76,10 @@ with tempfile.TemporaryDirectory(prefix="lingua-motion-unit-") as temporary:
         assert ("shell", "settings", "put", "global", scale, "1") in adb_calls
         assert ("shell", "settings", "put", "global", scale, "0") in adb_calls
         assert ("shell", "settings", "put", "global", scale, "0.0") in adb_calls
-    assert [args[0] for kind, args, _ in fake.calls if kind == "tap" and args].count("Check answer") == 2
+    assert [args[0] for kind, args, _ in fake.calls if kind == "wait_for" and args].count("Check answer") == 4
+    taps = [args for args in adb_calls if args[:3] == ("shell", "input", "swipe")]
+    assert len(taps) == 10
+    assert all(args[3:] == ("100", "150", "100", "150", "120") for args in taps)
 
     failed = FakeSmoke(Path(temporary))
     def fail_startup(*args, **kwargs):

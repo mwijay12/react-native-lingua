@@ -1,14 +1,13 @@
 import { useIsFocused } from "@react-navigation/native";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AppState } from "react-native";
 
 import { useReducedMotionPreference } from "@/hooks/useReducedMotionPreference";
-import { LaunchVisibilityContext } from "@/lib/launchVisibility";
 
 // Screen effects should not continue behind another route or in the background.
+// Screens mount only after the launch gate has dismissed its overlay.
 export function useScreenMotionAllowed() {
   const focused = useIsFocused();
-  const launchFinished = useContext(LaunchVisibilityContext);
   const reducedMotion = useReducedMotionPreference();
   const [active, setActive] = useState(AppState.currentState == null || AppState.currentState === "active");
 
@@ -17,5 +16,5 @@ export function useScreenMotionAllowed() {
     return () => subscription.remove();
   }, []);
 
-  return launchFinished && focused && active && !reducedMotion;
+  return focused && active && !reducedMotion;
 }

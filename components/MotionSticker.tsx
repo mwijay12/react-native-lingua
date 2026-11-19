@@ -4,11 +4,12 @@ import { Animated, Easing, Platform, View } from "react-native";
 import { LearningSticker, type StickerKind } from "@/components/LearningSticker";
 import { useScreenMotionAllowed } from "@/hooks/useScreenMotionAllowed";
 
-// Placement belongs to the parent. This inner layer owns a very small drift;
-// nothing moves over the surrounding text, and the drawing never starts hidden.
+// Placement belongs to the parent. A small one-time drift gives the drawing
+// life without continuous motion, blocking lists, or changing its hit area.
 export function MotionSticker({ kind, size = 72, testID }: { kind: StickerKind; size?: number; testID?: string }) {
   const motionAllowed = useScreenMotionAllowed();
   const drift = useRef(new Animated.Value(0)).current;
+  const hasDrifted = useRef(false);
 
   useEffect(() => {
     if (!motionAllowed) {
@@ -16,19 +17,20 @@ export function MotionSticker({ kind, size = 72, testID }: { kind: StickerKind; 
       drift.setValue(0);
       return;
     }
+    if (hasDrifted.current) return;
+    hasDrifted.current = true;
 
     const timing = (toValue: number, duration: number) => Animated.timing(drift, {
       toValue,
       duration,
       easing: Easing.inOut(Easing.sin),
-      // A decorative loop must not hold up virtualized lesson lists.
       isInteraction: false,
       useNativeDriver: Platform.OS !== "web",
     });
-    const loop = Animated.loop(Animated.sequence([timing(1, 1200), timing(-1, 2400), timing(0, 1200)]));
-    loop.start();
+    const greeting = Animated.sequence([timing(1, 900), timing(-1, 1400), timing(0, 900)]);
+    greeting.start();
     return () => {
-      loop.stop();
+      greeting.stop();
       drift.setValue(0);
     };
   }, [drift, motionAllowed]);

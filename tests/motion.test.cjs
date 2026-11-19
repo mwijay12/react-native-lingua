@@ -145,7 +145,6 @@ function launchFixture(preference) {
     "react-native-safe-area-context": { useSafeAreaInsets: () => ({ bottom: 0 }) },
     "react-native-worklets": { scheduleOnRN: (callback) => callback() },
     "@/hooks/useReducedMotionPreference": { useResolvedReducedMotionPreference: () => state.preference },
-    "@/lib/launchVisibility": { LaunchVisibilityContext: { Provider: "LaunchVisibilityProvider" } },
     "@/constants/images": { images: { splashLogo: 1 } },
     "@/constants/branding": { CREATOR_CREDIT: "Created by Mwijay" },
   });
@@ -229,22 +228,30 @@ test("launch has a maximum fallback and stops if the app backgrounds or motion i
   three.harness.cleanup();
 });
 
-test("launch gate exposes underlying app only after the splash is dismissed", () => {
+test("launch gate mounts navigation after the splash has left", (t) => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
   const { harness, module } = launchFixture(true);
   let tree = harness.render(module.LaunchGate, { children: "app" });
-  let content = find(tree, (element) => element.props?.children === "app");
-  assert.equal(content.props.pointerEvents, "none");
-  assert.equal(content.props.accessibilityElementsHidden, true);
-  assert.equal(find(tree, (element) => element.type === "LaunchVisibilityProvider").props.value, false);
+  assert.equal(find(tree, (element) => element.props?.children === "app"), undefined);
   const splash = find(tree, (element) => element.type === module.LaunchSplash);
   splash.props.onComplete();
   tree = harness.render(module.LaunchGate, { children: "app" });
-  content = find(tree, (element) => element.props?.children === "app");
-  assert.equal(content.props.pointerEvents, "auto");
-  assert.equal(content.props.accessibilityElementsHidden, false);
-  assert.equal(find(tree, (element) => element.type === "LaunchVisibilityProvider").props.value, true);
   assert.equal(find(tree, (element) => element.type === module.LaunchSplash), undefined);
+  assert.equal(find(tree, (element) => element.props?.children === "app"), undefined);
+  t.mock.timers.tick(50);
+  tree = harness.render(module.LaunchGate, { children: "app" });
+  assert.ok(find(tree, (element) => element.props?.children === "app"));
   harness.cleanup();
+
+  const unmounted = launchFixture(true);
+  tree = unmounted.harness.render(unmounted.module.LaunchGate, { children: "app" });
+  find(tree, (element) => element.type === unmounted.module.LaunchSplash).props.onComplete();
+  unmounted.harness.render(unmounted.module.LaunchGate, { children: "app" });
+  unmounted.harness.cleanup();
+  t.mock.timers.tick(50);
+  tree = unmounted.harness.render(unmounted.module.LaunchGate, { children: "app" });
+  assert.equal(find(tree, (element) => element.props?.children === "app"), undefined);
+  unmounted.harness.cleanup();
 });
 
 test("motion preference resolves safely, honors later events, and has a still fallback", async (t) => {
@@ -287,24 +294,19 @@ test("motion preference resolves safely, honors later events, and has a still fa
   fallback.cleanup();
 });
 
-test("screen effects wait for launch and stop when unfocused, backgrounded, or reduced", () => {
+test("screen effects stop when unfocused, backgrounded, or reduced", () => {
   const harness = hookHarness();
-  let visible = false;
   let focused = true;
   let reduced = false;
   let appListener;
-  harness.react.useContext = () => visible;
   const { useScreenMotionAllowed } = loadComponent("../hooks/useScreenMotionAllowed.ts", harness, {
     "@react-navigation/native": { useIsFocused: () => focused },
     "@/hooks/useReducedMotionPreference": { useReducedMotionPreference: () => reduced },
-    "@/lib/launchVisibility": { LaunchVisibilityContext: {} },
     "react-native": { AppState: { currentState: "active", addEventListener: (_event, callback) => {
       appListener = callback;
       return { remove() {} };
     } } },
   });
-  assert.equal(harness.render(useScreenMotionAllowed), false);
-  visible = true;
   assert.equal(harness.render(useScreenMotionAllowed), true);
   focused = false;
   assert.equal(harness.render(useScreenMotionAllowed), false);
@@ -316,6 +318,48 @@ test("screen effects wait for launch and stop when unfocused, backgrounded, or r
   assert.equal(harness.render(useScreenMotionAllowed), false);
   appListener("active");
   assert.equal(harness.render(useScreenMotionAllowed), true);
+  harness.cleanup();
+});
+
+test("decorative stickers drift once without blocking interactions or looping", () => {
+  const harness = hookHarness();
+  let allowed = false;
+  let starts = 0;
+  let stops = 0;
+  const timings = [];
+  class Value {
+    constructor(value) { this.value = value; }
+    stopAnimation() {}
+    setValue(value) { this.value = value; }
+    interpolate() { return 0; }
+  }
+  const { MotionSticker } = loadComponent("../components/MotionSticker.tsx", harness, {
+    "react-native": {
+      View: "View", Platform: { OS: "android" }, Easing: { inOut: (value) => value, sin: () => {} },
+      Animated: {
+        View: "AnimatedView", Value,
+        timing: (_value, options) => { timings.push(options); return {}; },
+        sequence: () => ({ start: () => { starts += 1; }, stop: () => { stops += 1; } }),
+      },
+    },
+    "@/components/LearningSticker": { LearningSticker: "LearningSticker" },
+    "@/hooks/useScreenMotionAllowed": { useScreenMotionAllowed: () => allowed },
+  });
+  let tree = harness.render(MotionSticker, { kind: "book", testID: "sticker" });
+  assert.equal(byId(tree, "sticker").props.pointerEvents, "none");
+  assert.equal(starts, 0);
+  allowed = true;
+  harness.render(MotionSticker, { kind: "book", testID: "sticker" });
+  assert.equal(starts, 1);
+  assert.equal(timings.length, 3);
+  assert.ok(timings.every((timing) => timing.isInteraction === false && timing.useNativeDriver === true));
+  allowed = false;
+  harness.render(MotionSticker, { kind: "book", testID: "sticker" });
+  assert.equal(stops, 1);
+  allowed = true;
+  tree = harness.render(MotionSticker, { kind: "book", testID: "sticker" });
+  assert.equal(starts, 1);
+  assert.ok(find(tree, (element) => element.type === "LearningSticker"));
   harness.cleanup();
 });
 
@@ -368,6 +412,9 @@ test("press feedback does not change button actions and is still with reduced mo
   const props = { testID: "button", accessibilityRole: "button", onPress: () => { pressed += 1; }, onPressIn: () => { pressedIn += 1; } };
   let tree = harness.render(MotionPressable, props);
   let button = byId(tree, "button");
+  assert.equal(tree.type, "TouchableOpacity", "the hit target must not be transformed");
+  assert.equal(button.props.children.type, "AnimatedView");
+  assert.equal(button.props.children.props.pointerEvents, "none");
   button.props.onPressIn({});
   button.props.onPress();
   button.props.onPressOut({});

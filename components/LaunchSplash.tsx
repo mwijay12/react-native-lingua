@@ -9,28 +9,24 @@ import { scheduleOnRN } from "react-native-worklets";
 import { CREATOR_CREDIT } from "@/constants/branding";
 import { images } from "@/constants/images";
 import { useResolvedReducedMotionPreference } from "@/hooks/useReducedMotionPreference";
-import { LaunchVisibilityContext } from "@/lib/launchVisibility";
 
-// The native splash stays up until this matching teal view has actually laid
-// out. The app is mounted underneath, so slow hydration/errors are not hidden
-// behind an indefinite animation. Tapping also skips the short introduction.
+// The native splash stays up until this matching teal view has laid out. As a
+// precaution, attach navigation in a separate turn after the overlay is gone.
+// Hydration continues independently, and tapping skips the introduction.
 export function LaunchGate({ children }: { children: ReactNode }) {
   const [launching, setLaunching] = useState(true);
+  const [contentReady, setContentReady] = useState(false);
   const finish = useCallback(() => setLaunching(false), []);
+
+  useEffect(() => {
+    if (launching) return;
+    const timer = setTimeout(() => setContentReady(true), 50);
+    return () => clearTimeout(timer);
+  }, [launching]);
 
   return (
     <View style={styles.root}>
-      <LaunchVisibilityContext.Provider value={!launching}>
-        <View
-          style={styles.content}
-          pointerEvents={launching ? "none" : "auto"}
-          accessibilityElementsHidden={launching}
-          importantForAccessibility={launching ? "no-hide-descendants" : "auto"}
-          aria-hidden={launching}
-        >
-          {children}
-        </View>
-      </LaunchVisibilityContext.Provider>
+      {contentReady && <View style={styles.content}>{children}</View>}
       {launching && <LaunchSplash onComplete={finish} />}
     </View>
   );
