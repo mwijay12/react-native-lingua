@@ -1,7 +1,9 @@
 name: Temporary Android failure diagnostics
 
 on:
-  workflow_dispatch:
+  push:
+    branches: ["arena/**"]
+    paths: [".github/workflows/temporary-chat-diagnostics.yml"]
 
 permissions:
   actions: read
