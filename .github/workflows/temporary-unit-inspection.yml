@@ -1,4 +1,4 @@
-name: Temporary native validation
+name: Temporary native spacing validation
 
 on:
   push:
@@ -9,85 +9,79 @@ permissions:
   actions: read
   contents: read
 
+env:
+  CI: "1"
+  EXPO_NO_TELEMETRY: "1"
+  EXPO_OFFLINE: "1"
+
 jobs:
-  upgrade:
-    name: Check in-place upgrade with existing APKs
+  spacing:
+    name: Verify updated JavaScript on isolated Android
     runs-on: ubuntu-24.04
-    timeout-minutes: 40
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - name: Apply local test-helper compatibility changes
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Prepare the same demo and bundle current JavaScript
         run: |
-          base64 -d <<'PATCH' | git apply
-          ZGlmZiAtLWdpdCBhL3NjcmlwdHMvc21va2UtYW5kcm9pZC1kZW1vLnB5IGIvc2NyaXB0cy9zbW9rZS1hbmRyb2lkLWRlbW8ucHkK
-          aW5kZXggYzBlZDAyZi4uOTMyNmY3OCAxMDA2NDQKLS0tIGEvc2NyaXB0cy9zbW9rZS1hbmRyb2lkLWRlbW8ucHkKKysrIGIvc2Ny
-          aXB0cy9zbW9rZS1hbmRyb2lkLWRlbW8ucHkKQEAgLTEzOSw3ICsxMzksOCBAQCBkZWYgc2Nyb2xsX3RvKHRleHQsIGRpcmVjdGlv
-          bj0iZG93biIsIG1heF9zd2lwZXM9MTQsIGV4YWN0PUZhbHNlKToKIAogCiBkZWYgY29tcGxldGVfbGVzc29uKHRpdGxlLCBhbnN3
-          ZXJzLCAqLCBsZXNzb25fbnVtYmVyPTEsIHdyb25nX2ZpcnN0PUZhbHNlLCB3cm9uZ19hbnN3ZXI9Ikdvb2RieWUiLAotICAgICAg
-          ICAgICAgICAgICAgICBzY3JlZW5zaG90X25hbWU9Tm9uZSwgcmV3YXJkPTEwLCBsaXN0ZW49RmFsc2UsIHNhbXBsZV90ZXh0PU5v
-          bmUsIGFscmVhZHlfY29tcGxldGVkPUZhbHNlKToKKyAgICAgICAgICAgICAgICAgICAgc2NyZWVuc2hvdF9uYW1lPU5vbmUsIHJl
-          d2FyZD0xMCwgbGlzdGVuPUZhbHNlLCBzbG93X3NhbXBsZT1UcnVlLCBzYW1wbGVfdGV4dD1Ob25lLAorICAgICAgICAgICAgICAg
-          ICAgICBhbHJlYWR5X2NvbXBsZXRlZD1GYWxzZSk6CiAgICAgbGFiZWwgPSBmIkxlc3NvbiB7bGVzc29uX251bWJlcn06IHt0aXRs
-          ZX0iCiAgICAgc2Nyb2xsX3RvKGxhYmVsKQogICAgIHRhcChsYWJlbCkKQEAgLTE1MSw5ICsxNTIsMTAgQEAgZGVmIGNvbXBsZXRl
-          X2xlc3Nvbih0aXRsZSwgYW5zd2VycywgKiwgbGVzc29uX251bWJlcj0xLCB3cm9uZ19maXJzdD1GYWxzZSwgd3JvbmcKICAgICAg
-          ICAgIyBUaGUgZW11bGF0b3IgaGFzIG5vIHNwZWFrZXJzOyBleGVyY2lzZSBib3RoIHJhdGVzIG9mZmxpbmUgd2l0aG91dAogICAg
-          ICAgICAjIGNsYWltaW5nIHRvIGV2YWx1YXRlIGF1ZGlibGUgcXVhbGl0eSBvciBuYXRpdmUgdm9pY2VzLgogICAgICAgICB0aW1l
-          LnNsZWVwKDEpCi0gICAgICAgIHNjcm9sbF90bygiUGxheSBwcm9udW5jaWF0aW9uIHNhbXBsZSBzbG93bHkiLCBleGFjdD1UcnVl
-          KQotICAgICAgICB0YXAoIlBsYXkgcHJvbnVuY2lhdGlvbiBzYW1wbGUgc2xvd2x5IiwgZXhhY3Q9VHJ1ZSkKLSAgICAgICAgdGlt
-          ZS5zbGVlcCgxKQorICAgICAgICBpZiBzbG93X3NhbXBsZToKKyAgICAgICAgICAgIHNjcm9sbF90bygiUGxheSBwcm9udW5jaWF0
-          aW9uIHNhbXBsZSBzbG93bHkiLCBleGFjdD1UcnVlKQorICAgICAgICAgICAgdGFwKCJQbGF5IHByb251bmNpYXRpb24gc2FtcGxl
-          IHNsb3dseSIsIGV4YWN0PVRydWUpCisgICAgICAgICAgICB0aW1lLnNsZWVwKDEpCiAgICAgICAgIHNjcm9sbF90bygiU3RvcCBw
-          cm9udW5jaWF0aW9uIHNhbXBsZSIsIGV4YWN0PVRydWUpCiAgICAgICAgIHRhcCgiU3RvcCBwcm9udW5jaWF0aW9uIHNhbXBsZSIs
-          IGV4YWN0PVRydWUpCiAgICAgICAgIHNjcm9sbF90bygiUmVhZCBhbG9uZyIsIGRpcmVjdGlvbj0idXAiKQpkaWZmIC0tZ2l0IGEv
-          c2NyaXB0cy9zbW9rZS1hbmRyb2lkLXBsYW5uaW5nLXVwZ3JhZGUucHkgYi9zY3JpcHRzL3Ntb2tlLWFuZHJvaWQtcGxhbm5pbmct
-          dXBncmFkZS5weQppbmRleCAyODIwZjBjLi5iNzBmODQ2IDEwMDY0NAotLS0gYS9zY3JpcHRzL3Ntb2tlLWFuZHJvaWQtcGxhbm5p
-          bmctdXBncmFkZS5weQorKysgYi9zY3JpcHRzL3Ntb2tlLWFuZHJvaWQtcGxhbm5pbmctdXBncmFkZS5weQpAQCAtNTAsNyArNTAs
-          OCBAQCBkZWYgbWFpbihvbGRfYXBrLCBuZXdfYXBrLCBvbGRfZW5nbGlzaF90b3RhbD0xMCk6CiAgICAgICAgICJQbGFjZXMgYXJv
-          dW5kIHRvd24iLAogICAgICAgICBbKCJjaG9pY2UiLCAiTWFya2V0IiksICgiY2hvaWNlIiwgIkhvc3BpdGFsaSIpLCAoInRleHQi
-          LCAiU2h1bGUiKSwKICAgICAgICAgICgiY2hvaWNlIiwgIlNva28gbGlrbyB3YXBpPyIpLCAoImNob2ljZSIsICJUaGUgbWFya2V0
-          IGlzIG5lYXJieSIpXSwKLSAgICAgICAgbGVzc29uX251bWJlcj05LCByZXdhcmQ9MTUsIGxpc3Rlbj1UcnVlLAorICAgICAgICAj
-          IEhpc3RvcmljYWwgYmFzZWxpbmVzIHByZWRhdGUgdGhlIHNsb3cgcGxheWJhY2sgYnV0dG9uLgorICAgICAgICBsZXNzb25fbnVt
-          YmVyPTksIHJld2FyZD0xNSwgbGlzdGVuPVRydWUsIHNsb3dfc2FtcGxlPUZhbHNlLAogICAgICkKICAgICBzbW9rZS5jaGFuZ2Vf
-          Y291cnNlKCJFbmdsaXNoIikKICAgICBzbW9rZS50YXAoIkhvbWUiKQpkaWZmIC0tZ2l0IGEvdGVzdHMvYW5kcm9pZC11cGdyYWRl
-          LWhhcm5lc3MucHkgYi90ZXN0cy9hbmRyb2lkLXVwZ3JhZGUtaGFybmVzcy5weQppbmRleCA4MjAxYzQwLi42YjgwMjQyIDEwMDY0
-          NAotLS0gYS90ZXN0cy9hbmRyb2lkLXVwZ3JhZGUtaGFybmVzcy5weQorKysgYi90ZXN0cy9hbmRyb2lkLXVwZ3JhZGUtaGFybmVz
-          cy5weQpAQCAtNDQsNiArNDQsMTIgQEAgZGVmIGNoZWNrX3NjZW5hcmlvKHVwZ3JhZGUsIG9sZF90b3RhbCk6CiAgICAgYXNzZXJ0
-          ICIyNSBYUCIgaW4gYmVmb3JlIGFuZCAiMjUgWFAiIGluIGFmdGVyIGFuZCAiNDAgWFAiIGluIGFmdGVyCiAgICAgYXNzZXJ0ICIz
-          IC8gNiBjb2xsZWN0ZWQiIGluIGJlZm9yZSBhbmQgIjMgLyA2IGNvbGxlY3RlZCIgaW4gYWZ0ZXIKICAgICBhc3NlcnQgIjQgLyA2
-          IGNvbGxlY3RlZCIgaW4gYWZ0ZXIKKyAgICBiYXNlbGluZV9zYW1wbGVzID0gW2t3YXJncyBmb3IgbmFtZSwgXywga3dhcmdzIGlu
-          IGNhbGxzWzppbnN0YWxsc1sxXV0KKyAgICAgICAgICAgICAgICAgICAgICAgIGlmIG5hbWUgPT0gImNvbXBsZXRlX2xlc3NvbiIg
-          YW5kIGt3YXJncy5nZXQoImxpc3RlbiIpXQorICAgIGN1cnJlbnRfc2FtcGxlcyA9IFtrd2FyZ3MgZm9yIG5hbWUsIF8sIGt3YXJn
-          cyBpbiBjYWxsc1tpbnN0YWxsc1sxXTpdCisgICAgICAgICAgICAgICAgICAgICAgIGlmIG5hbWUgPT0gImNvbXBsZXRlX2xlc3Nv
-          biIgYW5kIGt3YXJncy5nZXQoImxpc3RlbiIpXQorICAgIGFzc2VydCBsZW4oYmFzZWxpbmVfc2FtcGxlcykgPT0gMSBhbmQgYmFz
-          ZWxpbmVfc2FtcGxlc1swXS5nZXQoInNsb3dfc2FtcGxlIikgaXMgRmFsc2UKKyAgICBhc3NlcnQgbGVuKGN1cnJlbnRfc2FtcGxl
-          cykgPT0gMSBhbmQgY3VycmVudF9zYW1wbGVzWzBdLmdldCgic2xvd19zYW1wbGUiLCBUcnVlKSBpcyBUcnVlCiAKIAogIyBJbXBv
-          cnRlZCBzbW9rZSBoZWxwZXJzIG1ha2UgYSBkaWFnbm9zdGljcyBkaXJlY3Rvcnk7IGtlZXAgaXQgdGVtcG9yYXJ5Lgo=
-          PATCH
+          npm ci --legacy-peer-deps --ignore-scripts --no-audit --no-fund
+          npm run harden-storage
+          node scripts/prepare-android-demo.mjs
+          cd .expo/android-demo
+          ./node_modules/.bin/expo prebuild --platform android --no-install
+          mkdir -p "$GITHUB_WORKSPACE/diagnostic/assets" "$GITHUB_WORKSPACE/diagnostic/res"
+          ./node_modules/.bin/expo export:embed --entry-file node_modules/expo-router/entry.js --platform android --dev false --minify false --bundle-output "$GITHUB_WORKSPACE/diagnostic/assets/index.android.bundle" --assets-dest "$GITHUB_WORKSPACE/diagnostic/res" --bytecode
       - uses: actions/download-artifact@v4
         with:
           name: Lingua-Demo-APK
-          path: baseline
-          run-id: 44653269194
-          github-token: ${{ github.token }}
-      - uses: actions/download-artifact@v4
-        with:
-          name: Lingua-Demo-APK
-          path: current
+          path: previous
           run-id: 44674923975
           github-token: ${{ github.token }}
-      - name: Verify both APK checksums
+      - name: Make a test-only APK with the new JS bundle
         run: |
-          for dir in baseline current; do
-            expected="$(awk 'NR == 1 {print $1}' "$dir/SHA256SUMS.txt")"
-            actual="$(sha256sum "$dir/Lingua-Demo.apk" | awk '{print $1}')"
-            test -n "$expected" && test "$actual" = "$expected"
-          done
+          expected="$(awk 'NR == 1 {print $1}' previous/SHA256SUMS.txt)"
+          actual="$(sha256sum previous/Lingua-Demo.apk | awk '{print $1}')"
+          test -n "$expected" && test "$actual" = "$expected"
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile, ZipInfo, ZIP_STORED
+          source = Path('previous/Lingua-Demo.apk')
+          bundle = Path('diagnostic/assets/index.android.bundle')
+          with ZipFile(source) as original, ZipFile('diagnostic-unsigned.apk', 'w') as updated:
+              names = set(original.namelist())
+              assert 'assets/index.android.bundle' in names, 'Expected release JS bundle'
+              for asset in Path('diagnostic/res/raw').glob('assets_audio_*'):
+                  matches = [name for name in names if name.startswith('res/raw') and name.endswith('/' + asset.name)]
+                  assert len(matches) == 1, f'Missing audio asset {asset.name}'
+                  assert original.read(matches[0]) == asset.read_bytes(), f'Changed audio asset {asset.name}'
+              for info in original.infolist():
+                  upper = info.filename.upper()
+                  signature = upper == 'META-INF/MANIFEST.MF' or (upper.startswith('META-INF/') and upper.endswith(('.SF', '.RSA', '.DSA', '.EC')))
+                  if signature or info.filename == 'assets/index.android.bundle':
+                      continue
+                  updated.writestr(info, original.read(info.filename))
+              info = ZipInfo('assets/index.android.bundle')
+              info.compress_type = ZIP_STORED
+              updated.writestr(info, bundle.read_bytes())
+          print('Reused matching native resources and replaced only the generated JS bundle.')
+          PY
+          TOOLS="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
+          "$TOOLS/zipalign" -p -f 4 diagnostic-unsigned.apk diagnostic-aligned.apk
+          "$TOOLS/apksigner" sign --ks .expo/android-demo/android/app/debug.keystore --ks-pass pass:android --key-pass pass:android --ks-key-alias androiddebugkey --out diagnostic.apk diagnostic-aligned.apk
+          "$TOOLS/apksigner" verify --verbose diagnostic.apk
       - name: Enable KVM for the emulator
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-      - name: Upgrade synthetic learner offline
+      - name: Measure every Kiswahili unit
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
@@ -96,54 +90,27 @@ jobs:
           profile: pixel_2
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
-          script: python3 -u scripts/smoke-android-p0-upgrade.py baseline/Lingua-Demo.apk current/Lingua-Demo.apk > "$GITHUB_WORKSPACE/upgrade.log" 2>&1
-      - name: Report upgrade result
+          script: LINGUA_SYNTHETIC_EMULATOR=1 python3 -u scripts/smoke-android-motion.py diagnostic.apk > "$GITHUB_WORKSPACE/spacing.log" 2>&1
+      - name: Report measured spacing
         if: always()
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          p = Path('upgrade.log')
-          lines = p.read_text(errors='replace').splitlines() if p.exists() else ['No emulator test log.']
-          text = '\n'.join(lines[-30:])[-9500:]
+          p = Path('spacing.log')
+          lines = p.read_text(errors='replace').splitlines() if p.exists() else ['No spacing test log.']
+          selected = [line for line in lines if 'sw-unit-' in line or 'smoke passed' in line or 'Error' in line or 'Traceback' in line]
+          if not selected:
+              selected = lines[-20:]
+          text = '\n'.join(selected)[-9500:]
           for i in range(0, len(text), 2400):
               s = text[i:i+2400].replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
-              print(f'::notice title=Upgrade report {i//2400:02d}::{s}')
+              print(f'::notice title=Spacing report {i//2400:02d}::{s}')
           PY
-      - name: Save isolated upgrade diagnostics
+      - name: Save isolated diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: temporary-upgrade-diagnostics
+          name: temporary-spacing-diagnostics
           path: android-smoke/
           if-no-files-found: warn
           retention-days: 1
-
-  inspect:
-    name: Report current emulator checks
-    runs-on: ubuntu-24.04
-    timeout-minutes: 50
-    steps:
-      - name: Wait for current Android smoke checks and summarize
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-        run: |
-          gh run watch 44674923975 --exit-status --interval 30 > "$RUNNER_TEMP/watch.log" 2>&1 || true
-          for job in 136089917343 136089917352 136089917432; do
-            gh run view 44674923975 --job "$job" --log > "$RUNNER_TEMP/$job.log" || true
-          done
-          python3 - <<'PY'
-          import os, re
-          from pathlib import Path
-          root = Path(os.environ['RUNNER_TEMP'])
-          for job in ('136089917343', '136089917352', '136089917432'):
-              p = root / f'{job}.log'
-              lines = p.read_text(errors='replace').splitlines() if p.exists() else []
-              selected = [line for line in lines if re.search(r'sw-unit-\d:|smoke passed|Traceback|AssertionError|RuntimeError|FATAL EXCEPTION|error:|##\[error\]', line, re.I)]
-              if not selected:
-                  selected = lines[-15:]
-              text = '\n'.join(selected)[-15000:]
-              for i in range(0, len(text), 2400):
-                  s = text[i:i+2400].replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
-                  print(f'::notice title=Smoke {job} {i//2400:02d}::{s}')
-          PY
