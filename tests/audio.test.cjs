@@ -356,12 +356,16 @@ test("feedback service respects hydration, mute, app state and independent hapti
   const settings = store({ effectsEnabled: true });
   const hydration = store({ status: "loading" });
   const events = [], players = [], modes = [];
-  let appListener, unsupportedTick = false;
+  let appListener, unsupportedTick = false, deferTick = false, rejectTick;
   const sources = { correct: 1, wrong: 2, celebration: 3, option: 4 };
   const haptics = {
     AndroidHaptics: { Reject: "reject", Confirm: "confirm", Segment_Tick: "tick", Clock_Tick: "clock", Context_Click: "context" },
-    ImpactFeedbackStyle: { Light: "light" }, NotificationFeedbackType: { Warning: "warning", Success: "success" },
-    performAndroidHapticsAsync: (kind) => { events.push(`haptic:${kind}`); return unsupportedTick && kind === "tick" ? Promise.reject(new Error("not supported")) : Promise.resolve(); },
+    ImpactFeedbackStyle: { Light: "light" }, NotificationFeedbackType: { Error: "error", Success: "success" },
+    performAndroidHapticsAsync: (kind) => {
+      events.push(`haptic:${kind}`);
+      if (deferTick && kind === "tick") return new Promise((_resolve, reject) => { rejectTick = reject; });
+      return unsupportedTick && kind === "tick" ? Promise.reject(new Error("not supported")) : Promise.resolve();
+    },
     impactAsync: (kind) => { events.push(`haptic:${kind}`); return Promise.resolve(); },
     notificationAsync: (kind) => { events.push(`haptic:${kind}`); return Promise.resolve(); },
   };
@@ -416,6 +420,14 @@ test("feedback service respects hydration, mute, app state and independent hapti
   service.feedback.correct();
   await new Promise((resolve) => setImmediate(resolve));
   assert.deepEqual(events.slice(-2), ["haptic:tick", "haptic:clock"], "older Android releases get a compatible fallback");
+  deferTick = true;
+  service.feedback.correct();
+  const beforeInterruption = events.length;
+  appListener("background");
+  appListener("active");
+  rejectTick(new Error("late unsupported result"));
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(events.length, beforeInterruption, "an old haptic fallback cannot fire after a lifecycle change");
   cleanup();
   assert.ok(players.every((player) => player.releases === 1));
   assert.equal(appListener, null);
@@ -434,4 +446,38 @@ test("pronunciation requests cancel the prior sample without affecting effects",
   coordinator.release(a);
   coordinator.claim(b, () => calls.push("new b"));
   assert.equal(calls.length, 3);
+});
+
+test("iOS uses light success, error and celebration haptics with a shared silent-aware session", () => {
+  const { createSoundEffectsManager } = require("../lib/soundEffectsManager.ts");
+  const events = [], modes = [];
+  const store = (state) => ({ getState: () => state, subscribe: () => () => {} });
+  const mocks = {
+    "expo-audio": { setAudioModeAsync: (mode) => { modes.push(mode); return Promise.resolve(); } },
+    "expo-haptics": {
+      ImpactFeedbackStyle: { Light: "light" }, NotificationFeedbackType: { Error: "error", Success: "success" },
+      impactAsync: (kind) => { events.push(kind); return Promise.resolve(); },
+      notificationAsync: (kind) => { events.push(kind); return Promise.resolve(); },
+    },
+    "react-native": { Platform: { OS: "ios" }, AppState: { currentState: "active", addEventListener: () => ({ remove() {} }) } },
+    "@/constants/audio": { soundEffects: { correct: 1, wrong: 2, celebration: 3, option: 4 } },
+    "@/lib/soundEffectsManager": { createSoundEffectsManager },
+    "@/lib/effectPlayer": { createEffectPlayer: () => ({ play() {}, stop() {}, dispose() {} }) },
+    "@/store/audioSettingsStore": { useAudioSettingsHydration: store({ status: "ready" }), useAudioSettingsStore: store({ effectsEnabled: true }) },
+  };
+  const original = Module._load;
+  let service;
+  try {
+    Module._load = function (request, parent, isMain) { return Object.hasOwn(mocks, request) ? mocks[request] : original.call(this, request, parent, isMain); };
+    delete require.cache[require.resolve("../lib/soundEffects.ts")];
+    service = require("../lib/soundEffects.ts");
+  } finally { Module._load = original; }
+  const cleanup = service.startAudioFeedback();
+  service.feedback.correct();
+  service.feedback.wrong();
+  service.feedback.celebrate();
+  assert.deepEqual(events, ["light", "error", "success"]);
+  assert.equal(modes[0].playsInSilentMode, false);
+  assert.equal(modes[0].interruptionMode, "mixWithOthers");
+  cleanup();
 });

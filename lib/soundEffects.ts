@@ -15,6 +15,7 @@ const manager = createSoundEffectsManager(
 );
 let started = false;
 let active = AppState.currentState == null || AppState.currentState === "active";
+let lifecycle = 0;
 
 // Called once at the app root, including the standalone demo. Keep the audio
 // session shared by pronunciation and feedback: no player globally mutes or
@@ -22,6 +23,7 @@ let active = AppState.currentState == null || AppState.currentState === "active"
 export function startAudioFeedback() {
   if (started) return () => {};
   started = true;
+  lifecycle += 1;
   active = AppState.currentState == null || AppState.currentState === "active";
   if (Platform.OS !== "web") {
     try {
@@ -36,6 +38,7 @@ export function startAudioFeedback() {
   manager.start();
   manager.setActive(active);
   const appState = AppState.addEventListener("change", (state) => {
+    lifecycle += 1;
     active = state === "active";
     manager.setActive(active);
   });
@@ -48,6 +51,7 @@ export function startAudioFeedback() {
 
   return () => {
     started = false;
+    lifecycle += 1;
     appState.remove();
     unsubscribeSettings();
     unsubscribeHydration();
@@ -57,6 +61,7 @@ export function startAudioFeedback() {
 
 function haptic(kind: "correct" | "wrong" | "celebration") {
   if (!started || !active || Platform.OS === "web") return;
+  const currentLifecycle = lifecycle;
   try {
     if (Platform.OS === "android") {
       const primary = kind === "wrong" ? Haptics.AndroidHaptics.Reject
@@ -66,14 +71,14 @@ function haptic(kind: "correct" | "wrong" | "celebration") {
       const fallback = kind === "correct" ? Haptics.AndroidHaptics.Clock_Tick : Haptics.AndroidHaptics.Context_Click;
       void Haptics.performAndroidHapticsAsync(primary).catch(() => {
         try {
-          if (started && active) void Haptics.performAndroidHapticsAsync(fallback).catch(() => {});
+          if (started && active && lifecycle === currentLifecycle) void Haptics.performAndroidHapticsAsync(fallback).catch(() => {});
         } catch { /* No compatible haptic engine. */ }
       });
     } else {
       const pulse = kind === "correct"
         ? Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
         : Haptics.notificationAsync(kind === "wrong"
-          ? Haptics.NotificationFeedbackType.Warning : Haptics.NotificationFeedbackType.Success);
+          ? Haptics.NotificationFeedbackType.Error : Haptics.NotificationFeedbackType.Success);
       void pulse.catch(() => { /* Haptics are not available on every device. */ });
     }
   } catch { /* Feedback must never prevent scoring. */ }

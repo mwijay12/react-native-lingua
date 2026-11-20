@@ -147,11 +147,15 @@ def complete_lesson(title, answers, *, lesson_number=1, wrong_first=False, wrong
         screenshot(screenshot_name)
     if listen:
         scroll_to("Play pronunciation sample")
-        tap("Play pronunciation sample")
-        # The emulator runs without speakers, but playback must not prompt for
-        # a microphone or block the lesson while the device is offline.
+        tap("Play pronunciation sample", exact=True)
+        # The emulator has no speakers; exercise both rates offline without
+        # claiming to evaluate audible quality or native voices.
         time.sleep(1)
-        tap("Stop pronunciation sample")
+        scroll_to("Play pronunciation sample slowly", exact=True)
+        tap("Play pronunciation sample slowly", exact=True)
+        time.sleep(1)
+        scroll_to("Stop pronunciation sample", exact=True)
+        tap("Stop pronunciation sample", exact=True)
         scroll_to("Read along", direction="up")
         if sample_text:
             scroll_to(sample_text, direction="up")
