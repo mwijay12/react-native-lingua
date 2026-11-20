@@ -18,6 +18,7 @@ class FakeSmoke:
         self.calls = []
         self.questions = iter(('What does "Asante" mean?', 'Which word means "Goodbye"?'))
         self.unit = None
+        self.description_bottom = 382
 
     def adb(self, *args, **kwargs):
         self.calls.append(("adb", args, os.environ.get("ANDROID_SERIAL")))
@@ -43,7 +44,7 @@ class FakeSmoke:
             for resource, bounds in (
                 (f"unit-header-{unit}", "[20,100][380,400]"),
                 (f"unit-scene-{unit}", "[20,100][380,280]"),
-                (f"unit-description-{unit}", "[36,340][300,384]"),
+                (f"unit-description-{unit}", f"[36,340][300,{self.description_bottom}]"),
                 (f"lesson-card-{lesson}", "[20,412][380,540]"),
             ):
                 ET.SubElement(root, "node", {"resource-id": resource, "bounds": bounds})
@@ -106,6 +107,15 @@ with tempfile.TemporaryDirectory(prefix="lingua-motion-unit-") as temporary:
     taps = [args for args in adb_calls if args[:3] == ("shell", "input", "swipe")]
     assert len(taps) == 12
     assert all(args[3:] == ("100", "150", "100", "150", "120") for args in taps)
+
+    too_tight = FakeSmoke(Path(temporary))
+    too_tight.description_bottom = 386  # 14 dp below the description is too little.
+    motion.smoke = too_tight
+    try:
+        motion.check_unit_layouts()
+        raise AssertionError("Too little unit description padding must fail")
+    except AssertionError as error:
+        assert "padding=14.0dp" in str(error)
 
     failed = FakeSmoke(Path(temporary))
     def fail_startup(*args, **kwargs):

@@ -91,7 +91,8 @@ export default function LearnScreen() {
                 className="rounded-t-[20px]"
                 testID={`unit-scene-${unit.id}`}
               />
-              <View className="flex-row items-center px-4 py-4">
+              {/* An explicit bottom value avoids native and web rem sizes diverging. */}
+              <View className="flex-row items-center px-4 pt-4 pb-[18px]">
                 <View className="flex-1 pr-2">
                   <Text className="font-poppins-semibold text-[10px] tracking-[0.8px] text-lingua-teal">UNIT {unit.order} · {unit.lessons.filter((lesson) => completedLessonIds.includes(lesson.id)).length} / {unit.lessons.length} COMPLETE</Text>
                   <Text className="font-poppins-semibold text-lg text-text-primary mt-1">{unit.title}</Text>

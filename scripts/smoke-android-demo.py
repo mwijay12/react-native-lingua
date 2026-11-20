@@ -139,7 +139,8 @@ def scroll_to(text, direction="down", max_swipes=14, exact=False):
 
 
 def complete_lesson(title, answers, *, lesson_number=1, wrong_first=False, wrong_answer="Goodbye",
-                    screenshot_name=None, reward=10, listen=False, sample_text=None, already_completed=False):
+                    screenshot_name=None, reward=10, listen=False, slow_sample=True, sample_text=None,
+                    already_completed=False):
     label = f"Lesson {lesson_number}: {title}"
     scroll_to(label)
     tap(label)
@@ -151,9 +152,10 @@ def complete_lesson(title, answers, *, lesson_number=1, wrong_first=False, wrong
         # The emulator has no speakers; exercise both rates offline without
         # claiming to evaluate audible quality or native voices.
         time.sleep(1)
-        scroll_to("Play pronunciation sample slowly", exact=True)
-        tap("Play pronunciation sample slowly", exact=True)
-        time.sleep(1)
+        if slow_sample:
+            scroll_to("Play pronunciation sample slowly", exact=True)
+            tap("Play pronunciation sample slowly", exact=True)
+            time.sleep(1)
         scroll_to("Stop pronunciation sample", exact=True)
         tap("Stop pronunciation sample", exact=True)
         scroll_to("Read along", direction="up")

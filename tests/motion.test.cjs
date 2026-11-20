@@ -595,3 +595,36 @@ test("scene frames use their measured full width and override image intrinsic di
   assert.equal(tree.props.style.height, 180, "an empty layout does not collapse the artwork");
   harness.cleanup();
 });
+
+test("unit descriptions use an explicit cross-platform bottom padding", () => {
+  const harness = hookHarness();
+  const unit = { id: "sw-unit-1", order: 1, title: "First Steps", description: "Learn greetings", lessons: [{ id: "lesson-1" }] };
+  const { default: LearnScreen } = loadComponent("../app/(tabs)/learn.tsx", harness, {
+    "@expo/vector-icons": { Ionicons: "Ionicons" },
+    "expo-router": { useRouter: () => ({ push() {}, navigate() {} }) },
+    "react-native-safe-area-context": { SafeAreaView: "SafeAreaView" },
+    "@/components/LearningHydrationScreen": { LearningHydrationScreen: "LearningHydrationScreen" },
+    "@/components/LearningSticker": { LearningSticker: "LearningSticker" },
+    "@/components/LessonCard": { LessonCard: "LessonCard" },
+    "@/components/MotionProgress": { MotionProgress: "MotionProgress" },
+    "@/components/MotionSticker": { MotionSticker: "MotionSticker" },
+    "@/components/SceneImage": { SceneImage: "SceneImage" },
+    "@/constants/images": { unitScenes: [1] },
+    "@/constants/theme": { colors: { neutral: { textPrimary: "#000" } } },
+    "@/data/courses": { getCourseUnits: () => [unit] },
+    "@/data/languages": { LANGUAGES: [{ code: "sw", name: "Kiswahili" }] },
+    "@/hooks/useLearningHydration": { useLearningHydration: () => "ready" },
+    "@/store/languageStore": { useLanguageStore: () => ({ selectedLanguage: "sw" }) },
+    "@/store/learningStore": { useLearningStore: () => ({ completedLessonIds: [] }) },
+  });
+  const tree = harness.render(LearnScreen);
+  const header = byId(tree, "unit-header-sw-unit-1");
+  const row = header.props.children.find((child) => byId(child, "unit-description-sw-unit-1"));
+  assert.match(row.props.className, /(?:^|\s)pb-\[18px\](?:\s|$)/);
+  // NativeWind's current compiler uses a 14dp rem on native. An explicit px
+  // value must remain 18dp rather than becoming the 14dp of py-4.
+  const { compile } = require("react-native-css/compiler");
+  const stylesheet = compile(".description { padding-bottom: 18px; }").stylesheet();
+  assert.equal(stylesheet.s[0][1][0].d[0].paddingBottom, 18);
+  harness.cleanup();
+});

@@ -50,7 +50,8 @@ def main(old_apk, new_apk, old_english_total=10):
         "Places around town",
         [("choice", "Market"), ("choice", "Hospitali"), ("text", "Shule"),
          ("choice", "Soko liko wapi?"), ("choice", "The market is nearby")],
-        lesson_number=9, reward=15, listen=True,
+        # Historical baselines predate the slow playback button.
+        lesson_number=9, reward=15, listen=True, slow_sample=False,
     )
     smoke.change_course("English")
     smoke.tap("Home")

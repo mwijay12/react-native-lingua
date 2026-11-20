@@ -77,7 +77,7 @@ def check_unit_layouts():
             if scene_checked and header and text and lesson and lesson[1] >= header[3]:
                 padding = (header[3] - text[3]) / density
                 gap = (lesson[1] - header[3]) / density
-                if not 14 <= padding <= 20 or not 10 <= gap <= 14:
+                if not 16 <= padding <= 20 or not 10 <= gap <= 14:
                     raise AssertionError(f"{unit}: padding={padding:.1f}dp, lesson gap={gap:.1f}dp")
                 print(f"{unit}: padding={padding:.1f}dp, gap={gap:.1f}dp, image fills card", flush=True)
                 smoke.screenshot(f"layout-{unit}")
