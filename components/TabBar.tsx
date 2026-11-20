@@ -6,6 +6,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-na
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colors, fontFamily } from "@/constants/theme";
+import { useKeyboardVisible } from "@/hooks/useKeyboardVisible";
 import { useReducedMotionPreference } from "@/hooks/useReducedMotionPreference";
 
 const INDICATOR_WIDTH = 58;
@@ -29,6 +30,7 @@ const TABS: TabConfig[] = [
 export function TabBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
+  const keyboardVisible = useKeyboardVisible();
   const reducedMotion = useReducedMotionPreference();
   const tabWidth = Math.min(width, MAX_BAR_WIDTH) / TABS.length;
   const indicatorX = useSharedValue(state.index * tabWidth + (tabWidth - INDICATOR_WIDTH) / 2);
@@ -39,6 +41,9 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
   }, [state.index, indicatorX, tabWidth, reducedMotion]);
 
   const indicatorStyle = useAnimatedStyle(() => ({ transform: [{ translateX: indicatorX.value }] }));
+
+  // The custom bar is outside the chat screen's KeyboardAvoidingView.
+  if (keyboardVisible && state.routes[state.index]?.name === "chat") return null;
 
   return (
     <View style={[styles.frame, { paddingBottom: insets.bottom || 8 }]}>

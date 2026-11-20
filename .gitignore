@@ -29,6 +29,10 @@ npm-debug.*
 yarn-debug.*
 yarn-error.*
 
+# Python smoke-test caches
+__pycache__/
+*.py[cod]
+
 # macOS
 .DS_Store
 *.pem

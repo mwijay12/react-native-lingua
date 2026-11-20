@@ -26,6 +26,8 @@ if (!isPostHogConfigured) {
 export const posthog = new PostHog(apiKey || "placeholder_key", {
   host,
   disabled: !isPostHogConfigured,
+  // Conversations should not appear in recordings, even if remote settings change.
+  enableSessionReplay: false,
   captureAppLifecycleEvents: true,
   flushAt: 20,
   flushInterval: 10000,

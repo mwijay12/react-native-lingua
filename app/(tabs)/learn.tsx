@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
 import { LearningSticker, type StickerKind } from "@/components/LearningSticker";
 import { LessonCard } from "@/components/LessonCard";
+import { MotionProgress } from "@/components/MotionProgress";
 import { MotionSticker } from "@/components/MotionSticker";
 import { unitScenes } from "@/constants/images";
 import { colors } from "@/constants/theme";
@@ -69,9 +70,7 @@ export default function LearnScreen() {
             </View>
             <MotionSticker kind="book" size={72} testID="path-sticker" />
           </View>
-          <View className="h-2 bg-[#C8DDD3] rounded-full overflow-hidden mt-4" accessibilityRole="progressbar" accessibilityLabel="Course progress" accessibilityValue={{ min: 0, max: 100, now: progress }}>
-            <View className="h-2 bg-lingua-teal rounded-full" style={{ width: `${progress}%` }} />
-          </View>
+          <MotionProgress className="mt-4" value={progress} max={100} label="Course progress" trackColor="#C8DDD3" />
           <View className="flex-row justify-between items-center mt-2">
             <Text className="caption">{progress}% of your course complete</Text>
             <TouchableOpacity onPress={() => router.push("/review")} accessibilityRole="button" testID="learn-review-button" className="py-1">

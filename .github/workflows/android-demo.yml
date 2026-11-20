@@ -125,7 +125,9 @@ jobs:
           profile: pixel_2
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
-          script: python3 scripts/smoke-android-demo.py artifacts/Lingua-Demo.apk
+          script: |
+            LINGUA_SYNTHETIC_EMULATOR=1 python3 scripts/smoke-android-motion.py artifacts/Lingua-Demo.apk
+            python3 scripts/smoke-android-demo.py artifacts/Lingua-Demo.apk
       - name: Upload smoke-test screenshots and diagnostics
         if: always()
         uses: actions/upload-artifact@v4
