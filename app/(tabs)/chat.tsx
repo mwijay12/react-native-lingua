@@ -48,7 +48,8 @@ export default function ChatScreen() {
       collapsable={false}
     >
       <SafeAreaView edges={["top"]} style={styles.safeArea}>
-        <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+        {/* Edge-to-edge Android can draw beneath the keyboard without resizing. */}
+        <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === "web" ? undefined : "padding"}>
           <View className="w-full max-w-[720px] self-center flex-1">
             <View className={`px-5 ${compact ? "pt-2 pb-2" : "pt-4 pb-3"}`}>
               {!compact && (

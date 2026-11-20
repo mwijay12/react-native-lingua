@@ -332,6 +332,15 @@ test("chat screen exposes a private, honest composer and starter prompts", () =>
   assert.equal(tree.props["ph-no-capture"], true);
   assert.equal(tree.props.accessibilityLabel, "ph-no-capture");
   assert.equal(byId(tree, "chat-connection-status").props.children, "AI connection needed");
+  assert.equal(find(tree, (element) => element.type === "KeyboardAvoidingView").props.behavior, undefined);
+  for (const platform of ["android", "ios"]) {
+    native.Platform.OS = platform;
+    tree = harness.render(Screen);
+    assert.equal(find(tree, (element) => element.type === "KeyboardAvoidingView").props.behavior, "padding",
+      `${platform} must keep the composer above the native keyboard`);
+  }
+  native.Platform.OS = "web";
+  tree = harness.render(Screen);
   assert.equal(byId(tree, "chat-send-button").props.disabled, true);
   const prompt = find(tree, (element) => element.props?.accessibilityLabel === "Use prompt: Teach me a Kiswahili greeting");
   prompt.props.onPress();
