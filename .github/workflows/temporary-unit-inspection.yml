@@ -96,9 +96,7 @@ jobs:
           profile: pixel_2
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
-          script: |
-            set -o pipefail
-            python3 scripts/smoke-android-p0-upgrade.py baseline/Lingua-Demo.apk current/Lingua-Demo.apk 2>&1 | tee "$GITHUB_WORKSPACE/upgrade.log"
+          script: python3 -u scripts/smoke-android-p0-upgrade.py baseline/Lingua-Demo.apk current/Lingua-Demo.apk > "$GITHUB_WORKSPACE/upgrade.log" 2>&1
       - name: Report upgrade result
         if: always()
         run: |
