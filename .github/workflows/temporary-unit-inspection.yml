@@ -1,4 +1,4 @@
-name: Temporary unit layout inspection
+name: Temporary Android build diagnostics
 
 on:
   push:
@@ -12,126 +12,23 @@ permissions:
 jobs:
   inspect:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          name: Lingua-Demo-APK
-          path: original
-          run-id: 44653269194
-          github-token: ${{ github.token }}
-      - name: Prepare synthetic layout check
+      - name: Retrieve failed build diagnostics
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
-          cat > "$RUNNER_TEMP/unit-check.py" <<'PY'
-          import base64
-          import gzip
-          import importlib.util
-          import xml.etree.ElementTree as ET
-          from pathlib import Path
-          spec = importlib.util.spec_from_file_location('smoke', 'scripts/smoke-android-demo.py')
-          smoke = importlib.util.module_from_spec(spec)
-          spec.loader.exec_module(smoke)
-          def report(name):
-              root = smoke.dump_ui()
-              if root is None:
-                  raise RuntimeError('Could not dump the synthetic screen')
-              xml = ET.tostring(root)
-              Path(f'android-smoke/{name}.xml').write_bytes(xml)
-              print(f'::notice title={name} xml::{base64.b64encode(gzip.compress(xml)).decode()}')
-              labels = [f"{n.get('text', '')} | {n.get('content-desc', '')} | {n.get('bounds', '')}" for n in root.iter('node') if n.get('text') or n.get('content-desc')]
-              text = '\n'.join(labels).replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
-              print(f'::notice title={name} labels::{text[-10000:]}')
-              smoke.screenshot(name)
-          try:
-              smoke.adb('install', '-r', 'original/Lingua-Demo.apk')
-              smoke.adb('shell', 'pm', 'clear', smoke.PACKAGE)
-              smoke.adb('shell', 'am', 'start', '-n', f'{smoke.PACKAGE}/.MainActivity')
-              smoke.tap('Continue without an account', exact=True)
-              smoke.wait_for('Choose a language')
-              smoke.tap('Continue', exact=True)
-              smoke.wait_for('TODAY’S STUDY')
-              smoke.tap('Learn', exact=True)
-              smoke.wait_for('Choose a lesson')
-              report('unit-initial')
-              smoke.scroll_to('Language foundations')
-              report('unit-three')
-              width, height = smoke.screen_size()
-              smoke.adb('shell', 'input', 'swipe', str(width // 2), str(int(height * 0.70)), str(width // 2), str(int(height * 0.52)), '500')
-              report('unit-three-scrolled')
-          finally:
-              smoke.screenshot('unit-last')
-          PY
-      - name: Enable isolated emulator
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-      - name: Inspect baseline units on Android
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 35
-          arch: x86_64
-          target: google_apis
-          profile: pixel_2
-          disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
-          script: python3 "$RUNNER_TEMP/unit-check.py"
-      - name: Encode small synthetic screenshots
-        if: always()
-        run: |
-          set -euo pipefail
-          cat > "$RUNNER_TEMP/Resize.java" <<'JAVA'
-          import java.awt.image.BufferedImage;
-          import java.awt.Graphics2D;
-          import java.io.File;
-          import javax.imageio.ImageIO;
-          import javax.imageio.ImageWriter;
-          import javax.imageio.ImageWriteParam;
-          import javax.imageio.IIOImage;
-          import javax.imageio.stream.ImageOutputStream;
-          public class Resize {
-            public static void main(String[] args) throws Exception {
-              BufferedImage in = ImageIO.read(new File(args[0]));
-              int w = 320, h = in.getHeight() * w / in.getWidth();
-              BufferedImage out = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-              Graphics2D g = out.createGraphics();
-              g.drawImage(in, 0, 0, w, h, null); g.dispose();
-              ImageWriter writer = ImageIO.getImageWritersByFormatName("jpeg").next();
-              try (ImageOutputStream stream = ImageIO.createImageOutputStream(new File(args[1]))) {
-                writer.setOutput(stream);
-                ImageWriteParam p = writer.getDefaultWriteParam(); p.setCompressionMode(ImageWriteParam.MODE_EXPLICIT); p.setCompressionQuality(0.3f);
-                writer.write(null, new IIOImage(out, null, null), p);
-              }
-              writer.dispose();
-            }
-          }
-          JAVA
-          for name in unit-three unit-three-scrolled; do
-            if [ -f "android-smoke/$name.png" ]; then
-              java "$RUNNER_TEMP/Resize.java" "android-smoke/$name.png" "$RUNNER_TEMP/$name.jpg"
-            fi
-          done
+          gh run view 44674207797 --job 136082034138 --log > "$RUNNER_TEMP/android-build.log"
           python3 - <<'PY'
-          import base64, os
+          import os, re
           from pathlib import Path
-          for name in ('unit-three',):
-              path = Path(os.environ['RUNNER_TEMP']) / f'{name}.jpg'
-              if not path.exists(): continue
-              payload = base64.b64encode(path.read_bytes()).decode()
-              chunks = [payload[i:i+3000] for i in range(0, len(payload), 3000)]
-              for i, chunk in enumerate(chunks): print(f'::notice title={name} {i:02d}::{chunk}')
-          PY
-      - name: Encode second synthetic screenshot
-        if: always()
-        run: |
-          python3 - <<'PY'
-          import base64, os
-          from pathlib import Path
-          name = 'unit-three-scrolled'
-          path = Path(os.environ['RUNNER_TEMP']) / f'{name}.jpg'
-          if path.exists():
-              payload = base64.b64encode(path.read_bytes()).decode()
-              chunks = [payload[i:i+3000] for i in range(0, len(payload), 3000)]
-              for i, chunk in enumerate(chunks): print(f'::notice title={name} {i:02d}::{chunk}')
+          lines = (Path(os.environ['RUNNER_TEMP']) / 'android-build.log').read_text(errors='replace').splitlines()
+          selected = set()
+          for i, line in enumerate(lines):
+              if re.search(r'failure|failed|error|what went wrong|could not|caused by|exception|unresolved', line, re.I):
+                  selected.update(range(max(0, i - 2), min(len(lines), i + 7)))
+          text = '\n'.join(lines[i] for i in sorted(selected))[-22000:]
+          text = text.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+          print(f'::notice title=Android build diagnostic::{text}')
           PY
