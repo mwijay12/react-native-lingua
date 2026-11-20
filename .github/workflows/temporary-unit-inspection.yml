@@ -24,6 +24,8 @@ jobs:
       - name: Prepare synthetic layout check
         run: |
           cat > "$RUNNER_TEMP/unit-check.py" <<'PY'
+          import base64
+          import gzip
           import importlib.util
           import xml.etree.ElementTree as ET
           from pathlib import Path
@@ -34,7 +36,9 @@ jobs:
               root = smoke.dump_ui()
               if root is None:
                   raise RuntimeError('Could not dump the synthetic screen')
-              Path(f'android-smoke/{name}.xml').write_bytes(ET.tostring(root))
+              xml = ET.tostring(root)
+              Path(f'android-smoke/{name}.xml').write_bytes(xml)
+              print(f'::notice title={name} xml::{base64.b64encode(gzip.compress(xml)).decode()}')
               labels = [f"{n.get('text', '')} | {n.get('content-desc', '')} | {n.get('bounds', '')}" for n in root.iter('node') if n.get('text') or n.get('content-desc')]
               text = '\n'.join(labels).replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
               print(f'::notice title={name} labels::{text[-10000:]}')
@@ -52,6 +56,9 @@ jobs:
               report('unit-initial')
               smoke.scroll_to('Language foundations')
               report('unit-three')
+              width, height = smoke.screen_size()
+              smoke.adb('shell', 'input', 'swipe', str(width // 2), str(int(height * 0.70)), str(width // 2), str(int(height * 0.52)), '500')
+              report('unit-three-scrolled')
           finally:
               smoke.screenshot('unit-last')
           PY
@@ -100,7 +107,7 @@ jobs:
             }
           }
           JAVA
-          for name in unit-initial unit-three; do
+          for name in unit-three unit-three-scrolled; do
             if [ -f "android-smoke/$name.png" ]; then
               java "$RUNNER_TEMP/Resize.java" "android-smoke/$name.png" "$RUNNER_TEMP/$name.jpg"
             fi
@@ -108,9 +115,22 @@ jobs:
           python3 - <<'PY'
           import base64, os
           from pathlib import Path
-          for name in ('unit-initial', 'unit-three'):
+          for name in ('unit-three',):
               path = Path(os.environ['RUNNER_TEMP']) / f'{name}.jpg'
               if not path.exists(): continue
+              payload = base64.b64encode(path.read_bytes()).decode()
+              chunks = [payload[i:i+3000] for i in range(0, len(payload), 3000)]
+              for i, chunk in enumerate(chunks): print(f'::notice title={name} {i:02d}::{chunk}')
+          PY
+      - name: Encode second synthetic screenshot
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, os
+          from pathlib import Path
+          name = 'unit-three-scrolled'
+          path = Path(os.environ['RUNNER_TEMP']) / f'{name}.jpg'
+          if path.exists():
               payload = base64.b64encode(path.read_bytes()).decode()
               chunks = [payload[i:i+3000] for i in range(0, len(payload), 3000)]
               for i, chunk in enumerate(chunks): print(f'::notice title={name} {i:02d}::{chunk}')
