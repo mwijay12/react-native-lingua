@@ -1,0 +1,146 @@
+name: Temporary focused Android chat verification
+
+on:
+  push:
+    branches: ["arena/**"]
+    paths: [".github/workflows/temporary-keyboard-verification.yml"]
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  keyboard:
+    name: Verify keyboard and draft on Android
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: internal-disposable-keyboard-trial
+          path: trial
+          run-id: 44653039288
+          github-token: ${{ github.token }}
+      - name: Create focused synthetic test
+        run: |
+          cat > "$RUNNER_TEMP/chat-check.py" <<'PY'
+          import importlib.util
+          import time
+
+          spec = importlib.util.spec_from_file_location('smoke', 'scripts/smoke-android-demo.py')
+          smoke = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(smoke)
+          try:
+              smoke.adb('install', '-r', 'trial/Lingua-Trial.apk')
+              smoke.adb('shell', 'pm', 'clear', smoke.PACKAGE)
+              smoke.adb('shell', 'svc', 'wifi', 'disable', check=False)
+              smoke.adb('shell', 'svc', 'data', 'disable', check=False)
+              smoke.adb('logcat', '-c')
+              smoke.adb('shell', 'am', 'start', '-n', f'{smoke.PACKAGE}/.MainActivity')
+              smoke.tap('Continue without an account', exact=True)
+              smoke.wait_for('Choose a language')
+              smoke.tap('Continue', exact=True)
+              smoke.wait_for('TODAY’S STUDY')
+              smoke.tap('Chat', exact=True)
+              smoke.wait_for('AI connection needed')
+              smoke.tap('Use prompt: Teach me a Kiswahili greeting', exact=True)
+              smoke.wait_for('Teach me a Kiswahili greeting')
+              smoke.tap('Change course, currently Kiswahili', exact=True)
+              smoke.wait_for('Choosing a different course clears this conversation and draft.')
+              smoke.tap('Keep', exact=True)
+              smoke.tap('Message for the AI tutor', exact=True)
+              time.sleep(2)
+              for line in smoke.adb('shell', 'dumpsys', 'input_method', check=False).stdout.decode('utf8', 'replace').splitlines():
+                  if 'mInputShown=' in line or 'isInputViewShown=' in line:
+                      print('Keyboard state:', line.strip(), flush=True)
+              smoke.wait_for('Send message', exact=True)
+              smoke.screenshot('chat-keyboard-before-send')
+              smoke.tap('Send message', exact=True)
+              smoke.wait_for("AI chat isn't connected yet. Your draft is still here.")
+              smoke.wait_for('Teach me a Kiswahili greeting')
+              smoke.screenshot('chat-keyboard-after-send')
+              smoke.adb('shell', 'input', 'keyevent', 'KEYCODE_BACK')
+              smoke.tap('Clear conversation', exact=True)
+              smoke.wait_for('Clear this conversation and draft?')
+              smoke.tap('Clear', exact=True)
+              smoke.wait_for('Use prompt: Teach me a Kiswahili greeting', exact=True)
+              smoke.tap('Profile', exact=True)
+              smoke.scroll_to('Created by Mwijay')
+              smoke.wait_for('About Lingua')
+              print('Focused Android keyboard and draft test passed.', flush=True)
+          finally:
+              smoke.screenshot('chat-check-last-screen')
+              logs = smoke.adb('logcat', '-d', '-v', 'time', 'ReactNativeJS:V', 'AndroidRuntime:E', '*:S', check=False)
+              (smoke.OUT / 'chat-check-logcat.txt').write_bytes(logs.stdout)
+          PY
+      - name: Enable isolated emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Exercise disabled chat with the keyboard open
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: bash -o pipefail -c 'python3 "$RUNNER_TEMP/chat-check.py" 2>&1 | tee chat-check.log'
+      - name: Report synthetic test details
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          def notice(title, message):
+              message = message[-9000:].replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+              print(f'::notice title={title}::{message}')
+          for path in (Path('chat-check.log'), Path('android-smoke/chat-check-logcat.txt')):
+              if path.exists():
+                  lines = path.read_text(errors='replace').splitlines()
+                  fatal = next((i for i, line in enumerate(lines) if 'FATAL EXCEPTION' in line), None)
+                  notice(path.name, '\n'.join(lines[fatal:fatal+25] if fatal is not None else lines[-45:]))
+          path = Path('android-smoke/last-window.xml')
+          if path.exists():
+              try:
+                  labels = [f"{n.get('text', '')} | {n.get('content-desc', '')} | {n.get('bounds', '')}" for n in ET.parse(path).iter('node') if n.get('text') or n.get('content-desc')]
+                  notice('Last synthetic screen', '\n'.join(labels[-40:]))
+              except ET.ParseError:
+                  pass
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: internal-keyboard-check-results
+          path: android-smoke/
+          if-no-files-found: warn
+          retention-days: 1
+
+  prior:
+    name: Inspect earlier build failure
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Summarize completed job log if accessible
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api repos/mwijay12/react-native-lingua/actions/jobs/136012395420/logs > job.log 2> job.err || true
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+          err = Path('job.err').read_text(errors='replace')
+          err = re.sub(r'https?://\S+', '<redacted-url>', err)
+          lines = Path('job.log').read_text(errors='replace').splitlines()
+          matches = [i for i, line in enumerate(lines) if re.search(r'FAILURE:|What went wrong:|Could not resolve|error:', line, re.I)]
+          if matches:
+              i = matches[-1]
+              text = '\n'.join(lines[max(0, i-2):i+15])
+          else:
+              text = err[:1200] or f'No failure lines ({len(lines)} lines)'
+          text = text.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+          print(f'::notice title=Earlier Gradle failure::{text[:8000]}')
+          PY
