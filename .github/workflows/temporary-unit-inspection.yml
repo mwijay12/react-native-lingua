@@ -1,4 +1,4 @@
-name: Temporary Android build diagnostics
+name: Temporary native validation
 
 on:
   push:
@@ -10,33 +10,142 @@ permissions:
   contents: read
 
 jobs:
-  inspect:
+  upgrade:
+    name: Check in-place upgrade with existing APKs
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 40
     steps:
-      - name: Probe public Maven metadata
+      - uses: actions/checkout@v4
+      - name: Apply local test-helper compatibility changes
         run: |
-          for url in \
-            'https://repo.maven.apache.org/maven2/com/google/code/gson/gson/2.9.1/gson-2.9.1.pom' \
-            'https://repo1.maven.org/maven2/com/google/code/gson/gson/2.9.1/gson-2.9.1.pom' \
-            'https://plugins.gradle.org/m2/com/google/code/gson/gson/2.9.1/gson-2.9.1.pom'; do
-            status=$(curl -L -sS --max-time 20 -o /dev/null -w '%{http_code}' "$url" || true)
-            echo "::notice title=Maven probe::$url $status"
+          base64 -d <<'PATCH' | git apply
+          ZGlmZiAtLWdpdCBhL3NjcmlwdHMvc21va2UtYW5kcm9pZC1kZW1vLnB5IGIvc2NyaXB0cy9zbW9rZS1hbmRyb2lkLWRlbW8ucHkK
+          aW5kZXggYzBlZDAyZi4uOTMyNmY3OCAxMDA2NDQKLS0tIGEvc2NyaXB0cy9zbW9rZS1hbmRyb2lkLWRlbW8ucHkKKysrIGIvc2Ny
+          aXB0cy9zbW9rZS1hbmRyb2lkLWRlbW8ucHkKQEAgLTEzOSw3ICsxMzksOCBAQCBkZWYgc2Nyb2xsX3RvKHRleHQsIGRpcmVjdGlv
+          bj0iZG93biIsIG1heF9zd2lwZXM9MTQsIGV4YWN0PUZhbHNlKToKIAogCiBkZWYgY29tcGxldGVfbGVzc29uKHRpdGxlLCBhbnN3
+          ZXJzLCAqLCBsZXNzb25fbnVtYmVyPTEsIHdyb25nX2ZpcnN0PUZhbHNlLCB3cm9uZ19hbnN3ZXI9Ikdvb2RieWUiLAotICAgICAg
+          ICAgICAgICAgICAgICBzY3JlZW5zaG90X25hbWU9Tm9uZSwgcmV3YXJkPTEwLCBsaXN0ZW49RmFsc2UsIHNhbXBsZV90ZXh0PU5v
+          bmUsIGFscmVhZHlfY29tcGxldGVkPUZhbHNlKToKKyAgICAgICAgICAgICAgICAgICAgc2NyZWVuc2hvdF9uYW1lPU5vbmUsIHJl
+          d2FyZD0xMCwgbGlzdGVuPUZhbHNlLCBzbG93X3NhbXBsZT1UcnVlLCBzYW1wbGVfdGV4dD1Ob25lLAorICAgICAgICAgICAgICAg
+          ICAgICBhbHJlYWR5X2NvbXBsZXRlZD1GYWxzZSk6CiAgICAgbGFiZWwgPSBmIkxlc3NvbiB7bGVzc29uX251bWJlcn06IHt0aXRs
+          ZX0iCiAgICAgc2Nyb2xsX3RvKGxhYmVsKQogICAgIHRhcChsYWJlbCkKQEAgLTE1MSw5ICsxNTIsMTAgQEAgZGVmIGNvbXBsZXRl
+          X2xlc3Nvbih0aXRsZSwgYW5zd2VycywgKiwgbGVzc29uX251bWJlcj0xLCB3cm9uZ19maXJzdD1GYWxzZSwgd3JvbmcKICAgICAg
+          ICAgIyBUaGUgZW11bGF0b3IgaGFzIG5vIHNwZWFrZXJzOyBleGVyY2lzZSBib3RoIHJhdGVzIG9mZmxpbmUgd2l0aG91dAogICAg
+          ICAgICAjIGNsYWltaW5nIHRvIGV2YWx1YXRlIGF1ZGlibGUgcXVhbGl0eSBvciBuYXRpdmUgdm9pY2VzLgogICAgICAgICB0aW1l
+          LnNsZWVwKDEpCi0gICAgICAgIHNjcm9sbF90bygiUGxheSBwcm9udW5jaWF0aW9uIHNhbXBsZSBzbG93bHkiLCBleGFjdD1UcnVl
+          KQotICAgICAgICB0YXAoIlBsYXkgcHJvbnVuY2lhdGlvbiBzYW1wbGUgc2xvd2x5IiwgZXhhY3Q9VHJ1ZSkKLSAgICAgICAgdGlt
+          ZS5zbGVlcCgxKQorICAgICAgICBpZiBzbG93X3NhbXBsZToKKyAgICAgICAgICAgIHNjcm9sbF90bygiUGxheSBwcm9udW5jaWF0
+          aW9uIHNhbXBsZSBzbG93bHkiLCBleGFjdD1UcnVlKQorICAgICAgICAgICAgdGFwKCJQbGF5IHByb251bmNpYXRpb24gc2FtcGxl
+          IHNsb3dseSIsIGV4YWN0PVRydWUpCisgICAgICAgICAgICB0aW1lLnNsZWVwKDEpCiAgICAgICAgIHNjcm9sbF90bygiU3RvcCBw
+          cm9udW5jaWF0aW9uIHNhbXBsZSIsIGV4YWN0PVRydWUpCiAgICAgICAgIHRhcCgiU3RvcCBwcm9udW5jaWF0aW9uIHNhbXBsZSIs
+          IGV4YWN0PVRydWUpCiAgICAgICAgIHNjcm9sbF90bygiUmVhZCBhbG9uZyIsIGRpcmVjdGlvbj0idXAiKQpkaWZmIC0tZ2l0IGEv
+          c2NyaXB0cy9zbW9rZS1hbmRyb2lkLXBsYW5uaW5nLXVwZ3JhZGUucHkgYi9zY3JpcHRzL3Ntb2tlLWFuZHJvaWQtcGxhbm5pbmct
+          dXBncmFkZS5weQppbmRleCAyODIwZjBjLi5iNzBmODQ2IDEwMDY0NAotLS0gYS9zY3JpcHRzL3Ntb2tlLWFuZHJvaWQtcGxhbm5p
+          bmctdXBncmFkZS5weQorKysgYi9zY3JpcHRzL3Ntb2tlLWFuZHJvaWQtcGxhbm5pbmctdXBncmFkZS5weQpAQCAtNTAsNyArNTAs
+          OCBAQCBkZWYgbWFpbihvbGRfYXBrLCBuZXdfYXBrLCBvbGRfZW5nbGlzaF90b3RhbD0xMCk6CiAgICAgICAgICJQbGFjZXMgYXJv
+          dW5kIHRvd24iLAogICAgICAgICBbKCJjaG9pY2UiLCAiTWFya2V0IiksICgiY2hvaWNlIiwgIkhvc3BpdGFsaSIpLCAoInRleHQi
+          LCAiU2h1bGUiKSwKICAgICAgICAgICgiY2hvaWNlIiwgIlNva28gbGlrbyB3YXBpPyIpLCAoImNob2ljZSIsICJUaGUgbWFya2V0
+          IGlzIG5lYXJieSIpXSwKLSAgICAgICAgbGVzc29uX251bWJlcj05LCByZXdhcmQ9MTUsIGxpc3Rlbj1UcnVlLAorICAgICAgICAj
+          IEhpc3RvcmljYWwgYmFzZWxpbmVzIHByZWRhdGUgdGhlIHNsb3cgcGxheWJhY2sgYnV0dG9uLgorICAgICAgICBsZXNzb25fbnVt
+          YmVyPTksIHJld2FyZD0xNSwgbGlzdGVuPVRydWUsIHNsb3dfc2FtcGxlPUZhbHNlLAogICAgICkKICAgICBzbW9rZS5jaGFuZ2Vf
+          Y291cnNlKCJFbmdsaXNoIikKICAgICBzbW9rZS50YXAoIkhvbWUiKQpkaWZmIC0tZ2l0IGEvdGVzdHMvYW5kcm9pZC11cGdyYWRl
+          LWhhcm5lc3MucHkgYi90ZXN0cy9hbmRyb2lkLXVwZ3JhZGUtaGFybmVzcy5weQppbmRleCA4MjAxYzQwLi42YjgwMjQyIDEwMDY0
+          NAotLS0gYS90ZXN0cy9hbmRyb2lkLXVwZ3JhZGUtaGFybmVzcy5weQorKysgYi90ZXN0cy9hbmRyb2lkLXVwZ3JhZGUtaGFybmVz
+          cy5weQpAQCAtNDQsNiArNDQsMTIgQEAgZGVmIGNoZWNrX3NjZW5hcmlvKHVwZ3JhZGUsIG9sZF90b3RhbCk6CiAgICAgYXNzZXJ0
+          ICIyNSBYUCIgaW4gYmVmb3JlIGFuZCAiMjUgWFAiIGluIGFmdGVyIGFuZCAiNDAgWFAiIGluIGFmdGVyCiAgICAgYXNzZXJ0ICIz
+          IC8gNiBjb2xsZWN0ZWQiIGluIGJlZm9yZSBhbmQgIjMgLyA2IGNvbGxlY3RlZCIgaW4gYWZ0ZXIKICAgICBhc3NlcnQgIjQgLyA2
+          IGNvbGxlY3RlZCIgaW4gYWZ0ZXIKKyAgICBiYXNlbGluZV9zYW1wbGVzID0gW2t3YXJncyBmb3IgbmFtZSwgXywga3dhcmdzIGlu
+          IGNhbGxzWzppbnN0YWxsc1sxXV0KKyAgICAgICAgICAgICAgICAgICAgICAgIGlmIG5hbWUgPT0gImNvbXBsZXRlX2xlc3NvbiIg
+          YW5kIGt3YXJncy5nZXQoImxpc3RlbiIpXQorICAgIGN1cnJlbnRfc2FtcGxlcyA9IFtrd2FyZ3MgZm9yIG5hbWUsIF8sIGt3YXJn
+          cyBpbiBjYWxsc1tpbnN0YWxsc1sxXTpdCisgICAgICAgICAgICAgICAgICAgICAgIGlmIG5hbWUgPT0gImNvbXBsZXRlX2xlc3Nv
+          biIgYW5kIGt3YXJncy5nZXQoImxpc3RlbiIpXQorICAgIGFzc2VydCBsZW4oYmFzZWxpbmVfc2FtcGxlcykgPT0gMSBhbmQgYmFz
+          ZWxpbmVfc2FtcGxlc1swXS5nZXQoInNsb3dfc2FtcGxlIikgaXMgRmFsc2UKKyAgICBhc3NlcnQgbGVuKGN1cnJlbnRfc2FtcGxl
+          cykgPT0gMSBhbmQgY3VycmVudF9zYW1wbGVzWzBdLmdldCgic2xvd19zYW1wbGUiLCBUcnVlKSBpcyBUcnVlCiAKIAogIyBJbXBv
+          cnRlZCBzbW9rZSBoZWxwZXJzIG1ha2UgYSBkaWFnbm9zdGljcyBkaXJlY3Rvcnk7IGtlZXAgaXQgdGVtcG9yYXJ5Lgo=
+          PATCH
+      - uses: actions/download-artifact@v4
+        with:
+          name: Lingua-Demo-APK
+          path: baseline
+          run-id: 44653269194
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: Lingua-Demo-APK
+          path: current
+          run-id: 44674923975
+          github-token: ${{ github.token }}
+      - name: Verify both APK checksums
+        run: |
+          for dir in baseline current; do
+            expected="$(awk 'NR == 1 {print $1}' "$dir/SHA256SUMS.txt")"
+            actual="$(sha256sum "$dir/Lingua-Demo.apk" | awk '{print $1}')"
+            test -n "$expected" && test "$actual" = "$expected"
           done
-      - name: Retrieve failed build diagnostics
+      - name: Enable KVM for the emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Upgrade synthetic learner offline
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: |
+            set -o pipefail
+            python3 scripts/smoke-android-p0-upgrade.py baseline/Lingua-Demo.apk current/Lingua-Demo.apk 2>&1 | tee "$GITHUB_WORKSPACE/upgrade.log"
+      - name: Report upgrade result
+        if: always()
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('upgrade.log')
+          lines = p.read_text(errors='replace').splitlines() if p.exists() else ['No emulator test log.']
+          text = '\n'.join(lines[-30:])[-9500:]
+          for i in range(0, len(text), 2400):
+              s = text[i:i+2400].replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+              print(f'::notice title=Upgrade report {i//2400:02d}::{s}')
+          PY
+      - name: Save isolated upgrade diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: temporary-upgrade-diagnostics
+          path: android-smoke/
+          if-no-files-found: warn
+          retention-days: 1
+
+  inspect:
+    name: Report current emulator checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - name: Wait for current Android smoke checks and summarize
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          gh run view 44674207797 --job 136082971429 --log > "$RUNNER_TEMP/android-build.log"
+          gh run watch 44674923975 --exit-status --interval 30 > "$RUNNER_TEMP/watch.log" 2>&1 || true
+          for job in 136089917343 136089917352 136089917432; do
+            gh run view 44674923975 --job "$job" --log > "$RUNNER_TEMP/$job.log" || true
+          done
           python3 - <<'PY'
           import os, re
           from pathlib import Path
-          lines = (Path(os.environ['RUNNER_TEMP']) / 'android-build.log').read_text(errors='replace').splitlines()
-          lines = [line for line in lines if 'Assemble bundled test APK' in line]
-          text = '\n'.join(lines[-100:])[-21000:]
-          chunks = [text[i:i + 2500] for i in range(0, len(text), 2500)]
-          for index, chunk in enumerate(chunks):
-              chunk = chunk.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
-              print(f'::notice title=Android build diagnostic {index:02d}::{chunk}')
+          root = Path(os.environ['RUNNER_TEMP'])
+          for job in ('136089917343', '136089917352', '136089917432'):
+              p = root / f'{job}.log'
+              lines = p.read_text(errors='replace').splitlines() if p.exists() else []
+              selected = [line for line in lines if re.search(r'sw-unit-\d:|smoke passed|Traceback|AssertionError|RuntimeError|FATAL EXCEPTION|error:|##\[error\]', line, re.I)]
+              if not selected:
+                  selected = lines[-15:]
+              text = '\n'.join(selected)[-15000:]
+              for i in range(0, len(text), 2400):
+                  s = text[i:i+2400].replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+                  print(f'::notice title=Smoke {job} {i//2400:02d}::{s}')
           PY
