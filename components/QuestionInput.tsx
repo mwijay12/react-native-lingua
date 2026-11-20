@@ -11,14 +11,20 @@ interface QuestionInputProps {
   answer: string;
   disabled: boolean;
   onChange: (answer: string) => void;
+  onSelectOption: () => void;
   onSubmit: () => void;
 }
 
-// The same answer controls are used by lessons and the missed-question review.
-export function QuestionInput({ activity, answer, disabled, onChange, onSubmit }: QuestionInputProps) {
+// The same answer controls are used by lessons, review and Quick Mix.
+export function QuestionInput({ activity, answer, disabled, onChange, onSelectOption, onSubmit }: QuestionInputProps) {
   const motionAllowed = useScreenMotionAllowed();
   if (activity.type === "multiple-choice") {
     const options = activity.options ?? [];
+    const selectOption = (option: string) => {
+      if (disabled) return;
+      onSelectOption();
+      onChange(option);
+    };
     return (
       <View className="gap-3" accessibilityRole="radiogroup" accessibilityLabel="Answer choices">
         {options.map((option, index) => {
@@ -31,12 +37,12 @@ export function QuestionInput({ activity, answer, disabled, onChange, onSubmit }
               if (disabled) return;
               if (event.key === " ") {
                 event.preventDefault();
-                onChange(option);
+                selectOption(option);
               } else if (["ArrowDown", "ArrowRight", "ArrowUp", "ArrowLeft"].includes(event.key)) {
                 event.preventDefault();
                 const direction = event.key === "ArrowDown" || event.key === "ArrowRight" ? 1 : -1;
                 const next = (index + direction + options.length) % options.length;
-                onChange(options[next]);
+                selectOption(options[next]);
                 event.currentTarget.parentElement?.querySelectorAll<HTMLElement>('[role="radio"]')[next]?.focus();
               }
             },
@@ -45,7 +51,7 @@ export function QuestionInput({ activity, answer, disabled, onChange, onSubmit }
             <TouchableOpacity
               key={option}
               {...webKeyboard}
-              onPress={() => onChange(option)}
+              onPress={() => selectOption(option)}
               disabled={disabled}
               accessibilityRole="radio"
               accessibilityLabel={option}

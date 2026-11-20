@@ -41,7 +41,7 @@ export function SoundEffectsControl({ compact = false }: { compact?: boolean }) 
       disabled={loading}
       accessibilityRole={failed ? "button" : "switch"}
       accessibilityLabel={failed ? "Retry sound settings" : "Sound effects"}
-      accessibilityHint={failed ? "Try loading the sound preference again." : "Controls short feedback sounds, not pronunciation samples."}
+      accessibilityHint={failed ? "Try loading the sound preference again." : "Controls feedback sounds, not pronunciation samples or device haptics."}
       accessibilityState={failed ? { disabled: loading } : { checked: enabled && !loading, disabled: loading }}
       aria-checked={failed ? undefined : enabled && !loading}
       testID="sound-effects-toggle"
@@ -59,7 +59,7 @@ export function SoundEffectsControl({ compact = false }: { compact?: boolean }) 
       <View className="flex-row items-center">
         <View className="flex-1 pr-3">
           <Text className="font-poppins-semibold text-sm text-text-primary">Sound effects</Text>
-          <Text className="caption mt-1">Short answer and celebration sounds. Pronunciation samples play separately when tapped.</Text>
+          <Text className="caption mt-1">Option, answer and celebration sounds. Pronunciation plays separately; haptics follow your device settings.</Text>
         </View>
         {control}
       </View>

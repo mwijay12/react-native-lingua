@@ -21,6 +21,7 @@ import { MotionPressable } from "@/components/MotionPressable";
 import { MotionSticker } from "@/components/MotionSticker";
 import { PronunciationSample } from "@/components/PronunciationSample";
 import { QuestionInput } from "@/components/QuestionInput";
+import { SceneImage } from "@/components/SceneImage";
 import { SoundEffectsControl } from "@/components/SoundEffectsControl";
 import { pronunciationSamples } from "@/constants/audio";
 import { images, unitScenes } from "@/constants/images";
@@ -104,6 +105,7 @@ export default function LessonScreen() {
       addMistake(lesson.id, activity.id);
       setAttempts((count) => count + 1);
       setFeedback("incorrect");
+      sounds.wrong();
     }
   };
   const advance = () => {
@@ -146,7 +148,7 @@ export default function LessonScreen() {
             <>
               {unit && (
                 <View className="rounded-[22px] overflow-hidden mb-5" testID="lesson-scene">
-                  <Image source={unitScenes[(unit.order - 1) % unitScenes.length]} style={styles.lessonScene} resizeMode="cover" accessible={false} />
+                  <SceneImage source={unitScenes[(unit.order - 1) % unitScenes.length]} aspectRatio={2.4} maxHeight={160} />
                 </View>
               )}
               <View className="flex-row items-center mb-3">
@@ -225,6 +227,7 @@ export default function LessonScreen() {
                 answer={answer}
                 disabled={feedback === "correct"}
                 onChange={updateAnswer}
+                onSelectOption={sounds.option}
                 onSubmit={checkAnswer}
               />
               {activity.hint && feedback !== "correct" && (
@@ -303,6 +306,5 @@ export default function LessonScreen() {
 
 const styles = StyleSheet.create({
   content: { width: "100%", maxWidth: 720, alignSelf: "center", paddingHorizontal: 20, paddingTop: 20, paddingBottom: 40, flexGrow: 1 },
-  lessonScene: { width: "100%", aspectRatio: 2.4, maxHeight: 160 },
   finishCat: { width: 105, height: 120 },
 });

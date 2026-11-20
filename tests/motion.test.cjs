@@ -465,6 +465,7 @@ test("answer choices keep radio and web keyboard behavior", () => {
   const harness = hookHarness();
   const animation = animationMock(harness);
   const answers = [];
+  let optionSounds = 0;
   let focused = false;
   const { QuestionInput } = loadComponent("../components/QuestionInput.tsx", harness, {
     "react-native-reanimated": animation.module,
@@ -473,7 +474,7 @@ test("answer choices keep radio and web keyboard behavior", () => {
   });
   const tree = harness.render(QuestionInput, {
     activity: { type: "multiple-choice", options: ["Habari", "Asante"] }, answer: "", disabled: false,
-    onChange: (answer) => answers.push(answer), onSubmit() {},
+    onChange: (answer) => answers.push(answer), onSelectOption: () => { optionSounds += 1; }, onSubmit() {},
   });
   const first = byId(tree, "activity-choice-0");
   assert.equal(first.props.accessibilityRole, "radio");
@@ -486,6 +487,111 @@ test("answer choices keep radio and web keyboard behavior", () => {
   });
   assert.equal(prevented, true);
   assert.equal(focused, true);
-  assert.deepEqual(answers, ["Habari", "Asante"]);
+  first.props.onKeyDownCapture({ key: " ", preventDefault() {} });
+  assert.deepEqual(answers, ["Habari", "Asante", "Habari"]);
+  assert.equal(optionSounds, 3, "touch, Space and arrow choices all request the quiet tick");
+  const disabled = harness.render(QuestionInput, {
+    activity: { type: "multiple-choice", options: ["Habari", "Asante"] }, answer: "", disabled: true,
+    onChange: (answer) => answers.push(answer), onSelectOption: () => { optionSounds += 1; }, onSubmit() {},
+  });
+  byId(disabled, "activity-choice-0").props.onPress();
+  byId(disabled, "activity-choice-0").props.onKeyDownCapture({ key: " ", preventDefault() {} });
+  assert.equal(optionSounds, 3, "disabled answers stay silent");
+  harness.cleanup();
+});
+
+test("sample controls expose normal and slow prerecorded playback", () => {
+  const harness = hookHarness();
+  const calls = [];
+  const { PronunciationSample } = loadComponent("../components/PronunciationSample.tsx", harness, {
+    "@expo/vector-icons": { Ionicons: "Ionicons" },
+    "@/constants/audio": { PRONUNCIATION_NORMAL_RATE: 0.9, PRONUNCIATION_SLOW_RATE: 0.65 },
+    "@/hooks/useAudioPlayback": { useAudioPlayback: () => ({ play: (rate) => calls.push(rate), stop: () => calls.push("stop"), error: false }) },
+  });
+  const tree = harness.render(PronunciationSample, { sample: { source: 1, lines: ["Habari", "Asante"] } });
+  byId(tree, "play-pronunciation").props.onPress();
+  byId(tree, "play-pronunciation-slow").props.onPress();
+  byId(tree, "stop-pronunciation").props.onPress();
+  assert.deepEqual(calls, [0.9, 0.65, "stop"]);
+  assert.equal(byId(tree, "play-pronunciation-slow").props.accessibilityLabel, "Play pronunciation sample slowly");
+  assert.equal(byId(tree, "pronunciation-transcript").props.children, "Habari · Asante");
+  harness.cleanup();
+});
+
+test("native pronunciation stops earlier samples and cancels pending playback", async () => {
+  const { createPronunciationCoordinator } = require("../lib/pronunciationCoordinator.ts");
+  const coordinator = createPronunciationCoordinator();
+  const listeners = new Set();
+  let focused = true;
+  const makePlayer = () => ({
+    rates: [], pending: [], plays: 0, pauses: 0, shouldCorrectPitch: false,
+    pause() { this.pauses += 1; },
+    setPlaybackRate(rate, quality) { this.rates.push([rate, quality]); },
+    seekTo() { return new Promise((resolve) => this.pending.push(resolve)); },
+    play() { this.plays += 1; },
+  });
+  const firstPlayer = makePlayer(), secondPlayer = makePlayer();
+  const first = hookHarness(), second = hookHarness();
+  const overrides = (player) => ({
+    "@react-navigation/native": { useIsFocused: () => focused },
+    "expo-audio": { useAudioPlayer: () => player },
+    "@/constants/audio": { PRONUNCIATION_NORMAL_RATE: 0.9 },
+    "@/lib/pronunciationCoordinator": { pronunciationCoordinator: coordinator },
+    "react-native": { AppState: { currentState: "active", addEventListener: (_event, callback) => {
+      listeners.add(callback); return { remove() { listeners.delete(callback); } };
+    } } },
+  });
+  const firstHook = loadComponent("../hooks/useAudioPlayback.ts", first, overrides(firstPlayer)).useAudioPlayback;
+  const secondHook = loadComponent("../hooks/useAudioPlayback.ts", second, overrides(secondPlayer)).useAudioPlayback;
+  const a = first.render(firstHook, 1), b = second.render(secondHook, 2);
+  const flush = () => new Promise((resolve) => setImmediate(resolve));
+  a.play();
+  b.play(0.65);
+  assert.ok(firstPlayer.pauses >= 1, "starting B stops A");
+  firstPlayer.pending.shift()();
+  secondPlayer.pending.shift()();
+  await flush();
+  assert.equal(firstPlayer.plays, 0, "a canceled seek cannot start speech");
+  assert.equal(secondPlayer.plays, 1);
+  assert.deepEqual(firstPlayer.rates, [[0.9, "high"]]);
+  assert.deepEqual(secondPlayer.rates, [[0.65, "high"]]);
+  assert.equal(secondPlayer.shouldCorrectPitch, true);
+  a.play();
+  assert.ok(secondPlayer.pauses >= 1, "starting A stops B");
+  for (const listener of listeners) listener("background");
+  firstPlayer.pending.shift()();
+  await flush();
+  assert.equal(firstPlayer.plays, 0, "backgrounding cancels a pending seek");
+  for (const listener of listeners) listener("active");
+  a.play();
+  focused = false;
+  first.render(firstHook, 1);
+  firstPlayer.pending.shift()();
+  await flush();
+  assert.equal(firstPlayer.plays, 0, "leaving the screen cancels playback");
+  first.cleanup();
+  second.cleanup();
+  assert.equal(listeners.size, 0);
+});
+
+test("scene frames use their measured full width and override image intrinsic dimensions", () => {
+  const harness = hookHarness();
+  const { SceneImage } = loadComponent("../components/SceneImage.tsx", harness);
+  const props = { source: 17, aspectRatio: 2.1, maxHeight: 180, className: "rounded-t-[20px]", testID: "scene" };
+  let tree = harness.render(SceneImage, props);
+  assert.equal(tree.props.style.height, 180);
+  assert.match(tree.props.className, /w-full.*overflow-hidden.*rounded-t/);
+  const image = find(tree, (element) => element.type === "Image");
+  assert.deepEqual(image.props.style, { width: "100%", height: "100%" });
+  assert.equal(image.props.resizeMode, "cover");
+  tree.props.onLayout({ nativeEvent: { layout: { width: 350 } } });
+  tree = harness.render(SceneImage, props);
+  assert.ok(Math.abs(tree.props.style.height - 350 / 2.1) < 0.001);
+  tree.props.onLayout({ nativeEvent: { layout: { width: 680 } } });
+  tree = harness.render(SceneImage, props);
+  assert.equal(tree.props.style.height, 180, "a wide card caps height without shrinking width");
+  tree.props.onLayout({ nativeEvent: { layout: { width: 0 } } });
+  tree = harness.render(SceneImage, props);
+  assert.equal(tree.props.style.height, 180, "an empty layout does not collapse the artwork");
   harness.cleanup();
 });

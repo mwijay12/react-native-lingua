@@ -3,11 +3,13 @@ import "../global.css";
 import { LaunchGate } from "@/components/LaunchSplash";
 import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
 import { PendingSaveBanner } from "@/components/PendingSaveBanner";
+import { startAudioFeedback } from "@/lib/soundEffects";
 import { useLanguageHydrationStatus } from "@/store/languageStore";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 import { View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
@@ -15,6 +17,7 @@ SplashScreen.preventAutoHideAsync();
 
 // This layout is only copied into the isolated Android demo project.
 export default function DemoRootLayout() {
+  useEffect(() => startAudioFeedback(), []);
   const languageHydration = useLanguageHydrationStatus((state) => state.status);
   const [fontsLoaded, fontError] = useFonts({
     "Poppins-Regular": require("../assets/fonts/Poppins-Regular.ttf"),

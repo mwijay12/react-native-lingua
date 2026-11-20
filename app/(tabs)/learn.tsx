@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
@@ -8,6 +8,7 @@ import { LearningSticker, type StickerKind } from "@/components/LearningSticker"
 import { LessonCard } from "@/components/LessonCard";
 import { MotionProgress } from "@/components/MotionProgress";
 import { MotionSticker } from "@/components/MotionSticker";
+import { SceneImage } from "@/components/SceneImage";
 import { unitScenes } from "@/constants/images";
 import { colors } from "@/constants/theme";
 import { getCourseUnits } from "@/data/courses";
@@ -82,13 +83,19 @@ export default function LearnScreen() {
 
         {units.map((unit) => (
           <View key={unit.id} className="mb-6" testID={`course-unit-${unit.id}`}>
-            <View className={`rounded-[20px] overflow-hidden mb-3 ${UNIT_BACKGROUNDS[(unit.order - 1) % UNIT_BACKGROUNDS.length]}`}>
-              <Image source={unitScenes[(unit.order - 1) % unitScenes.length]} style={styles.unitScene} resizeMode="cover" accessible={false} />
+            <View className={`rounded-[20px] overflow-hidden mb-3 ${UNIT_BACKGROUNDS[(unit.order - 1) % UNIT_BACKGROUNDS.length]}`} testID={`unit-header-${unit.id}`}>
+              <SceneImage
+                source={unitScenes[(unit.order - 1) % unitScenes.length]}
+                aspectRatio={2.1}
+                maxHeight={180}
+                className="rounded-t-[20px]"
+                testID={`unit-scene-${unit.id}`}
+              />
               <View className="flex-row items-center px-4 py-4">
                 <View className="flex-1 pr-2">
                   <Text className="font-poppins-semibold text-[10px] tracking-[0.8px] text-lingua-teal">UNIT {unit.order} · {unit.lessons.filter((lesson) => completedLessonIds.includes(lesson.id)).length} / {unit.lessons.length} COMPLETE</Text>
                   <Text className="font-poppins-semibold text-lg text-text-primary mt-1">{unit.title}</Text>
-                  <Text className="body-sm text-text-secondary mt-1">{unit.description}</Text>
+                  <Text className="body-sm text-text-secondary mt-1" testID={`unit-description-${unit.id}`}>{unit.description}</Text>
                 </View>
                 <LearningSticker kind={UNIT_STICKERS[(unit.order - 1) % UNIT_STICKERS.length]} size={58} />
               </View>
@@ -115,5 +122,4 @@ export default function LearnScreen() {
 
 const styles = StyleSheet.create({
   content: { width: "100%", maxWidth: 720, alignSelf: "center", paddingHorizontal: 20, paddingBottom: 36 },
-  unitScene: { width: "100%", aspectRatio: 2.1, maxHeight: 180 },
 });

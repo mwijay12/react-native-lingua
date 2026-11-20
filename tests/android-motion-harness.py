@@ -3,6 +3,7 @@
 import importlib.util
 import os
 import tempfile
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -16,12 +17,37 @@ class FakeSmoke:
         self.OUT = output
         self.calls = []
         self.questions = iter(('What does "Asante" mean?', 'Which word means "Goodbye"?'))
+        self.unit = None
 
     def adb(self, *args, **kwargs):
         self.calls.append(("adb", args, os.environ.get("ANDROID_SERIAL")))
         if args[:4] == ("shell", "settings", "get", "global"):
             return SimpleNamespace(stdout=b"0.0\n")
+        if args == ("shell", "wm", "density"):
+            return SimpleNamespace(stdout=b"Physical density: 160\n", returncode=0)
         return SimpleNamespace(stdout=b"", returncode=0)
+
+    def screen_size(self):
+        self.calls.append(("screen_size", (), os.environ.get("ANDROID_SERIAL")))
+        return (400, 800)
+
+    def scroll_to(self, text, **kwargs):
+        self.calls.append(("scroll_to", (text,), os.environ.get("ANDROID_SERIAL")))
+        self.unit = next((unit for unit in motion.UNITS if unit[1] == text), None)
+
+    def dump_ui(self):
+        self.calls.append(("dump_ui", (), os.environ.get("ANDROID_SERIAL")))
+        root = ET.Element("hierarchy")
+        if self.unit:
+            unit, _description, lesson = self.unit
+            for resource, bounds in (
+                (f"unit-header-{unit}", "[20,100][380,400]"),
+                (f"unit-scene-{unit}", "[20,100][380,280]"),
+                (f"unit-description-{unit}", "[36,340][300,384]"),
+                (f"lesson-card-{lesson}", "[20,412][380,540]"),
+            ):
+                ET.SubElement(root, "node", {"resource-id": resource, "bounds": bounds})
+        return root
 
     def wait_for_one_of(self, _options):
         return next(self.questions)
@@ -78,7 +104,7 @@ with tempfile.TemporaryDirectory(prefix="lingua-motion-unit-") as temporary:
         assert ("shell", "settings", "put", "global", scale, "0.0") in adb_calls
     assert [args[0] for kind, args, _ in fake.calls if kind == "wait_for" and args].count("Check answer") == 4
     taps = [args for args in adb_calls if args[:3] == ("shell", "input", "swipe")]
-    assert len(taps) == 10
+    assert len(taps) == 12
     assert all(args[3:] == ("100", "150", "100", "150", "120") for args in taps)
 
     failed = FakeSmoke(Path(temporary))
