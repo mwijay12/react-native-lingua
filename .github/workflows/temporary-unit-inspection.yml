@@ -24,11 +24,10 @@ jobs:
           import os, re
           from pathlib import Path
           lines = (Path(os.environ['RUNNER_TEMP']) / 'android-build.log').read_text(errors='replace').splitlines()
-          selected = set()
-          for i, line in enumerate(lines):
-              if re.search(r'failure|failed|error|what went wrong|could not|caused by|exception|unresolved', line, re.I):
-                  selected.update(range(max(0, i - 2), min(len(lines), i + 7)))
-          text = '\n'.join(lines[i] for i in sorted(selected))[-22000:]
-          text = text.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
-          print(f'::notice title=Android build diagnostic::{text}')
+          lines = [line for line in lines if 'Assemble bundled test APK' in line]
+          text = '\n'.join(lines[-100:])[-21000:]
+          chunks = [text[i:i + 2500] for i in range(0, len(text), 2500)]
+          for index, chunk in enumerate(chunks):
+              chunk = chunk.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+              print(f'::notice title=Android build diagnostic {index:02d}::{chunk}')
           PY
