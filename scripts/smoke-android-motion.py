@@ -82,13 +82,14 @@ def check_unit_layouts():
                 print(f"{unit}: padding={padding:.1f}dp, gap={gap:.1f}dp, image fills card", flush=True)
                 smoke.screenshot(f"layout-{unit}")
                 break
-            if attempt == 9:
-                raise AssertionError(f"{unit}: scene, description and first lesson could not be measured")
-            # If the scene is already above the viewport, scroll up first;
-            # otherwise scroll down until the first lesson appears.
-            start, end = (0.50, 0.66) if not scene_checked else (0.70, 0.56)
-            smoke.adb("shell", "input", "swipe", str(width // 2), str(int(height * start)), str(width // 2), str(int(height * end)), "400")
-            time.sleep(0.4)
+            if attempt < 9:
+                # If the scene is already above the viewport, scroll up first;
+                # otherwise scroll down until the first lesson appears.
+                start, end = (0.50, 0.66) if not scene_checked else (0.70, 0.56)
+                smoke.adb("shell", "input", "swipe", str(width // 2), str(int(height * start)), str(width // 2), str(int(height * end)), "400")
+                time.sleep(0.4)
+        else:
+            raise AssertionError(f"{unit}: scene, description and first lesson could not be measured")
 
 
 def set_scales(value):

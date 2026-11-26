@@ -117,6 +117,32 @@ with tempfile.TemporaryDirectory(prefix="lingua-motion-unit-") as temporary:
     except AssertionError as error:
         assert "padding=14.0dp" in str(error)
 
+    missing_ui = FakeSmoke(Path(temporary))
+    attempts = []
+    def no_ui_dump():
+        attempts.append(None)
+        return None
+    missing_ui.dump_ui = no_ui_dump
+    motion.smoke = missing_ui
+    try:
+        motion.check_unit_layouts()
+    except AssertionError as error:
+        assert "sw-unit-1: scene, description and first lesson could not be measured" in str(error)
+    else:
+        raise AssertionError("Exhausted UI dump retries must fail")
+    assert len(attempts) == 10
+
+    delayed_ui = FakeSmoke(Path(temporary))
+    real_dump = delayed_ui.dump_ui
+    attempts = []
+    def delayed_ui_dump():
+        attempts.append(None)
+        return None if len(attempts) < 10 else real_dump()
+    delayed_ui.dump_ui = delayed_ui_dump
+    motion.smoke = delayed_ui
+    motion.check_unit_layouts()
+    assert len(attempts) == 14  # The tenth attempt succeeds, followed by four other units.
+
     failed = FakeSmoke(Path(temporary))
     def fail_startup(*args, **kwargs):
         raise RuntimeError("Synthetic launch failure")
