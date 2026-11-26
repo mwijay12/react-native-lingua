@@ -83,6 +83,7 @@ export default function PlayScreen() {
       sounds.correct();
     } else {
       setFeedback("incorrect");
+      sounds.wrong();
     }
   };
   const advance = () => {
@@ -173,7 +174,7 @@ export default function PlayScreen() {
             <Text className="caption mb-2">{roundCourse} · {question.lessonTitle}</Text>
             <Text className="font-poppins-semibold text-xl text-text-primary mb-2" testID="mix-question">{question.activity.question}</Text>
             <Text className="body-sm text-text-secondary mb-5">Choose one answer. Take your time.</Text>
-            <QuestionInput activity={question.activity} answer={answer} disabled={feedback !== null} onChange={setAnswer} onSubmit={check} />
+            <QuestionInput activity={question.activity} answer={answer} disabled={feedback !== null} onChange={setAnswer} onSelectOption={sounds.option} onSubmit={check} />
             {feedback && (
               <FeedbackPanel kind={feedback} testID="mix-feedback">
                 <Text className="font-poppins-semibold text-sm text-text-primary">{feedback === "correct" ? "Lovely work! You found it." : "Good try! Here is the answer."}</Text>

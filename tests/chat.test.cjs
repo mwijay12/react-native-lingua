@@ -497,6 +497,7 @@ test("production analytics disables touch capture on chat and keeps session repl
 
     const harness = hookHarness();
     let pathname = "/chat";
+    let audioStarts = 0, audioStops = 0;
     const jsx = { jsx: (type, props) => ({ type, props }), jsxs: (type, props) => ({ type, props }) };
     const Stack = { Screen: "StackScreen" };
     const { default: RootLayout } = load("../app/_layout.tsx", {
@@ -507,6 +508,7 @@ test("production analytics disables touch capture on chat and keeps session repl
       "@/components/LearningHydrationScreen": { LearningHydrationScreen: "LearningHydrationScreen" },
       "@/components/PendingSaveBanner": { PendingSaveBanner: "PendingSaveBanner" },
       "@/lib/posthog": { posthog: { screen: () => {}, identify: () => {} } },
+      "@/lib/soundEffects": { startAudioFeedback: () => { audioStarts += 1; return () => { audioStops += 1; }; } },
       "@/store/languageStore": { useLanguageHydrationStatus: (select) => select({ status: "ready" }), useLanguageStore: () => ({}) },
       "@clerk/expo": { ClerkProvider: "ClerkProvider" }, "@clerk/expo/token-cache": { tokenCache: {} },
       "expo-font": { useFonts: () => [true, null] },
@@ -521,7 +523,9 @@ test("production analytics disables touch capture on chat and keeps session repl
     assert.equal(harness.render(RootLayout).props.autocapture.captureTouches, false);
     pathname = "/learn";
     assert.equal(harness.render(RootLayout).props.autocapture.captureTouches, true);
+    assert.equal(audioStarts, 1, "feedback preloads once at the app root");
     harness.cleanup();
+    assert.equal(audioStops, 1);
   } finally {
     if (oldDev === undefined) delete global.__DEV__;
     else global.__DEV__ = oldDev;

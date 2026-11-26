@@ -18,13 +18,17 @@ phone; Expo Go is not an exact preview.
 
 Fifteen generated pronunciation samples (greetings, both travel lessons and
 both days-and-plans lessons in each course) are bundled in the APK. Tap Play
-sample to listen and follow the visible transcript; Stop and leaving the lesson
-stop playback. Other lessons have written pronunciation guides. The recordings
-are generated learning aids, not human-reviewed pronunciation references;
-accents and pronunciations can vary. Short feedback chimes are on by default and can be
-muted via the speaker on lesson, review or Quick Mix screens, or in Profile.
-That switch does not mute pronunciation samples. All these assets work offline;
-no microphone is used or requested. The build checks the APK's final permissions.
+sample or Play slowly to listen and follow the visible transcript; Stop and
+leaving the lesson stop playback. A new sample stops the previous one. Other
+lessons have written pronunciation guides; there is no dynamic text-to-speech
+or installed-voice selection. The recordings are generated learning aids, not
+human-reviewed pronunciation references; accents and pronunciations can vary.
+Short option, correct, wrong and completion effects are preloaded, on by default,
+and can be muted via the speaker on lesson, review or Quick Mix screens, or in
+Profile. That switch does not mute pronunciation samples or device haptics.
+Haptics follow the phone's own settings and may be unavailable on some devices.
+All these assets work offline; no microphone is used or requested. The build
+checks the APK's final permissions.
 
 XP, completed lessons, study sessions, the daily goal and missed questions are
 stored locally after a successful write, not synced to an account. XP is awarded only the first

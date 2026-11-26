@@ -68,7 +68,14 @@ export const pronunciationSamples: Readonly<Partial<Record<string, Pronunciation
   },
 };
 
+// Statically registered so Metro includes every effect in offline native builds.
 export const soundEffects = {
   correct: require("../assets/audio/effects/correct.wav"),
+  wrong: require("../assets/audio/effects/wrong.wav"),
   celebration: require("../assets/audio/effects/celebration.wav"),
+  option: require("../assets/audio/effects/option.wav"),
 } as const;
+
+export type SoundEffect = keyof typeof soundEffects;
+export const PRONUNCIATION_NORMAL_RATE = 0.9;
+export const PRONUNCIATION_SLOW_RATE = 0.65;

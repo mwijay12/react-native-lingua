@@ -44,6 +44,12 @@ def check_scenario(upgrade, old_total):
     assert "25 XP" in before and "25 XP" in after and "40 XP" in after
     assert "3 / 6 collected" in before and "3 / 6 collected" in after
     assert "4 / 6 collected" in after
+    baseline_samples = [kwargs for name, _, kwargs in calls[:installs[1]]
+                        if name == "complete_lesson" and kwargs.get("listen")]
+    current_samples = [kwargs for name, _, kwargs in calls[installs[1]:]
+                       if name == "complete_lesson" and kwargs.get("listen")]
+    assert len(baseline_samples) == 1 and baseline_samples[0].get("slow_sample") is False
+    assert len(current_samples) == 1 and current_samples[0].get("slow_sample", True) is True
 
 
 # Imported smoke helpers make a diagnostics directory; keep it temporary.

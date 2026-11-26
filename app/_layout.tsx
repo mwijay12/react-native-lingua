@@ -4,6 +4,7 @@ import { LaunchGate } from "@/components/LaunchSplash";
 import { LearningHydrationScreen } from "@/components/LearningHydrationScreen";
 import { PendingSaveBanner } from "@/components/PendingSaveBanner";
 import { posthog } from "@/lib/posthog";
+import { startAudioFeedback } from "@/lib/soundEffects";
 import { useLanguageHydrationStatus, useLanguageStore } from "@/store/languageStore";
 import { ClerkProvider, useUser } from "@clerk/expo";
 import { tokenCache } from "@clerk/expo/token-cache";
@@ -40,6 +41,7 @@ function ClerkIdentifier() {
 }
 
 export default function RootLayout() {
+  useEffect(() => startAudioFeedback(), []);
   const languageHydration = useLanguageHydrationStatus((state) => state.status);
   const [fontsLoaded, fontError] = useFonts({
     "Poppins-Regular": require("../assets/fonts/Poppins-Regular.ttf"),

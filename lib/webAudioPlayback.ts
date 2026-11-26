@@ -21,7 +21,7 @@ export function createWebAudioPlayback(media: HTMLMediaElement, onError: () => v
   };
 
   return {
-    play() {
+    play(rate = 1) {
       if (disposed) return;
       const current = ++generation;
       requested = true;
@@ -34,6 +34,8 @@ export function createWebAudioPlayback(media: HTMLMediaElement, onError: () => v
       try {
         media.pause();
         media.currentTime = 0;
+        media.preservesPitch = true;
+        media.playbackRate = rate;
         // Call play synchronously within the user's gesture, not after an
         // awaited seek, so browsers can honor their autoplay policies.
         const started = media.play();

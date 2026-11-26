@@ -76,6 +76,7 @@ export default function ReviewScreen() {
       sounds.correct();
     } else {
       setFeedback("incorrect");
+      sounds.wrong();
     }
   };
   const advance = () => {
@@ -184,7 +185,7 @@ export default function ReviewScreen() {
               <Text className="body-sm text-text-secondary mb-5">
                 {question.activity.type === "multiple-choice" ? "Choose one answer." : "Type your answer below."}
               </Text>
-              <QuestionInput activity={question.activity} answer={answer} disabled={feedback !== null} onChange={setAnswer} onSubmit={checkAnswer} />
+              <QuestionInput activity={question.activity} answer={answer} disabled={feedback !== null} onChange={setAnswer} onSelectOption={sounds.option} onSubmit={checkAnswer} />
               {question.activity.hint && !feedback && <Text className="body-sm text-text-secondary mt-4">Hint: {question.activity.hint}</Text>}
               {feedback && (
                 <FeedbackPanel kind={feedback} testID="review-feedback">

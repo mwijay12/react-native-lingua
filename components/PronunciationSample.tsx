@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 
-import type { PronunciationSample as Sample } from "@/constants/audio";
+import { PRONUNCIATION_NORMAL_RATE, PRONUNCIATION_SLOW_RATE, type PronunciationSample as Sample } from "@/constants/audio";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 
 export function PronunciationSample({ sample }: { sample: Sample }) {
@@ -22,9 +22,13 @@ export function PronunciationSample({ sample }: { sample: Sample }) {
       <Text className="font-poppins-semibold text-xs text-text-primary mt-4">Read along</Text>
       <Text className="body-sm text-text-secondary mt-1" testID="pronunciation-transcript">{sample.lines.join(" · ")}</Text>
       <View className="flex-row flex-wrap gap-2 mt-4">
-        <TouchableOpacity onPress={play} className="basis-[128px] grow shrink min-h-11 rounded-xl bg-lingua-teal flex-row items-center justify-center px-2 py-2" accessibilityRole="button" accessibilityLabel="Play pronunciation sample" accessibilityHint="Plays the selected words and phrases from the beginning." testID="play-pronunciation">
+        <TouchableOpacity onPress={() => play(PRONUNCIATION_NORMAL_RATE)} className="basis-[128px] grow shrink min-h-11 rounded-xl bg-lingua-teal flex-row items-center justify-center px-2 py-2" accessibilityRole="button" accessibilityLabel="Play pronunciation sample" accessibilityHint="Plays the selected words and phrases from the beginning." testID="play-pronunciation">
           <Ionicons name="play" size={16} color="#FFFFFF" />
           <Text className="font-poppins-semibold text-sm text-white ml-2 shrink text-center">Play sample</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => play(PRONUNCIATION_SLOW_RATE)} className="basis-[128px] grow shrink min-h-11 rounded-xl border border-lingua-teal flex-row items-center justify-center px-2 py-2" accessibilityRole="button" accessibilityLabel="Play pronunciation sample slowly" accessibilityHint="Restarts the sample at a slower speed." testID="play-pronunciation-slow">
+          <Ionicons name="play" size={16} color="#14675D" />
+          <Text className="font-poppins-semibold text-sm text-lingua-teal ml-2 shrink text-center">Play slowly</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={stop} className="basis-[128px] grow shrink min-h-11 rounded-xl border border-lingua-teal flex-row items-center justify-center px-2 py-2" accessibilityRole="button" accessibilityLabel="Stop pronunciation sample" testID="stop-pronunciation">
           <Ionicons name="stop" size={16} color="#14675D" />

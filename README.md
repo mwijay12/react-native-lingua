@@ -80,21 +80,28 @@ It adds no app dependency or remote service.
 
 Fifteen short, generated pronunciation samples cover the greeting lesson, both
 travel lessons and both days-and-plans lessons in each language. Tap **Play
-sample** to hear the selected words and phrases in the on-screen transcript;
-tap **Stop** or leave the lesson to stop. The controls wrap on narrow screens or
-when text is enlarged. Other lessons still use written, approximate pronunciation
-guides. The generated recordings have not been human-reviewed and are learning
-aids, not a substitute for feedback from a fluent speaker; pronunciations and
-accents can vary. The installed native app bundles the audio for offline
-playback; the web build must first load its assets from its host.
+sample** or **Play slowly** to hear the selected words and phrases in the
+on-screen transcript; tap **Stop** or leave the lesson to stop. Playback uses
+0.9× or 0.65× speed with pitch correction where supported, and starting a sample
+stops any prior one. The controls wrap on narrow screens or when text is
+enlarged. Other lessons still use written, approximate pronunciation guides.
+The generated recordings have not been human-reviewed and are learning aids,
+not a substitute for feedback from a fluent speaker; pronunciations and accents
+can vary. There is no dynamic text-to-speech or installed-voice selection. The
+installed native app bundles the audio for offline playback; the web build must
+first load its assets from its host.
 
-Short, original feedback chimes play after correct answers and completed lesson,
-review or Quick Mix sessions. They are on by default and can be muted using the
-speaker in those screens or **Profile → Listening preferences**. This setting
-is stored separately from study and play progress; it does not mute the
-explicitly tapped pronunciation samples. Audio playback never records speech or
-starts an AI service. The Android configuration removes microphone permission
-from this playback-only build, and the demo build checks the final APK.
+Short, original effects mark option selections, correct and incorrect answers,
+and completed lesson, review or Quick Mix sessions. The app preloads two players
+per effect so quick sounds can overlap. Effects are on by default and can be
+muted using the speaker in those screens or **Profile → Listening preferences**.
+This setting is stored separately from study and play progress; it does not mute
+explicitly tapped pronunciation samples. On supported phones, subtle answer and
+completion haptics follow the device's haptic settings independently of the sound
+switch. On iOS playback also respects the device's silent switch. Audio playback
+never records speech or starts an AI service. The Android configuration removes
+microphone permission from this playback-only build, and
+the demo build checks the final APK.
 
 The study dashboard has a configurable daily session goal, a rolling seven-day
 activity view and per-course completion. A finished lesson or review set counts
